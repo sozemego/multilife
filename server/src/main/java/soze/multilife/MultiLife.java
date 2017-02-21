@@ -1,40 +1,32 @@
 package soze.multilife;
 
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
-import soze.multilife.server.ConnectionEvent;
 import soze.multilife.server.Server;
+import soze.multilife.simulation.Simulation;
+import soze.multilife.simulation.SimulationSocketHandler;
 
-import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by soze on 2/20/2017.
  */
 public class MultiLife {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws InterruptedException, ExecutionException {
 
 		MultiLife ml = new MultiLife();
 		ml.start();
 
 	}
 
-	private final EventBus bus;
+	private final Simulation simulation;
 
 	private MultiLife() {
-		this.bus = new EventBus("Main");
-		this.bus.register(this);
+		this.simulation = new Simulation();
 	}
 
-	private void start() throws IOException {
-		Server server = new Server(8080, bus);
+	private void start() throws InterruptedException, ExecutionException {
+		Server server = new Server(8080, new SimulationSocketHandler(this.simulation));
 		server.start();
-	}
-
-	@Subscribe
-	public void handleConnectionEvent(ConnectionEvent event) {
-
-
 	}
 
 }

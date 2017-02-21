@@ -5,25 +5,23 @@
     <title>Title</title>
 </head>
 <body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
-<script>
 
-    let socket;
+<script>
 
     function start() {
 
-        socket = io.connect("http://127.0.0.1:8080");
+        let ws = new WebSocket("ws://127.0.0.1:8080/game");
+        ws.onopen = function() {
+            console.log("open!");
+        };
 
-        socket.on("", function(data) {
-            console.log(data);
-        });
-
-        socket.emit("a", {data: "b"});
+        ws.onmessage = function(msg) {
+            console.log(msg);
+        };
 
     }
 
-start();
-
+    start();
 </script>
 
 </body>

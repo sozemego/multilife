@@ -1,46 +1,40 @@
 package soze.multilife.server;
 
-import com.google.common.eventbus.EventBus;
+import org.webbitserver.*;
+import org.webbitserver.handler.StaticFileHandler;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+
 
 /**
- * Created by soze on 2/20/2017.
+ * A very basic class which initializes a web server. It exposes client static files
+ * and accepts a WebSocket handler for game communication.
  */
 public class Server {
 
-	private final EventBus bus;
+	private final WebServer webServer;
 
-	public Server(int port, EventBus bus) throws IOException {
-		this.server = new ServerSocket(port);
-		this.bus = bus;
+	/**
+	 * Creates a new Server. It creates a new server at a given port.
+	 * gameSocketHandler cannot be null. It's an object which will handle game connections.
+	 * @param port
+	 * @param gameSocketHandler
+	 */
+	public Server(int port, BaseWebSocketHandler gameSocketHandler) {
+		this.webServer = WebServers.createWebServer(port)
+				.add("/game", Objects.requireNonNull(gameSocketHandler))
+				.add("/", new StaticFileHandler("client"));
+		System.out.println("Server is listening on: " + webServer.getUri());
 	}
 
-	public void start() throws IOException {
-		new Thread(new SocketListener(server, bus)).start();
+	/**
+	 * Starts the server. This call is blocking until the server is ready to accept incoming requests.
+	 * @throws InterruptedException
+	 * @throws ExecutionException
+	 */
+	public void start() throws InterruptedException, ExecutionException {
+		this.webServer.start().get();
 	}
 
-	public static class SocketListener implements Runnable {
-
-		private final EventBus bus;
-
-		SocketListener(ServerSocket server, EventBus bus) {
-			this.server = server;
-			this.bus = bus;
-		}
-
-		public void run() { //TODO https://github.com/webbit/webbit
-			System.out.println("Now listening for connections!");
-			while(true) {
-				try {
-					Socket socket = server.accept();
-					bus.post(new ConnectionEvent(socket));
-				} catch (IOException e) {
-					e.printStackTrace(); // DONT KNOW WHAT TO DO YET!
-				}
-			}
-		}
-	}
 }
