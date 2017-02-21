@@ -13,6 +13,7 @@
         let ws = new WebSocket("ws://127.0.0.1:8080/game");
         ws.onopen = function() {
             console.log("open!");
+            ws.send(JSON.stringify(getLoginObject()));
         };
 
         ws.onmessage = function(msg) {
@@ -20,6 +21,11 @@
         };
 
     }
+
+		function getLoginObject() {
+			let name = "Player";
+			return {type: "LOGIN", name: name};
+		}
 
     start();
 </script>

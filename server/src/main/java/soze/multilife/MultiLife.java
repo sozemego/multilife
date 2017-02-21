@@ -1,8 +1,8 @@
 package soze.multilife;
 
 import soze.multilife.server.Server;
-import soze.multilife.simulation.Simulation;
-import soze.multilife.simulation.SimulationSocketHandler;
+import soze.multilife.server.GameSocketHandler;
+import soze.multilife.server.Lobby;
 
 import java.util.concurrent.ExecutionException;
 
@@ -18,14 +18,15 @@ public class MultiLife {
 
 	}
 
-	private final Simulation simulation;
+	private final Lobby lobby;
 
 	private MultiLife() {
-		this.simulation = new Simulation();
+		this.lobby = new Lobby();
+		new Thread(lobby).start();
 	}
 
 	private void start() throws InterruptedException, ExecutionException {
-		Server server = new Server(8080, new SimulationSocketHandler(this.simulation));
+		Server server = new Server(8080, new GameSocketHandler(this.lobby));
 		server.start();
 	}
 
