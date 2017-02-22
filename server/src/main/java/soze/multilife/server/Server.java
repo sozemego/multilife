@@ -24,7 +24,7 @@ public class Server {
 	public Server(int port, BaseWebSocketHandler gameSocketHandler) {
 		this.webServer = WebServers.createWebServer(port)
 				.add("/game", Objects.requireNonNull(gameSocketHandler))
-				.add("/", new StaticFileHandler("client"));
+				.add(new StaticFileHandler("client"));
 		System.out.println("Server is listening on: " + webServer.getUri());
 	}
 

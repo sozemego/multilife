@@ -5,6 +5,6 @@ package soze.multilife.simulation.rule;
  */
 public enum RuleType {
 
-	BASIC, HIGHLIFE;
+  BASIC, HIGHLIFE, LIFE_WITHOUT_DEATH, DIAMOEBA;
 
 }

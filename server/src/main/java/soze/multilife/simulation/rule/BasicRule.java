@@ -5,19 +5,19 @@ package soze.multilife.simulation.rule;
  */
 public class BasicRule implements Rule {
 
-	@Override
-	public int apply(int aliveNeighbours, boolean alive) {
-		if(alive) {
-			if(aliveNeighbours < 2 || aliveNeighbours > 3) {
-				return -1;
-			}
-		} else {
-			if(aliveNeighbours == 3) {
-				return 1;
-			}
-		}
-		return 0;
-	}
+  @Override
+  public int apply(int aliveNeighbours, boolean alive) {
+    if(alive) {
+      if(aliveNeighbours < 2 || aliveNeighbours > 3) {
+	return -1;
+      }
+    } else {
+      if(aliveNeighbours == 3) {
+	return 1;
+      }
+    }
+    return 0;
+  }
 
 
 }

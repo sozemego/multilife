@@ -3,32 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="main.css">
 </head>
 <body>
+<div id="login" class="login">
+    <p>Name:</p>
+    <input type="text" id = "name">
+</div>
 
-<script>
-
-    function start() {
-
-        let ws = new WebSocket("ws://127.0.0.1:8080/game");
-        ws.onopen = function() {
-            console.log("open!");
-            ws.send(JSON.stringify(getLoginObject()));
-        };
-
-        ws.onmessage = function(msg) {
-            console.log(msg);
-        };
-
-    }
-
-		function getLoginObject() {
-			let name = "Player";
-			return {type: "LOGIN", name: name};
-		}
-
-    start();
-</script>
-
+<canvas id = "canvas" width = "1000" height = "900"></canvas>
+<script type="text/javascript" src="game.js"></script>
 </body>
 </html>

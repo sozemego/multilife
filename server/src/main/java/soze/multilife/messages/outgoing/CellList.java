@@ -7,11 +7,11 @@ import java.util.List;
  */
 public class CellList extends OutgoingMessage {
 
-	public final List<CellData> cells;
+  public final List<CellData> cells;
 
-	public CellList(List<CellData> cells) {
-		this.cells = cells;
-		this.setType(Type.CELL_LIST);
-	}
+  public CellList(List<CellData> cells) {
+    this.setType(OutgoingType.CELL_LIST);
+    this.cells = cells;
+  }
 
 }

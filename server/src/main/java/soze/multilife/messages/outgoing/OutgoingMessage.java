@@ -2,13 +2,13 @@ package soze.multilife.messages.outgoing;
 
 public abstract class OutgoingMessage {
 
-	private Type type;
+	private OutgoingType type;
 
-	public void setType(Type type) {
+	public void setType(OutgoingType type) {
 		this.type = type;
 	}
 
-	public Type getType() {
+	public OutgoingType getType() {
 		return this.type;
 	}
 
