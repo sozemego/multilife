@@ -1,31 +1,27 @@
 package soze.multilife.simulation.rule;
 
+import java.util.Objects;
+
 /**
- * Created by soze on 2/21/2017.
+ * An object containing static methods to retrieve game of life rules.
  */
 public class RuleFactory {
 
-  private static final Rule basicRule = new BasicRule();
-  private static final Rule highlifeRule = new HighlifeRule();
-  private static final Rule lifeWithoutDeathRule = new LifeWithoutDeathRule();
-  private static final Rule diamoebaRule = new DiamoebaRule();
-
+	/**
+	 * Returns a Rule object for a given RuleType.
+	 * @param type
+	 * @return
+	 */
   public static Rule getRule(RuleType type) {
-    if(type == RuleType.BASIC) {
-      return basicRule;
-    }
-    if(type == RuleType.HIGHLIFE) {
-      return highlifeRule;
-    }
-    if(type == RuleType.LIFE_WITHOUT_DEATH) {
-      return lifeWithoutDeathRule;
-    }
-    if(type == RuleType.DIAMOEBA) {
-      return diamoebaRule;
-    }
-    return basicRule;
+  	return Objects.requireNonNull(type).getRule();
   }
 
+	/**
+	 * Finds an appropriate RuleType and returns a Rule
+	 * associated with it.
+	 * @param rule
+	 * @return
+	 */
   public static Rule getRule(String rule) {
     return getRule(RuleType.valueOf(rule.toUpperCase()));
   }

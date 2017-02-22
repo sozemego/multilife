@@ -38,7 +38,7 @@ public class Instance {
 
   public void addPlayer(Player player) {
     players.put(player.getId(), player);
-    this.simulation.addFreshPlayer(player);
+    this.simulation.addPlayer(player);
   }
 
   public void removePlayer(long id) {
@@ -62,8 +62,8 @@ public class Instance {
   }
 
   private void handleMessage(ClickMessage message, long id) {
-    int index = message.getIndex();
-    simulation.click(index, id);
+    int[] indices = message.getIndices();
+    simulation.click(indices, id);
   }
 
   public long getId() {
