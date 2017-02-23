@@ -101,8 +101,13 @@ function onMapData(data) {
     cells = [];
     width = data.width;
     height = data.height;
+    for(let i = 0; i < width; i++) {
+        for(let j = 0; j < height; j++) {
+            cells.push({});
+        }
+    }
     playerColors = data.playerColors;
-		play();
+    play();
 }
 
 function calculateCellSize() {
@@ -115,11 +120,13 @@ function calculateCellSize() {
 }
 
 function onMapUpdate(data) {
-    cells = [];
+    console.log(data.cells.length);
     let newCells = data.cells;
     for(let i = 0; i < newCells.length; i++) {
-        let cell = newCells[i];
-        cells.push(cell);
+        let newCell = newCells[i];
+        let cell = cells[getIndex(newCell.x * cellSize, newCell.y * cellSize)];
+        cell.alive = newCell.alive;
+        cell.ownerId = newCell.ownerId;
     }
 }
 

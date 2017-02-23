@@ -5,55 +5,59 @@ package soze.multilife.simulation;
  */
 public class Cell {
 
-	private final int x;
-	private final int y;
-	private boolean alive = false;
-	private long ownerId = 0L;
+  private final int x;
+  private final int y;
+  private boolean alive = false;
+  private long ownerId = 0L;
 
-	public Cell(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
+  public Cell(int x, int y) {
+	this.x = x;
+	this.y = y;
+  }
 
-	public int getX() {
-		return x;
-	}
+  public void setAlive(boolean alive) {
+	this.alive = alive;
+  }
 
-	public int getY() {
-		return y;
-	}
+  public int getX() {
+	return x;
+  }
 
-	public boolean isAlive() {
-		return alive;
-	}
+  public int getY() {
+	return y;
+  }
 
-	public void setIsAlive(boolean alive) {
-		this.alive = alive;
-	}
+  public boolean isAlive() {
+	return alive;
+  }
 
-	public long getOwnerId() {
-		return ownerId;
-	}
+  public void setIsAlive(boolean alive) {
+	this.alive = alive;
+  }
 
-	public void setOwnerId(long ownerId) {
-		this.ownerId = ownerId;
-	}
+  public long getOwnerId() {
+	return ownerId;
+  }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+  public void setOwnerId(long ownerId) {
+	this.ownerId = ownerId;
+  }
 
-		Cell cell = (Cell) o;
+  @Override
+  public boolean equals(Object o) {
+	if (this == o) return true;
+	if (o == null || getClass() != o.getClass()) return false;
 
-		if (x != cell.x) return false;
-		return y == cell.y;
-	}
+	Cell cell = (Cell) o;
 
-	@Override
-	public int hashCode() {
-		int result = x;
-		result = 31 * result + y;
-		return result;
-	}
+	if (x != cell.x) return false;
+	return y == cell.y;
+  }
+
+  @Override
+  public int hashCode() {
+	int result = x;
+	result = 31 * result + y;
+	return result;
+  }
 }

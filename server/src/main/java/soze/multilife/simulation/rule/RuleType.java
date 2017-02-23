@@ -17,7 +17,13 @@ public enum RuleType {
 	LIFE_WITHOUT_DEATH("B3/S0123456789"),
 	DIAMOEBA("B35678/S5678"),
 	MORLEY("B368/S245"),
-	LIFE_34("B34/S34");
+	LIFE_34("B34/S34"),
+  	CORAL("B3/S45678 "),
+  	SEEDS("B2/S"),
+  	ANNEAL("B4678/S3567"),
+  	FOUR("B36/S125"),
+  	NO_NAME("B25/S4"),
+  	REPLICATOR("B1357/S1357");
 
 	private final Rule rule;
 
