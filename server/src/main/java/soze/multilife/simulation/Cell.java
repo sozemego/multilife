@@ -60,4 +60,5 @@ public class Cell {
 	result = 31 * result + y;
 	return result;
   }
+
 }

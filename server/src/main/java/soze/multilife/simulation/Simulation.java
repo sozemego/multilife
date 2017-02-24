@@ -9,7 +9,7 @@ import soze.multilife.simulation.rule.Rule;
 import soze.multilife.simulation.rule.RuleFactory;
 import soze.multilife.simulation.rule.RuleType;
 
-import java.awt.*;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,19 +37,12 @@ public class Simulation {
   private final int width;
   private final int height;
 
-  /** Arrays of current cells and next iteration cells. */
-  //private final Cell[] cells;
-  //private final Cell[] newCells;
-
-	private final Grid currentGrid = new Grid();
-
-  private final Map<Point, Cell> currentCells = new HashMap<>();
-  private final Map<Point, Cell> nextCells = new HashMap<>();
-  private final Set<Cell> currentActiveCells = new HashSet<>();
-  private final Set<Cell> nextActiveCells = new HashSet<>();
+  /** Objects managing the cells. It manages all cells as well as the active cells and the cells
+   * that will be active in the next generation. */
+  private final Grid grid;
 
   /** Percent of alive cells spawned on simulation start. */
-  private final float initialDensity = 0.5f;
+  private final float initialDensity = 0.05f;
 
   /** Maps playerId to game of life rule they use. */
   private final Map<Long, Rule> rules = new HashMap<>();
@@ -59,27 +52,20 @@ public class Simulation {
   public Simulation(int width, int height) {
 	this.width = width;
 	this.height = height;
-	rules.put(simulationOwnerId, RuleFactory.getRule(RuleType.BASIC));
+	this.grid = new Grid(width, height);
+	grid.addRule(simulationOwnerId, RuleFactory.getRule(RuleType.LIFE_WITHOUT_DEATH));
   }
 
   /**
    * Spawns cells for the entire game grid.
    */
   public void init() {
-	for(int i = 0; i < height; i++) {
-	  for(int j = 0; j < width; j++) {
-		if(Math.random() < initialDensity) {
-		  currentGrid.addCell(j, i);
+	SecureRandom random = new SecureRandom();
+    for(int i = 0; i < width; i++) {
+      for(int j = 0; j < height; j++) {
+        if(random.nextFloat() < initialDensity) {
+          grid.changeState(i, j, true, simulationOwnerId);
 		}
-	  }
-	}
-
-	for(int i = 0; i < allCells.length; i++) {
-	  if(Math.random() < initialDensity) {
-		Cell cell = allCells[i];
-		cell.setIsAlive(true);
-		currentActiveCells.add(cell);
-		currentActiveCells.addAll(getAllNeighbours(cell));
 	  }
 	}
   }
@@ -105,23 +91,23 @@ public class Simulation {
 	}
   }
 
-  /**
-   * Called when a player clicks on a grid. A player sends an array of indices
-   * of cells they supposedly marked. This method goes through all of these cells
-   * and if possible (dead cell) marks it as alive and sets its owner as the player who clicked.
-   * @param indices
-   * @param id
-   */
-  public void click(int[] indices, long id) {
-	for(int i = 0; i < indices.length; i++) {
-	  int index = indices[i];
-	  Cell cell = getCellAt(index);
-	  if(!cell.isAlive()) {
-		cell.setIsAlive(true);
-		cell.setOwnerId(id);
-	  }
-	}
-  }
+//  /**
+//   * Called when a player clicks on a grid. A player sends an array of indices
+//   * of cells they supposedly marked. This method goes through all of these cells
+//   * and if possible (dead cell) marks it as alive and sets its owner as the player who clicked.
+//   * @param indices
+//   * @param id
+//   */
+//  public void click(int[] indices, long id) {
+//	for(int i = 0; i < indices.length; i++) {
+//	  int index = indices[i];
+//	  Cell cell = getCellAt(index);
+//	  if(!cell.isAlive()) {
+//		cell.setIsAlive(true);
+//		cell.setOwnerId(id);
+//	  }
+//	}
+//  }
 
   /**
    * Updates the simulation. It sends data for newly logged in players,
@@ -134,9 +120,9 @@ public class Simulation {
   public void update() {
 	updateFreshPlayers();
 	if(!players.isEmpty()) {
-	  updateCells();
-	  sendData();
-	  switchCells();
+	  grid.update();
+	  sendActiveCellData();
+	  grid.transferCells();
 	}
   }
 
@@ -163,10 +149,8 @@ public class Simulation {
 			it.remove();
 		  }
 
-		  String mapData = getMapData();
-		  for (Player p : players.values()) {
-			p.send(mapData);
-		  }
+		  sendMapData();
+		  sendAllCellData();
 		}
 	  }
 	}
@@ -192,137 +176,27 @@ public class Simulation {
 	return mapData;
   }
 
-  /**
-   * Returns index in an one-dimensional array based on cell coordinates.
-   * @param x
-   * @param y
-   * @return
-   */
-  private int getIndex(int x, int y) {
-	int index = x + (y * width); // find index
-	int maxSize = allCells.length;
-	if(index < 0) return index + (maxSize); // wrap around if neccesary
-	if(index >= maxSize) return index % (maxSize);
-	return index; // return index if not neccesary to wrap
+  private void sendAllCellData() {
+	CellList list = getAllCellData();
+	sendCellList(list);
   }
 
-  /**
-   * Returns a cell at given coordinates.
-   * @param x
-   * @param y
-   * @return
-   */
-  private Cell getCellAt(int x, int y) {
-	return getCellAt(getIndex(x, y));
-  }
-
-  private Cell getCellAt(int index) {
-	return (index < 0 || index >= allCells.length) ? nullCell : allCells[index];
-  }
-
-  /**
-   * Iterates all cells and based on their and their neighbours state
-   * updates newCells grid.
-   */
-  private void updateCells() {
-	for(Cell cell: currentActiveCells) {
-	  List<Cell> aliveNeighbours = getAliveNeighbours(cell);
-	  long ownerId = cell.getOwnerId();
-	  int state = rules.get(ownerId).apply(aliveNeighbours.size(), cell.isAlive());
-	  if(state != 0) {
-		long strongestOwnerId = getStrongestOwnerId(aliveNeighbours);
-		Cell nextCell = new Cell(cell.getX(), cell.getY());
-		nextCell.setIsAlive(state > 0);
-		nextCell.setOwnerId(strongestOwnerId);
-		nextActiveCells.add(nextCell);
-		nextActiveCells.addAll(cell.getNeighbours());
-	  }
+  private void sendMapData() {
+	String mapData = getMapData();
+	for (Player p : players.values()) {
+	  p.send(mapData);
 	}
-
-
-//		for(int i = 0; i < cells.length; i++) {
-//			Cell cell = cells[i];
-//			List<Cell> aliveNeighbours = getAliveNeighbours(cell.getX(), cell.getY());
-//			long ownerId = cell.getOwnerId();
-//			int state = rules.get(ownerId).apply(aliveNeighbours.size(), cell.isAlive());
-//			if(state != 0) {
-//				long strongestOwnerId = getStrongestOwnerId(aliveNeighbours);
-//				newCells[i].setIsAlive(state > 0);
-//				newCells[i].setOwnerId(strongestOwnerId);
-//			}
-//		}
   }
 
   /**
-   * Returns a list of all alive cells that are adjacent to a cell at location x, y.
-   * @return
+   * Sends next active cells to all players.
    */
-  private List<Cell> getAliveNeighbours(Cell cell) {
-	return getAllNeighbours(cell).stream()
-	  .filter(Cell::isAlive)
-	  .collect(Collectors.toList());
+  private void sendActiveCellData() {
+	CellList list = getActiveCellData();
+	sendCellList(list);
   }
 
-  private List<Cell> getAllNeighbours(Cell cell) {
-	return getAllNeighbours(cell.getX(), cell.getY());
-  }
-
-  /**
-   * Finds all neighbours of a cell at x, y position.
-   * @param x
-   * @param y
-   * @return
-   */
-  private List<Cell> getAllNeighbours(int x, int y) {
-	List<Cell> neighbours = new ArrayList<>();
-	for(int i = -1; i < 2; i++) {
-	  for(int j = -1; j < 2; j++) {
-		if(i == 0 && j == 0) continue;
-		neighbours.add(getCellAt(x + i, y + j));
-	  }
-	}
-	return neighbours;
-  }
-
-  private Cell copyCell(Cell cell) {
-	Cell newCell = new Cell(cell.getX(), cell.getY());
-	newCell.setIsAlive(cell.isAlive());
-	newCell.setOwnerId(cell.getOwnerId());
-	return;
-  }
-
-  /**
-   * Finds the most frequently (mode) occuring ownerId among given cells.
-   * @param cells
-   * @return
-   */
-  private long getStrongestOwnerId(List<Cell> cells) {
-	List<Long> ownerIds = cells.stream().map(Cell::getOwnerId).collect(Collectors.toList());
-	return mode(ownerIds);
-  }
-
-  private long mode(List<Long> list) {
-	long maxValue = simulationOwnerId, maxCount = 0;
-
-	for (int i = 0; i < list.size(); ++i) {
-	  int count = 0;
-	  for (int j = 0; j < list.size(); ++j) {
-		if (list.get(j).equals(list.get(i))) ++count;
-	  }
-	  if (count > maxCount) {
-		maxCount = count;
-		maxValue = list.get(i);
-	  }
-	}
-
-	return maxValue;
-  }
-
-  /**
-   * Sends current cell data to all players.
-   */
-  private void sendData() {
-	CellList list = getCellData();
+  private void sendCellList(CellList list) {
 	ObjectMapper mapper = new ObjectMapper();
 	try {
 	  String serializedList = mapper.writeValueAsString(list);
@@ -336,28 +210,20 @@ public class Simulation {
 	}
   }
 
-  private CellList getCellData() {
+  private CellList getAllCellData() {
 	List<CellData> cellData = new ArrayList<>();
-	for(Cell cell: nextActiveCells) {
+	for(Cell cell: grid.getAllCells().stream().filter(Cell::isAlive).collect(Collectors.toList())) {
 	  cellData.add(new CellData(cell));
 	}
 	return new CellList(cellData);
   }
 
-  /**
-   * Switches current and new grid.
-   */
-  private void switchCells() {
-	currentActiveCells.clear();
-	currentActiveCells.addAll(nextActiveCells);
-	nextActiveCells.clear();
-
-//		for(int i = 0; i < cells.length; i++) {
-//			Cell cell1 = cells[i];
-//			Cell cell2 = newCells[i];
-//			cell1.setIsAlive(cell2.isAlive());
-//			cell1.setOwnerId(cell2.getOwnerId());
-//		}
+  private CellList getActiveCellData() {
+	List<CellData> cellData = new ArrayList<>();
+	for(Cell cell: grid.getActiveCells()) {
+	  cellData.add(new CellData(cell));
+	}
+	return new CellList(cellData);
   }
 
   public int getWidth() {

@@ -10,7 +10,7 @@ let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 let width = 0;
 let height = 0;
-let cellSize = 5;
+let cellSize = 10;
 let ws;
 let clicked = false;
 let myId = 0;
@@ -99,11 +99,15 @@ function handleMessage(msg) {
 
 function onMapData(data) {
     cells = [];
+    let oldCells = cells.splice();
+    cells = [];
     width = data.width;
     height = data.height;
+    canvas.width = width * cellSize;
+    canvas.height = height * cellSize;
     for(let i = 0; i < width; i++) {
         for(let j = 0; j < height; j++) {
-            cells.push({});
+            cells.push({x: i, y: j});
         }
     }
     playerColors = data.playerColors;
@@ -112,21 +116,21 @@ function onMapData(data) {
 
 function calculateCellSize() {
 	if(width > height) {
-			cellSize = canvas.width / width;
+			//cellSize = Math.round(canvas.width / width);
 	}
 	if(height >= width) {
-			cellSize = canvas.height / height;
+			//cellSize = Math.round(canvas.height / height);
 	}
 }
 
 function onMapUpdate(data) {
     console.log(data.cells.length);
     let newCells = data.cells;
+
     for(let i = 0; i < newCells.length; i++) {
         let newCell = newCells[i];
-        let cell = cells[getIndex(newCell.x * cellSize, newCell.y * cellSize)];
-        cell.alive = newCell.alive;
-        cell.ownerId = newCell.ownerId;
+        let index = getIndex(newCell.x * cellSize, newCell.y * cellSize);
+        cells[index] = newCell;
     }
 }
 
@@ -136,8 +140,8 @@ function play() {
 }
 
 function render() {
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
+    //canvas.width  = window.innerWidth;
+    //canvas.height = window.innerHeight;
 		calculateCellSize();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for(let i = 0; i < cells.length; i++) {
@@ -152,7 +156,7 @@ function drawCell(cell, i) {
 		}
     ctx.beginPath();
     ctx.fillStyle = getColor(cell.ownerId);
-    let position = getPosition(i);
+    let position = {x: cell.x, y: cell.y};
     ctx.rect(position.x * cellSize, position.y * cellSize, cellSize, cellSize);
     ctx.fill();
 }
@@ -166,12 +170,14 @@ function getPosition(i) {
 }
 
 function onMouseMove(x, y) {
+
     if(clicked === false) {
         return;
     }
     if(ws) {
         let canvasPosition = getCanvasPosition(x, y);
-
+        let index = getIndex(canvasPosition.x, canvasPosition.y);
+        console.log(x, y, index);
         if(canvasPosition.x < 0 || canvasPosition.x > canvas.width) {
             return;
         }
@@ -207,5 +213,9 @@ function getCanvasPosition(x, y) {
 function getIndex(x, y) {
     x = x / cellSize;
     y = y / cellSize;
-    return Math.floor(x) + (Math.floor(y) * width);
+    let index = Math.floor(x) + (Math.floor(y) * width);
+    let maxSize = width * height;
+    if(index < 0) return index + (maxSize); // wrap around if neccesary
+    if(index >= maxSize) return index % (maxSize);
+    return index; // return index if not neccesary to wrap
 }
