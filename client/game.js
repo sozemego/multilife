@@ -1,77 +1,49 @@
-/**
- * Created by KJurek on 16.02.2017.
- */
-
-/**
- Define global variables for this game.
- */
 let cells = [];
-let canvas = document.getElementById("canvas");
-let ctx = canvas.getContext("2d");
 let width = 0;
 let height = 0;
 let cellSize = 10;
 let ws;
-let clicked = false;
 let myId = 0;
 let playerColors;
-let intervalId;
 
-function getLoginObject(name) {
-    return {type: "LOGIN", name: name, rule: "BASIC"};
+let canvas;
+
+let input;
+let button;
+let clicked = false;
+
+function setup() {
+	canvas = createCanvas(600, 600);
+
+	input = createInput();
+	input.position(300, 300);
+
+	button = createButton("enter");
+	button.position(300, 350);
+	button.mousePressed(login);
+
+	canvas.mousePressed(click);
+	canvas.mouseReleased(release);
+	canvas.mouseMoved(onMouseMove);
+
 }
 
-document.addEventListener("mousedown", function(event) {
-    clicked = true;
-});
-
-document.addEventListener("mouseup", function(event) {
-    clicked = false;
-});
-
-document.addEventListener("mousemove", function(event) {
-    onMouseMove(event.pageX, event.pageY);
-});
-
-document.getElementById("login-button").addEventListener("click", function(event) {
-	let inputField = document.getElementById("name");
-	let name = inputField.value;
-	login(name);
-});
-
-/**
- Bind event handler for when a player chooses a name
- (so, attempts to login).
- */
-const nameInput = document.getElementById("name");
-nameInput.addEventListener("keydown", function(event) {
-    this.onName(event);
-}.bind(this));
-
-/**
- Fired when user inputs something in the name field.
- On enter press, attempts to login the user.
- */
-function onName(event) {
-    if(event.keyCode === 13) {
-        login(event.target.value);
-    }
-}
-
-/**
-  Called when user sends submit name, instead of pressing return
-  in the input field itself.
-*/
-function onNameSubmit(event) {
-    let inputField = document.getElementById("name");
-    let name = inputField.value;
-    login(name);
+function draw() {
+	background(245);
+	render();
 }
 
 /**
  Attempts to login with a given name
 */
-function login(name) {
+function login() {
+	let name = input.value();
+	if(!name) {
+		return;
+	}
+	input.remove();
+	button.remove();
+
   ws = new WebSocket("ws://127.0.0.1:8080/game");
   ws.onopen = function() {
   	ws.send(JSON.stringify(getLoginObject(name)));
@@ -80,9 +52,81 @@ function login(name) {
   ws.onmessage = function(msg) {
     handleMessage(JSON.parse(msg.data));
   };
-
-	document.getElementById("login").classList.toggle("logged");
 }
+
+function getLoginObject(name) {
+    return {type: "LOGIN", name: name, rule: "BASIC"};
+}
+
+function click() {
+	clicked = true;
+}
+
+function release() {
+	clicked = false;
+}
+
+/**
+	Called when a mouse is moved.
+*/
+function onMouseMove() {
+	if(!clicked) {
+		return;
+	}
+	if(ws) {
+		let indices = [];
+		for(let i = -4; i < 4; i++) {
+			for(let j = -4; j < 4; j++) {
+				let index = getIndex(mouseX + (i * cellSize), mouseY + (j * cellSize));
+				if(!cells[index].alive) {
+					cells[index].alive = true;
+					cells[index].ownerId = myId;
+				}
+				indices.push(index);
+			}
+		}
+		ws.send(JSON.stringify({type:"CLICK", indices: indices}));
+		//render();
+	}
+}
+
+/**
+	Returns a index in the cell array of a point at location x, y.
+	x, y represents a point on a canvas (in pixels).
+*/
+function getIndex(x, y) {
+    x = x / cellSize;
+    y = y / cellSize;
+    let index = Math.floor(x) + (Math.floor(y) * width);
+    let maxSize = width * height;
+    if(index < 0) return index + (maxSize); // wrap around if neccesary
+    if(index >= maxSize) return index % (maxSize);
+    return index; // return index if not neccesary to wrap
+}
+
+/**
+	Returns color of the player with a given id.
+*/
+function getColor(id) {
+    return playerColors[id] || "#000000";
+}
+
+function render() {
+    for(let i = 0; i < cells.length; i++) {
+        let cell = cells[i];
+        drawCell(cell, i);
+    }
+}
+
+function drawCell(cell, i) {
+		if(!cell.alive) {
+			return;
+		}
+		let color = getColor(cell.ownerId);
+		fill(color);
+		rect(cell.x * cellSize, cell.y * cellSize, cellSize, cellSize);
+}
+
 
 function handleMessage(msg) {
     if(msg.type === "PLAYER_IDENTITY") {
@@ -94,37 +138,25 @@ function handleMessage(msg) {
     if(msg.type === "CELL_LIST") {
         onMapUpdate(msg);
     }
-    console.log("Received message of type", msg.type);
+    //console.log("Received message of type", msg.type);
 }
 
 function onMapData(data) {
-    cells = [];
     let oldCells = cells.splice();
-    cells = [];
     width = data.width;
     height = data.height;
-    canvas.width = width * cellSize;
-    canvas.height = height * cellSize;
-    for(let i = 0; i < width; i++) {
-        for(let j = 0; j < height; j++) {
-            cells.push({x: i, y: j});
+		canvas.size(width * cellSize, height * cellSize);
+
+    for(let i = 0; i < height; i++) {
+        for(let j = 0; j < width; j++) {
+            cells.push({x: j, y: i});
         }
     }
     playerColors = data.playerColors;
-    play();
-}
-
-function calculateCellSize() {
-	if(width > height) {
-			//cellSize = Math.round(canvas.width / width);
-	}
-	if(height >= width) {
-			//cellSize = Math.round(canvas.height / height);
-	}
 }
 
 function onMapUpdate(data) {
-    console.log(data.cells.length);
+    //console.log(data.cells.length);
     let newCells = data.cells;
 
     for(let i = 0; i < newCells.length; i++) {
@@ -132,90 +164,4 @@ function onMapUpdate(data) {
         let index = getIndex(newCell.x * cellSize, newCell.y * cellSize);
         cells[index] = newCell;
     }
-}
-
-function play() {
-		clearInterval(intervalId);
-    intervalId = setInterval(render, 16);
-}
-
-function render() {
-    //canvas.width  = window.innerWidth;
-    //canvas.height = window.innerHeight;
-		calculateCellSize();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for(let i = 0; i < cells.length; i++) {
-        let cell = cells[i];
-        drawCell(cell, i);
-    }
-}
-
-function drawCell(cell, i) {
-		if(!cell.alive) {
-			return;
-		}
-    ctx.beginPath();
-    ctx.fillStyle = getColor(cell.ownerId);
-    let position = {x: cell.x, y: cell.y};
-    ctx.rect(position.x * cellSize, position.y * cellSize, cellSize, cellSize);
-    ctx.fill();
-}
-
-function getColor(id) {
-    return playerColors[id] || "#000000";
-}
-
-function getPosition(i) {
-    return {x: i % width, y: Math.floor(i / width)};
-}
-
-function onMouseMove(x, y) {
-
-    if(clicked === false) {
-        return;
-    }
-    if(ws) {
-        let canvasPosition = getCanvasPosition(x, y);
-        let index = getIndex(canvasPosition.x, canvasPosition.y);
-        console.log(x, y, index);
-        if(canvasPosition.x < 0 || canvasPosition.x > canvas.width) {
-            return;
-        }
-        if(canvasPosition.y < 0 || canvasPosition.y > canvas.height) {
-            return;
-        }
-
-				let indices = [];
-				for(let i = -4; i < 4; i++) {
-					for(let j = -4; j < 4; j++) {
-						let index = getIndex(canvasPosition.x + (i * cellSize), canvasPosition.y + (j * cellSize));
-						if(!cells[index].alive) {
-							cells[index].alive = true;
-							cells[index].ownerId = myId;
-						}
-						indices.push(index);
-					}
-				}
-
-        ws.send(JSON.stringify({type:"CLICK", indices: indices}));
-				render();
-    }
-}
-
-function getCanvasPosition(x, y) {
-    let rect = canvas.getBoundingClientRect();
-    return {
-        x: x - rect.left,
-        y: y - rect.top
-    };
-}
-
-function getIndex(x, y) {
-    x = x / cellSize;
-    y = y / cellSize;
-    let index = Math.floor(x) + (Math.floor(y) * width);
-    let maxSize = width * height;
-    if(index < 0) return index + (maxSize); // wrap around if neccesary
-    if(index >= maxSize) return index % (maxSize);
-    return index; // return index if not neccesary to wrap
 }

@@ -5,13 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import soze.multilife.messages.outgoing.CellData;
 import soze.multilife.messages.outgoing.CellList;
 import soze.multilife.messages.outgoing.MapData;
-import soze.multilife.simulation.rule.Rule;
 import soze.multilife.simulation.rule.RuleFactory;
 import soze.multilife.simulation.rule.RuleType;
 
 import java.security.SecureRandom;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -44,16 +42,13 @@ public class Simulation {
   /** Percent of alive cells spawned on simulation start. */
   private final float initialDensity = 0.05f;
 
-  /** Maps playerId to game of life rule they use. */
-  private final Map<Long, Rule> rules = new HashMap<>();
-
   private final long simulationOwnerId = 0L;
 
   public Simulation(int width, int height) {
 	this.width = width;
 	this.height = height;
 	this.grid = new Grid(width, height);
-	grid.addRule(simulationOwnerId, RuleFactory.getRule(RuleType.LIFE_WITHOUT_DEATH));
+	grid.addRule(simulationOwnerId, RuleFactory.getRule(RuleType.BASIC));
   }
 
   /**
@@ -91,23 +86,19 @@ public class Simulation {
 	}
   }
 
-//  /**
-//   * Called when a player clicks on a grid. A player sends an array of indices
-//   * of cells they supposedly marked. This method goes through all of these cells
-//   * and if possible (dead cell) marks it as alive and sets its owner as the player who clicked.
-//   * @param indices
-//   * @param id
-//   */
-//  public void click(int[] indices, long id) {
-//	for(int i = 0; i < indices.length; i++) {
-//	  int index = indices[i];
-//	  Cell cell = getCellAt(index);
-//	  if(!cell.isAlive()) {
-//		cell.setIsAlive(true);
-//		cell.setOwnerId(id);
-//	  }
-//	}
-//  }
+  /**
+   * Called when a player clicks on a grid. A player sends an array of indices
+   * of cells they supposedly marked. This method goes through all of these cells
+   * and if possible (dead cell) marks it as alive and sets its owner as the player who clicked.
+   * @param indices
+   * @param id
+   */
+  public void click(int[] indices, long id) {
+	for(int i = 0; i < indices.length; i++) {
+	  int index = indices[i];
+	  grid.click(index, id);
+	}
+  }
 
   /**
    * Updates the simulation. It sends data for newly logged in players,
@@ -138,7 +129,7 @@ public class Simulation {
 
 		for (Player p : freshPlayers) {
 		  playerColors.put(p.getId(), availableColors[players.size() % availableColors.length]);
-		  rules.put(p.getId(), RuleFactory.getRule(p.getRule()));
+		  grid.addRule(p.getId(), RuleFactory.getRule(p.getRule()));
 		}
 
 		synchronized (players) {

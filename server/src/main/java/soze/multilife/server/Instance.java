@@ -63,7 +63,7 @@ public class Instance {
 
   private void handleMessage(ClickMessage message, long id) {
     int[] indices = message.getIndices();
-    //simulation.click(indices, id);
+    simulation.click(indices, id);
   }
 
   public long getId() {
