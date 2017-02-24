@@ -6,7 +6,7 @@ package soze.multilife.server;
  */
 public class InstanceRunner implements Runnable {
 
-	private static final int TIME_INACTIVE_TO_DESTROY_IN_SECONDS = 60;
+	private static final int TIME_INACTIVE_TO_DESTROY_IN_SECONDS = 15;
 	private static final long TICK_TIME_MS = 250;
 
 	private final Instance instance;

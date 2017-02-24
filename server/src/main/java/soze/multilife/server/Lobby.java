@@ -2,11 +2,9 @@ package soze.multilife.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import soze.multilife.messages.incoming.ClickMessage;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingType;
 import soze.multilife.messages.incoming.LoginMessage;
-import soze.multilife.messages.outgoing.OutgoingType;
 import soze.multilife.messages.outgoing.PlayerIdentity;
 import soze.multilife.simulation.Player;
 
@@ -36,14 +34,14 @@ public class Lobby implements Runnable {
 
       /* Remove dead instances every ten minutes. */
       synchronized (instances) {
-	boolean removed = instances.values().removeIf(Instance::isScheduledForRemoval);
-	System.out.println("Lobby's sweepin', removed instances: " + removed);
+        boolean removed = instances.values().removeIf(Instance::isScheduledForRemoval);
+        System.out.println("Lobby's sweepin', removed instances: " + removed);
       }
 
       try {
-	Thread.sleep(1000 * 60 * 10);
+        Thread.sleep(1000 * 15);
       } catch (InterruptedException e) {
-	e.printStackTrace();
+        e.printStackTrace();
       }
     }
   }
