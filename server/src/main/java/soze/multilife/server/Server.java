@@ -1,9 +1,9 @@
 package soze.multilife.server;
 
-import org.webbitserver.*;
+import org.webbitserver.WebServer;
+import org.webbitserver.WebServers;
 import org.webbitserver.handler.StaticFileHandler;
 
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 
@@ -13,28 +13,29 @@ import java.util.concurrent.ExecutionException;
  */
 public class Server {
 
-	private final WebServer webServer;
+  private final WebServer webServer;
 
-	/**
-	 * Creates a new Server. It creates a new server at a given port.
-	 * gameSocketHandler cannot be null. It's an object which will handle game connections.
-	 * @param port
-	 * @param gameSocketHandler
-	 */
-	public Server(int port, BaseWebSocketHandler gameSocketHandler) {
-		this.webServer = WebServers.createWebServer(port)
-				.add("/game", Objects.requireNonNull(gameSocketHandler))
-				.add(new StaticFileHandler("client"));
-		System.out.println("Server is listening on: " + webServer.getUri());
-	}
+  /**
+   * Creates a new Server at a given port. Also creates a Lobby object (runnable)
+   * and starts it.
+   * @param port
+   */
+  public Server(int port) {
+	Lobby lobby = new Lobby();
+	new Thread(lobby).start();
+	this.webServer = WebServers.createWebServer(port)
+	  .add("/game", new GameSocketHandler(lobby))
+	  .add(new StaticFileHandler("client"));
+  }
 
-	/**
-	 * Starts the server. This call is blocking until the server is ready to accept incoming requests.
-	 * @throws InterruptedException
-	 * @throws ExecutionException
-	 */
-	public void start() throws InterruptedException, ExecutionException {
-		this.webServer.start().get();
-	}
+  /**
+   * Starts the server. This call is blocking until the server is ready to accept incoming requests.
+   * @throws InterruptedException
+   * @throws ExecutionException
+   */
+  public void start() throws InterruptedException, ExecutionException {
+	webServer.start().get();
+	System.out.println("Server is listening on: " + webServer.getUri());
+  }
 
 }
