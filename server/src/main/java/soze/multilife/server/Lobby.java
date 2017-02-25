@@ -9,7 +9,9 @@ import soze.multilife.messages.outgoing.PlayerIdentity;
 import soze.multilife.simulation.Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A lobby. Connected, but not logged in users are stored here,
@@ -32,10 +34,15 @@ public class Lobby implements Runnable {
   public void run() {
     while(true) {
 
-      /* Remove dead instances every ten minutes. */
       synchronized (instances) {
-        boolean removed = instances.values().removeIf(Instance::isScheduledForRemoval);
-        System.out.println("Lobby's sweepin', removed instances: " + removed);
+        List<Instance> instancesScheduledForRemoval =
+		  instances
+		  .values()
+		  .stream()
+		  .filter(Instance::isScheduledForRemoval)
+		  .collect(Collectors.toList());
+        instances.values().removeAll(instancesScheduledForRemoval);
+        System.out.println("Lobby's sweepin', removed instances: " + instancesScheduledForRemoval.size());
       }
 
       try {
