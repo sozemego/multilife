@@ -1,6 +1,6 @@
 package soze.multilife.simulation;
 
-import soze.multilife.server.Connection;
+import soze.multilife.server.connection.Connection;
 
 /**
  * Created by soze on 2/21/2017.

@@ -4,6 +4,7 @@ import org.webbitserver.WebServer;
 import org.webbitserver.WebServers;
 import org.webbitserver.handler.StaticFileHandler;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 
@@ -16,15 +17,12 @@ public class Server {
   private final WebServer webServer;
 
   /**
-   * Creates a new Server at a given port. Also creates a Lobby object (runnable)
-   * and starts it.
+   * Creates a new Server at a given port.
    * @param port
    */
-  public Server(int port) {
-	Lobby lobby = new Lobby();
-	new Thread(lobby).start();
+  public Server(int port, GameSocketHandler gameSocketHandler) {
 	this.webServer = WebServers.createWebServer(port)
-	  .add("/game", new GameSocketHandler(lobby))
+	  .add("/game", Objects.requireNonNull(gameSocketHandler))
 	  .add(new StaticFileHandler("client"));
   }
 
