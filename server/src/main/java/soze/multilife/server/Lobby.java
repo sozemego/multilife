@@ -35,13 +35,14 @@ public class Lobby implements Runnable {
     while(true) {
 
       synchronized (instances) {
-        List<Instance> instancesScheduledForRemoval =
+        List<Long> instancesScheduledForRemoval =
 		  instances
-		  .values()
-		  .stream()
-		  .filter(Instance::isScheduledForRemoval)
-		  .collect(Collectors.toList());
-        instances.values().removeAll(instancesScheduledForRemoval);
+			.values()
+			.stream()
+			.filter(Instance::isScheduledForRemoval)
+			.map(Instance::getId)
+			.collect(Collectors.toList());
+        instancesScheduledForRemoval.forEach(instances::remove);
         System.out.println("Lobby's sweepin', removed instances: " + instancesScheduledForRemoval.size());
       }
 
