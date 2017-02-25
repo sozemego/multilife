@@ -37,7 +37,7 @@ public class GameSocketHandler extends BaseWebSocketHandler {
   }
 
   private Connection getConnection(WebSocketConnection connection) {
-    return new Connection((long) connection.httpRequest().id(), connection);
+    return new Connection(connection);
   }
 
 }

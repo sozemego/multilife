@@ -8,16 +8,14 @@ import org.webbitserver.WebSocketConnection;
  */
 public class Connection {
 
-	private final long id;
 	private final WebSocketConnection connection;
 
-	public Connection(long id, WebSocketConnection connection) {
-		this.id = id;
+	public Connection(WebSocketConnection connection) {
 		this.connection = connection;
 	}
 
 	public long getId() {
-		return id;
+		return (long) connection.httpRequest().id();
 	}
 
 	public void send(String msg) {
