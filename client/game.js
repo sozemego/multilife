@@ -14,6 +14,7 @@ let clicked = false;
 
 function setup() {
 	canvas = createCanvas(600, 600);
+	frameRate(30);
 
 	input = createInput();
 	input.position(300, 300);
@@ -30,6 +31,7 @@ function setup() {
 
 function draw() {
 	background(245);
+	updateCells();
 	render();
 }
 
@@ -78,15 +80,15 @@ function onMouseMove() {
 		for(let i = -4; i < 4; i++) {
 			for(let j = -4; j < 4; j++) {
 				let index = getIndex(mouseX + (i * cellSize), mouseY + (j * cellSize));
-				if(!cells[index].alive) {
-					cells[index].alive = true;
-					cells[index].ownerId = myId;
+				if(!cells[index].isAlive()) {
+					cells[index].setAlive(true);
+					cells[index].setOwnerId(myId);
+					cells[index].setColor(getColor(myId));
 				}
 				indices.push(index);
 			}
 		}
 		ws.send(JSON.stringify({type:"CLICK", indices: indices}));
-		//render();
 	}
 }
 
@@ -111,22 +113,19 @@ function getColor(id) {
     return playerColors[id] || "#000000";
 }
 
+function updateCells() {
+	for(let i = 0; i < cells.length; i++) {
+			let cell = cells[i];
+			cell.update();
+	}
+}
+
 function render() {
     for(let i = 0; i < cells.length; i++) {
         let cell = cells[i];
-        drawCell(cell, i);
+				cell.render();
     }
 }
-
-function drawCell(cell, i) {
-		if(!cell.alive) {
-			return;
-		}
-		let color = getColor(cell.ownerId);
-		fill(color);
-		rect(cell.x * cellSize, cell.y * cellSize, cellSize, cellSize);
-}
-
 
 function handleMessage(msg) {
     if(msg.type === "PLAYER_IDENTITY") {
@@ -142,17 +141,15 @@ function handleMessage(msg) {
 }
 
 function onMapData(data) {
-    let oldCells = cells.splice();
     width = data.width;
     height = data.height;
 		canvas.size(width * cellSize, height * cellSize);
-
+		playerColors = data.playerColors;
     for(let i = 0; i < height; i++) {
         for(let j = 0; j < width; j++) {
-            cells.push({x: j, y: i});
+            cells.push(new Cell(j, i, false, 0, cellSize, getColor(0), Cell.ellipseRenderFunction));
         }
     }
-    playerColors = data.playerColors;
 }
 
 function onMapUpdate(data) {
@@ -162,6 +159,8 @@ function onMapUpdate(data) {
     for(let i = 0; i < newCells.length; i++) {
         let newCell = newCells[i];
         let index = getIndex(newCell.x * cellSize, newCell.y * cellSize);
-        cells[index] = newCell;
+        cells[index].setAlive(newCell.alive);
+				cells[index].setOwnerId(newCell.ownerId);
+				cells[index].setColor(getColor(newCell.ownerId));
     }
 }
