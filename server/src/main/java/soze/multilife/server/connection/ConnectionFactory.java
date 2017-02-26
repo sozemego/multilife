@@ -1,6 +1,8 @@
 package soze.multilife.server.connection;
 
 import org.webbitserver.WebSocketConnection;
+import soze.multilife.events.EventHandler;
+import soze.multilife.server.metrics.MetricsConnection;
 
 /**
  * Class used for wrapping socket objects provided
@@ -8,12 +10,18 @@ import org.webbitserver.WebSocketConnection;
  */
 public class ConnectionFactory {
 
-	public Connection getBaseConnection(WebSocketConnection connection) {
-	  return new BaseConnection(connection);
-	}
+  private final EventHandler eventHandler;
 
-	public Connection getLoggingConnection(WebSocketConnection connection) {
-	  return new LoggingConnection(new BaseConnection(connection));
-	}
+  public ConnectionFactory(EventHandler eventHandler) {
+	this.eventHandler = eventHandler;
+  }
+
+  public Connection getBaseConnection(WebSocketConnection connection) {
+	return new BaseConnection(connection);
+  }
+
+  public Connection getLoggingConnection(WebSocketConnection connection) {
+	return new MetricsConnection(new BaseConnection(connection), eventHandler);
+  }
 
 }

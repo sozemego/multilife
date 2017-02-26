@@ -3,6 +3,7 @@ package soze.multilife.server;
 import org.webbitserver.WebServer;
 import org.webbitserver.WebServers;
 import org.webbitserver.handler.StaticFileHandler;
+import soze.multilife.server.metrics.MetricsHttpHandler;
 
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -20,9 +21,10 @@ public class Server {
    * Creates a new Server at a given port.
    * @param port
    */
-  public Server(int port, GameSocketHandler gameSocketHandler) {
+  public Server(int port, GameSocketHandler gameSocketHandler, MetricsHttpHandler metricsHttpHandler) {
 	this.webServer = WebServers.createWebServer(port)
 	  .add("/game", Objects.requireNonNull(gameSocketHandler))
+	  .add("/metrics", Objects.requireNonNull(metricsHttpHandler))
 	  .add(new StaticFileHandler("client"));
   }
 

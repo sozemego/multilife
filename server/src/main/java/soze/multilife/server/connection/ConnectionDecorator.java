@@ -1,8 +1,10 @@
 package soze.multilife.server.connection;
 
+import soze.multilife.server.metrics.MetricsConnection;
+
 /**
  * Class used for decorating connections.
- * @see LoggingConnection
+ * @see MetricsConnection
  */
 public class ConnectionDecorator implements Connection {
 
@@ -21,4 +23,9 @@ public class ConnectionDecorator implements Connection {
   public void send(String msg) {
 	decorated.send(msg);
   }
+
+  protected Connection getConnection() {
+    return decorated;
+  }
+
 }
