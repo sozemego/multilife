@@ -43,7 +43,11 @@ public class MultiLife {
   }
 
   private void start() throws InterruptedException, ExecutionException {
-	Server server = new Server(8080, new GameSocketHandler(lobby, connectionFactory), metricsHttpHandler);
+    Server server = new Server.ServerBuilder(8080)
+	  .withWebSocketHandler("/game", new GameSocketHandler(lobby, connectionFactory))
+	  .withHttpHandler("/metrics", metricsHttpHandler)
+	  .withStaticFileHandler("client")
+	  .build();
 	server.start();
   }
 
