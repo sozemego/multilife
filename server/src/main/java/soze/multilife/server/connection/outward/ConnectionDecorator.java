@@ -1,11 +1,12 @@
-package soze.multilife.server.connection;
+package soze.multilife.server.connection.outward;
 
-import soze.multilife.server.metrics.MetricsConnection;
+import soze.multilife.messages.outgoing.OutgoingMessage;
+import soze.multilife.server.metrics.InstanceMetricsConnection;
 
 /**
  * Class used for decorating connections.
  *
- * @see MetricsConnection
+ * @see InstanceMetricsConnection
  */
 public class ConnectionDecorator implements Connection {
 
@@ -21,7 +22,7 @@ public class ConnectionDecorator implements Connection {
   }
 
   @Override
-  public void send(String msg) {
+  public void send(OutgoingMessage msg) {
 	decorated.send(msg);
   }
 

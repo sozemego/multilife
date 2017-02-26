@@ -5,6 +5,8 @@ import org.webbitserver.HttpHandler;
 import org.webbitserver.HttpRequest;
 import org.webbitserver.HttpResponse;
 
+import java.util.Map;
+
 /**
  * A http handler for /metrics endpoint.
  */
@@ -28,10 +30,21 @@ public class MetricsHttpHandler implements HttpHandler {
 	long messagesSent = metricsService.getTotalMessagesSent();
 	double averageBytesSent = metricsService.getAverageBytesSent();
 
+	Map<String, Long> typeCountMap = metricsService.getTypeCountMap();
+
+	String typeCountMapString = "";
+
+	synchronized (typeCountMap) {
+	  for(Map.Entry<String, Long> entry: typeCountMap.entrySet()) {
+		typeCountMapString += "Type: " + entry.getKey() + " -> ["+entry.getValue() + "]\n";
+	  }
+	}
+
 	return "Total bytes sent: " + totalBytesSent +
-	  ". Total megabytes sent: " + (totalBytesSent / 1e6) +
-	  ". Average bytes per message: " + averageBytesSent +
-	  ". Total messages sent: " + messagesSent;
+	  ".\nTotal megabytes sent: " + (totalBytesSent / 1e6) +
+	  ".\nAverage bytes per message: " + averageBytesSent +
+	  ".\nTotal messages sent: " + messagesSent +
+	  ".\n" + typeCountMapString;
   }
 
 

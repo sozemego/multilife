@@ -1,15 +1,15 @@
-package soze.multilife.server.metrics;
+package soze.multilife.server.metrics.events;
 
 /**
- * Event passed by {@link MetricsConnection} to {@link MetricsService}.
+ * Event based on outgoing serialized data.
  */
-public class MetricEvent {
+public class SerializedMetricEvent {
 
   private final long timeStamp;
   private final long connectionId;
-  private final int bytesSent;
+  private final long bytesSent;
 
-  public MetricEvent(long timeStamp, long connectionId, int bytesSent) {
+  public SerializedMetricEvent(long timeStamp, long connectionId, long bytesSent) {
 	this.timeStamp = timeStamp;
 	this.connectionId = connectionId;
 	this.bytesSent = bytesSent;
@@ -23,7 +23,8 @@ public class MetricEvent {
 	return connectionId;
   }
 
-  public int getBytesSent() {
+  public long getBytesSent() {
 	return bytesSent;
   }
+
 }

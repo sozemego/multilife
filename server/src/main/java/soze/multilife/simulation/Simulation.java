@@ -1,7 +1,5 @@
 package soze.multilife.simulation;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import soze.multilife.messages.outgoing.CellData;
 import soze.multilife.messages.outgoing.CellList;
 import soze.multilife.messages.outgoing.MapData;
@@ -167,24 +165,12 @@ public class Simulation {
   }
 
   /**
-   * Assembles and stringifies MapData.
+   * Assembles and returns MapData.
    *
    * @return
    */
-  private String getMapData() {
-	ObjectMapper mapper = new ObjectMapper();
-	MapData dataObject = getMapDataObject();
-	try {
-	  return mapper.writeValueAsString(dataObject);
-	} catch (JsonProcessingException e) {
-	  e.printStackTrace();
-	  return "";
-	}
-  }
-
-  private MapData getMapDataObject() {
-	MapData mapData = new MapData(width, height, playerColors);
-	return mapData;
+  private MapData getMapData() {
+	return new MapData(width, height, playerColors);
   }
 
   private void sendAllCellData() {
@@ -193,7 +179,7 @@ public class Simulation {
   }
 
   private void sendMapData() {
-	String mapData = getMapData();
+	MapData mapData = getMapData();
 	for (Player p : players.values()) {
 	  p.send(mapData);
 	}
@@ -208,16 +194,10 @@ public class Simulation {
   }
 
   private void sendCellList(CellList list) {
-	ObjectMapper mapper = new ObjectMapper();
-	try {
-	  String serializedList = mapper.writeValueAsString(list);
-	  synchronized (players) {
-		for (Player p : players.values()) {
-		  p.send(serializedList);
-		}
+	synchronized (players) {
+	  for (Player p : players.values()) {
+		p.send(list);
 	  }
-	} catch (JsonProcessingException e) {
-	  e.printStackTrace();
 	}
   }
 

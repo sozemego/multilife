@@ -1,12 +1,10 @@
 package soze.multilife.server;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingType;
 import soze.multilife.messages.incoming.LoginMessage;
 import soze.multilife.messages.outgoing.PlayerIdentity;
-import soze.multilife.server.connection.Connection;
+import soze.multilife.server.connection.outward.Connection;
 import soze.multilife.simulation.Player;
 
 import java.util.HashMap;
@@ -66,19 +64,13 @@ public class Lobby implements Runnable {
   }
 
   /**
-   * Creates and stringifies a PersonIdentity object.
+   * Creates a PersonIdentity object.
    *
-   * @param id
+   * @param id unique id of the player
    * @return
    */
-  private String getPlayerIdentity(long id) {
-	PlayerIdentity playerIdentity = new PlayerIdentity(id);
-	ObjectMapper mapper = new ObjectMapper();
-	try {
-	  return mapper.writeValueAsString(playerIdentity);
-	} catch (JsonProcessingException e) {
-	  return "";
-	}
+  private PlayerIdentity getPlayerIdentity(long id) {
+	return new PlayerIdentity(id);
   }
 
   /**

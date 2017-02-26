@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.webbitserver.BaseWebSocketHandler;
 import org.webbitserver.WebSocketConnection;
 import soze.multilife.messages.incoming.IncomingMessage;
-import soze.multilife.server.connection.Connection;
+import soze.multilife.server.connection.outward.Connection;
 import soze.multilife.server.connection.ConnectionFactory;
 
 /**
@@ -41,7 +41,7 @@ public class GameSocketHandler extends BaseWebSocketHandler {
   }
 
   private Connection getConnection(WebSocketConnection connection) {
-	return connectionFactory.getMetricsConnection(connection);
+	return connectionFactory.getConnection(connection);
   }
 
 }

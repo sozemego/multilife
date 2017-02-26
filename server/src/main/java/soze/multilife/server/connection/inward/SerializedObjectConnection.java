@@ -1,9 +1,9 @@
-package soze.multilife.server.connection;
+package soze.multilife.server.connection.inward;
 
 /**
- * A bridge for all types of connections.
+ * Created by soze on 2/26/2017.
  */
-public interface Connection {
+public interface SerializedObjectConnection {
 
   /**
    * Returns id of this connection. Ids have to be unique.
@@ -15,8 +15,8 @@ public interface Connection {
   /**
    * Sends a message to the client connected to this connection.
    *
-   * @param msg
+   * @param message
    */
-  public void send(String msg);
+  public void send(String message);
 
 }

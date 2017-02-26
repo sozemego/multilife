@@ -1,6 +1,7 @@
 package soze.multilife.simulation;
 
-import soze.multilife.server.connection.Connection;
+import soze.multilife.messages.outgoing.OutgoingMessage;
+import soze.multilife.server.connection.outward.Connection;
 
 /**
  * Created by soze on 2/21/2017.
@@ -23,7 +24,7 @@ public class Player {
 	return id;
   }
 
-  public void send(String msg) {
+  public void send(OutgoingMessage msg) {
 	this.connection.send(msg);
   }
 
