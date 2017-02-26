@@ -41,7 +41,7 @@ public class GameSocketHandler extends BaseWebSocketHandler {
   }
 
   private Connection getConnection(WebSocketConnection connection) {
-	return connectionFactory.getLoggingConnection(connection);
+	return connectionFactory.getMetricsConnection(connection);
   }
 
 }

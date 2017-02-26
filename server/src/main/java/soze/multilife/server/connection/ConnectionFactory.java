@@ -20,7 +20,7 @@ public class ConnectionFactory {
 	return new BaseConnection(connection);
   }
 
-  public Connection getLoggingConnection(WebSocketConnection connection) {
+  public Connection getMetricsConnection(WebSocketConnection connection) {
 	return new MetricsConnection(new BaseConnection(connection), eventHandler);
   }
 
