@@ -17,29 +17,45 @@ import java.util.stream.Collectors;
  */
 public class Simulation {
 
-  /** A static cell, not located anywhere, in case we need to return invalid cell. */
+  /**
+   * A static cell, not located anywhere, in case we need to return invalid cell.
+   */
   private static final Cell nullCell = new Cell(-1, -1);
 
-  /** Players which recently joined, have not received map data yet. */
+  /**
+   * Players which recently joined, have not received map data yet.
+   */
   private final List<Player> freshPlayers = new ArrayList<>();
 
-  /** Players already in-game. */
+  /**
+   * Players already in-game.
+   */
   private final Map<Long, Player> players = new HashMap<>();
 
-  /** Maps playerId to color (#hex) of their alive cells. */
+  /**
+   * Maps playerId to color (#hex) of their alive cells.
+   */
   private final Map<Long, String> playerColors = new HashMap<>();
-  /** Colors which are available for players. */
-  private final String[] availableColors = new String[] {"#ff0000", "#00ff00", "#0000ff", "#ffff00"};
+  /**
+   * Colors which are available for players.
+   */
+  private final String[] availableColors = new String[]{"#ff0000", "#00ff00", "#0000ff", "#ffff00"};
 
-  /** Width and height of the game grid. */
+  /**
+   * Width and height of the game grid.
+   */
   private final int width;
   private final int height;
 
-  /** Objects managing the cells. It manages all cells as well as the active cells and the cells
-   * that will be active in the next generation. */
+  /**
+   * Objects managing the cells. It manages all cells as well as the active cells and the cells
+   * that will be active in the next generation.
+   */
   private final Grid grid;
 
-  /** Percent of alive cells spawned on simulation start. */
+  /**
+   * Percent of alive cells spawned on simulation start.
+   */
   private final float initialDensity = 0.05f;
 
   private final long simulationOwnerId = 0L;
@@ -56,10 +72,10 @@ public class Simulation {
    */
   public void init() {
 	SecureRandom random = new SecureRandom();
-    for(int i = 0; i < width; i++) {
-      for(int j = 0; j < height; j++) {
-        if(random.nextFloat() < initialDensity) {
-          grid.changeState(i, j, true, simulationOwnerId);
+	for (int i = 0; i < width; i++) {
+	  for (int j = 0; j < height; j++) {
+		if (random.nextFloat() < initialDensity) {
+		  grid.changeState(i, j, true, simulationOwnerId);
 		}
 	  }
 	}
@@ -67,6 +83,7 @@ public class Simulation {
 
   /**
    * Adds a player to the simulation.
+   *
    * @param player
    */
   public void addPlayer(Player player) {
@@ -77,6 +94,7 @@ public class Simulation {
 
   /**
    * Removes a player from the simulation.
+   *
    * @param id
    */
   public void removePlayer(long id) {
@@ -90,11 +108,12 @@ public class Simulation {
    * Called when a player clicks on a grid. A player sends an array of indices
    * of cells they supposedly marked. This method goes through all of these cells
    * and if possible (dead cell) marks it as alive and sets its owner as the player who clicked.
+   *
    * @param indices
    * @param id
    */
   public void click(int[] indices, long id) {
-	for(int i = 0; i < indices.length; i++) {
+	for (int i = 0; i < indices.length; i++) {
 	  int index = indices[i];
 	  grid.click(index, id);
 	}
@@ -110,7 +129,7 @@ public class Simulation {
   // ask simulation (getters) for data to send.
   public void update() {
 	updateFreshPlayers();
-	if(!players.isEmpty()) {
+	if (!players.isEmpty()) {
 	  grid.update();
 	  sendActiveCellData();
 	  grid.transferCells();
@@ -125,7 +144,7 @@ public class Simulation {
    */
   private void updateFreshPlayers() {
 	synchronized (freshPlayers) {
-	  if(!freshPlayers.isEmpty()) {
+	  if (!freshPlayers.isEmpty()) {
 
 		for (Player p : freshPlayers) {
 		  playerColors.put(p.getId(), availableColors[players.size() % availableColors.length]);
@@ -134,7 +153,7 @@ public class Simulation {
 
 		synchronized (players) {
 		  Iterator<Player> it = freshPlayers.iterator();
-		  while(it.hasNext()) {
+		  while (it.hasNext()) {
 			Player player = it.next();
 			players.put(player.getId(), player);
 			it.remove();
@@ -149,6 +168,7 @@ public class Simulation {
 
   /**
    * Assembles and stringifies MapData.
+   *
    * @return
    */
   private String getMapData() {
@@ -203,7 +223,7 @@ public class Simulation {
 
   private CellList getAllCellData() {
 	List<CellData> cellData = new ArrayList<>();
-	for(Cell cell: grid.getAllCells().stream().filter(Cell::isAlive).collect(Collectors.toList())) {
+	for (Cell cell : grid.getAllCells().stream().filter(Cell::isAlive).collect(Collectors.toList())) {
 	  cellData.add(new CellData(cell));
 	}
 	return new CellList(cellData);
@@ -211,7 +231,7 @@ public class Simulation {
 
   private CellList getActiveCellData() {
 	List<CellData> cellData = new ArrayList<>();
-	for(Cell cell: grid.getActiveCells()) {
+	for (Cell cell : grid.getActiveCells()) {
 	  cellData.add(new CellData(cell));
 	}
 	return new CellList(cellData);

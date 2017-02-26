@@ -26,91 +26,91 @@ public class Instance {
   private final Queue<MessageQueueNode> queuedMessages = new ConcurrentLinkedQueue<>();
 
   public Instance(long id, Simulation simulation, int maxPlayers) {
-    this.id = id;
-    this.simulation = simulation;
-    this.maxPlayers = maxPlayers;
+	this.id = id;
+	this.simulation = simulation;
+	this.maxPlayers = maxPlayers;
   }
 
   public void update() {
-    handleMessages();
-    simulation.update();
+	handleMessages();
+	simulation.update();
   }
 
   public void addPlayer(Player player) {
-    players.put(player.getId(), player);
-    this.simulation.addPlayer(player);
+	players.put(player.getId(), player);
+	this.simulation.addPlayer(player);
   }
 
   public void removePlayer(long id) {
-    players.remove(id);
-    simulation.removePlayer(id);
+	players.remove(id);
+	simulation.removePlayer(id);
   }
 
   public void addMessage(IncomingMessage message, long id) {
-    queuedMessages.add(new MessageQueueNode(message, id));
+	queuedMessages.add(new MessageQueueNode(message, id));
   }
 
   private void handleMessages() {
-    MessageQueueNode node;
-    while((node = queuedMessages.poll()) != null) {
-      IncomingMessage message = node.getIncomingMessage();
-      long id = node.getId();
-      if(message.getType() == IncomingType.CLICK) {
-        handleMessage((ClickMessage) message, id);
-      }
-    }
+	MessageQueueNode node;
+	while ((node = queuedMessages.poll()) != null) {
+	  IncomingMessage message = node.getIncomingMessage();
+	  long id = node.getId();
+	  if (message.getType() == IncomingType.CLICK) {
+		handleMessage((ClickMessage) message, id);
+	  }
+	}
   }
 
   private void handleMessage(ClickMessage message, long id) {
-    int[] indices = message.getIndices();
-    simulation.click(indices, id);
+	int[] indices = message.getIndices();
+	simulation.click(indices, id);
   }
 
   public long getId() {
-    return id;
+	return id;
   }
 
   public boolean isActive() {
-    return !players.isEmpty();
+	return !players.isEmpty();
   }
 
   public int getNumberOfPlayers() {
-    return players.size();
+	return players.size();
   }
 
   public boolean isFull() {
-    return getNumberOfPlayers() == maxPlayers;
+	return getNumberOfPlayers() == maxPlayers;
   }
 
   public boolean isScheduledForRemoval() {
-    return scheduledForRemoval;
+	return scheduledForRemoval;
   }
 
   public void setScheduledForRemoval(boolean scheduledForRemoval) {
-    this.scheduledForRemoval = scheduledForRemoval;
+	this.scheduledForRemoval = scheduledForRemoval;
   }
 
   public Simulation getSimulation() {
-    return simulation;
+	return simulation;
   }
 
   private static class MessageQueueNode {
 
-    private final IncomingMessage incomingMessage;
-    private final long id;
+	private final IncomingMessage incomingMessage;
+	private final long id;
 
-    public MessageQueueNode(IncomingMessage incomingMessage, long id) {
-      this.incomingMessage = incomingMessage;
-      this.id = id;
-    }
+	public MessageQueueNode(IncomingMessage incomingMessage, long id) {
+	  this.incomingMessage = incomingMessage;
+	  this.id = id;
+	}
 
-    public IncomingMessage getIncomingMessage() {
-      return incomingMessage;
-    }
+	public IncomingMessage getIncomingMessage() {
+	  return incomingMessage;
+	}
 
-    public long getId() {
-      return id;
-    }
+	public long getId() {
+	  return id;
+	}
   }
 
 }

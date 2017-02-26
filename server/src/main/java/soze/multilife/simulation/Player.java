@@ -13,29 +13,29 @@ public class Player {
   private final String rule;
 
   public Player(long id, Connection connection, String name, String rule) {
-    this.id = id;
-    this.connection = connection;
-    this.name = name;
-    this.rule = rule;
+	this.id = id;
+	this.connection = connection;
+	this.name = name;
+	this.rule = rule;
   }
 
   public long getId() {
-    return id;
+	return id;
   }
 
   public void send(String msg) {
-    this.connection.send(msg);
+	this.connection.send(msg);
   }
 
   public Connection getConnection() {
-    return connection;
+	return connection;
   }
 
   public String getName() {
-    return name;
+	return name;
   }
 
   public String getRule() {
-    return rule;
+	return rule;
   }
 }

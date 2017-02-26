@@ -4,6 +4,7 @@ import soze.multilife.server.metrics.MetricsConnection;
 
 /**
  * Class used for decorating connections.
+ *
  * @see MetricsConnection
  */
 public class ConnectionDecorator implements Connection {
@@ -25,7 +26,7 @@ public class ConnectionDecorator implements Connection {
   }
 
   protected Connection getConnection() {
-    return decorated;
+	return decorated;
   }
 
 }

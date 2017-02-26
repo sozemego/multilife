@@ -18,10 +18,10 @@ public class MetricsService implements Runnable {
 
   @Override
   public void run() {
-	while(true) {
+	while (true) {
 
 	  MetricEvent event;
-	  while((event = eventQueue.poll()) != null) {
+	  while ((event = eventQueue.poll()) != null) {
 		totalBytesSent += event.getBytesSent();
 		totalMessagesSent++;
 		averageBytesSent = totalBytesSent / totalMessagesSent;

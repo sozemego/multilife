@@ -5,13 +5,13 @@ package soze.multilife.messages.incoming;
  */
 public class ClickMessage extends IncomingMessage {
 
-	public int[] indices;
+  public int[] indices;
 
-	public int[] getIndices() {
-		return indices;
-	}
+  public int[] getIndices() {
+	return indices;
+  }
 
-	public void setIndices(int[] indices) {
-		this.indices = indices;
-	}
+  public void setIndices(int[] indices) {
+	this.indices = indices;
+  }
 }

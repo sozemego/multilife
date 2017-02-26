@@ -8,7 +8,7 @@ public class PlayerIdentity extends OutgoingMessage {
   public long playerId;
 
   public PlayerIdentity(long playerId) {
-    setType(OutgoingType.PLAYER_IDENTITY);
-    this.playerId = playerId;
+	setType(OutgoingType.PLAYER_IDENTITY);
+	this.playerId = playerId;
   }
 }

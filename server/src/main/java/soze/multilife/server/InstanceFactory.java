@@ -25,6 +25,7 @@ public class InstanceFactory {
   /**
    * Finds an instance with free space, or creates a new one if unsuccesful.
    * For each new instance, a new {@link InstanceRunner} is created and started.
+   *
    * @return
    */
   public Instance getInstance() {

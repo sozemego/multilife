@@ -19,6 +19,7 @@ public class Server {
 
   /**
    * Creates a new Server at a given port.
+   *
    * @param port
    */
   public Server(int port, GameSocketHandler gameSocketHandler, MetricsHttpHandler metricsHttpHandler) {
@@ -30,6 +31,7 @@ public class Server {
 
   /**
    * Starts the server. This call is blocking until the server is ready to accept incoming requests.
+   *
    * @throws InterruptedException
    * @throws ExecutionException
    */

@@ -6,24 +6,24 @@ public class LoginMessage extends IncomingMessage {
   private String rule;
 
   public String getRule() {
-    return rule;
+	return rule;
   }
 
   public void setRule(String rule) {
-    this.rule = rule;
+	this.rule = rule;
   }
 
   public void setName(String name) {
-    this.name = name;
+	this.name = name;
   }
 
   public String getName() {
-    return this.name;
+	return this.name;
   }
 
   @Override
   public String toString() {
-    return "LoginMessage of type [" + getType() + "]. Name [" + getName() + "]";
+	return "LoginMessage of type [" + getType() + "]. Name [" + getName() + "]";
   }
 
 }

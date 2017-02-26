@@ -31,7 +31,7 @@ public class MultiLife {
   private final EventHandler eventHandler;
 
   private MultiLife() {
-    this.eventHandler = new EventBusHandler();
+	this.eventHandler = new EventBusHandler();
 	this.connectionFactory = new ConnectionFactory(eventHandler);
 	this.lobby = new Lobby();
 	MetricsService metricsService = new MetricsService();

@@ -12,10 +12,10 @@ public class MapData extends OutgoingMessage {
   public Map<Long, String> playerColors;
 
   public MapData(int width, int height, Map<Long, String> playerColors) {
-    this.setType(OutgoingType.MAP_DATA);
-    this.width = width;
-    this.height = height;
-    this.playerColors = playerColors;
+	this.setType(OutgoingType.MAP_DATA);
+	this.width = width;
+	this.height = height;
+	this.playerColors = playerColors;
   }
 
 }

@@ -24,12 +24,13 @@ public class MetricsConnection extends ConnectionDecorator {
 
   @Override
   public void send(String msg) {
-    postEvent(msg);
+	postEvent(msg);
 	super.send(msg);
   }
 
   /**
    * Assemblers and posts event based on this message.
+   *
    * @param msg outgoing message (most likely serialized json)
    */
   private void postEvent(String msg) {
@@ -39,6 +40,7 @@ public class MetricsConnection extends ConnectionDecorator {
 
   /**
    * Creates {@link MetricEvent}
+   *
    * @param msg outgoing message (most likely serialized json)
    * @return event constructed from the data
    */
@@ -46,7 +48,6 @@ public class MetricsConnection extends ConnectionDecorator {
 	long timeStamp = System.nanoTime();
 	return new MetricEvent(timeStamp, getConnection().getId(), msg.length() * 2);
   }
-
 
 
 }
