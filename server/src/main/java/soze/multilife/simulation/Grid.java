@@ -183,7 +183,7 @@ public class Grid {
 	  int state = rules.get(ownerId).apply(aliveNeighbours.size(), cell.isAlive());
 	  if (state != 0) {
 		long strongestOwnerId = getStrongestOwnerId(aliveNeighbours);
-		changeState(x, y, state > 0, strongestOwnerId);
+		changeState(x, y, state > 0, strongestOwnerId == -1 ? cell.getOwnerId() : strongestOwnerId);
 	  }
 	}
   }
@@ -209,11 +209,14 @@ public class Grid {
 
   /**
    * Finds the most frequently (mode) occuring ownerId among given cells.
-   *
+   * If there are no cells, returns -1.
    * @param cells
    * @return
    */
   private long getStrongestOwnerId(List<Cell> cells) {
+    if(cells.isEmpty()) {
+      return -1;
+	}
 	List<Long> ownerIds = cells.stream()
 	  .map(Cell::getOwnerId)
 	  .collect(Collectors.toList());

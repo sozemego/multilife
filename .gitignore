@@ -17,3 +17,6 @@ target/
 
 # untrack p5.js files
 p5*.js
+
+*.log
+log/
