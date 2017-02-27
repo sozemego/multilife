@@ -10,7 +10,8 @@ import soze.multilife.server.metrics.events.InstanceMetricEvent;
 import soze.multilife.server.metrics.events.SerializedMetricEvent;
 
 /**
- * Created by soze on 2/27/2017.
+ * A {@link Connection} implementation which measures various
+ * metrics about outgoing messages.
  */
 public class MetricsConnection implements Connection {
 
