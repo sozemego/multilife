@@ -18,7 +18,7 @@ public enum RuleType {
   DIAMOEBA("B35678/S5678"),
   MORLEY("B368/S245"),
   LIFE_34("B34/S34"),
-  CORAL("B3/S45678 "),
+  CORAL("B3/S45678"),
   SEEDS("B2/S"),
   ANNEAL("B4678/S3567"),
   FOUR("B36/S125"),
