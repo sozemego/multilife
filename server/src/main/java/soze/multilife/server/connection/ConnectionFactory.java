@@ -2,12 +2,7 @@ package soze.multilife.server.connection;
 
 import org.webbitserver.WebSocketConnection;
 import soze.multilife.events.EventHandler;
-import soze.multilife.server.connection.inward.BaseSerializedObjectConnection;
-import soze.multilife.server.connection.inward.SerializedObjectConnection;
-import soze.multilife.server.connection.outward.BaseConnection;
-import soze.multilife.server.connection.outward.Connection;
-import soze.multilife.server.metrics.InstanceMetricsConnection;
-import soze.multilife.server.metrics.SerializedObjectMetricsConnection;
+import soze.multilife.server.metrics.MetricsConnection;
 
 /**
  * Class used for wrapping socket objects provided
@@ -31,11 +26,7 @@ public class ConnectionFactory {
   }
 
   private Connection getMetricsConnection(WebSocketConnection connection) {
-	return new InstanceMetricsConnection(new BaseConnection(getSerializedObjectConnection(connection)), eventHandler);
-  }
-
-  private SerializedObjectConnection getSerializedObjectConnection(WebSocketConnection connection) {
-    return new SerializedObjectMetricsConnection(new BaseSerializedObjectConnection(connection), eventHandler);
+	return new MetricsConnection(connection, eventHandler);
   }
 
 }

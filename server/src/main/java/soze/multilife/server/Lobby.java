@@ -4,7 +4,7 @@ import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingType;
 import soze.multilife.messages.incoming.LoginMessage;
 import soze.multilife.messages.outgoing.PlayerIdentity;
-import soze.multilife.server.connection.outward.Connection;
+import soze.multilife.server.connection.Connection;
 import soze.multilife.simulation.Player;
 
 import java.util.HashMap;

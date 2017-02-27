@@ -1,9 +1,9 @@
-package soze.multilife.server.connection.outward;
+package soze.multilife.server.connection;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.webbitserver.WebSocketConnection;
 import soze.multilife.messages.outgoing.OutgoingMessage;
-import soze.multilife.server.connection.inward.SerializedObjectConnection;
 
 /**
  * Base simulation facing {@link Connection} implementation.
@@ -12,15 +12,15 @@ import soze.multilife.server.connection.inward.SerializedObjectConnection;
 public class BaseConnection implements Connection {
 
   private final ObjectMapper mapper = new ObjectMapper();
-  private final SerializedObjectConnection connection;
+  private final WebSocketConnection connection;
 
-  public BaseConnection(SerializedObjectConnection connection) {
+  public BaseConnection(WebSocketConnection connection) {
 	this.connection = connection;
   }
 
   @Override
   public long getId() {
-	return connection.getId();
+	return (long) connection.httpRequest().id();
   }
 
   @Override

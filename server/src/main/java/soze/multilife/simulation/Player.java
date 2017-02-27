@@ -1,7 +1,7 @@
 package soze.multilife.simulation;
 
 import soze.multilife.messages.outgoing.OutgoingMessage;
-import soze.multilife.server.connection.outward.Connection;
+import soze.multilife.server.connection.Connection;
 
 /**
  * Created by soze on 2/21/2017.

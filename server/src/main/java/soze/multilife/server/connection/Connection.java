@@ -1,4 +1,4 @@
-package soze.multilife.server.connection.outward;
+package soze.multilife.server.connection;
 
 import soze.multilife.messages.outgoing.OutgoingMessage;
 
