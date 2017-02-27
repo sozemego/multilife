@@ -1,10 +1,15 @@
 package soze.multilife.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A runnable for running instances.
  * It updates the instance and sleeps.
  */
 public class InstanceRunner implements Runnable {
+
+  private static final Logger LOG = LoggerFactory.getLogger(InstanceRunner.class);
 
   private static final int TIME_INACTIVE_TO_DESTROY_IN_SECONDS = 15;
   private static final long TICK_TIME_MS = 250;
@@ -21,7 +26,7 @@ public class InstanceRunner implements Runnable {
 
   @Override
   public void run() {
-	System.out.println("InstanceRunner for instanceId " + instance.getId() + " was started.");
+	LOG.info("InstanceRunner for instanceId [{}] was started. ", instance.getId());
 	long time = System.nanoTime();
 	while (!instance.isScheduledForRemoval()) {
 
@@ -31,7 +36,7 @@ public class InstanceRunner implements Runnable {
 		timeInactive += System.nanoTime() - time;
 		if ((timeInactive / 1e9) > TIME_INACTIVE_TO_DESTROY_IN_SECONDS) {
 		  instance.setScheduledForRemoval(true);
-		  System.out.println("After " + TIME_INACTIVE_TO_DESTROY_IN_SECONDS + " s of inactivity, instanceId " + instance.getId() + " was set to be removed");
+		  LOG.info("After [{} s] of inactivity instanceId [{}] was set to be removed. ", TIME_INACTIVE_TO_DESTROY_IN_SECONDS, instance.getId());
 		}
 	  } else {
 		timeInactive = 0;
@@ -41,7 +46,7 @@ public class InstanceRunner implements Runnable {
 	  try {
 		Thread.sleep(TICK_TIME_MS);
 	  } catch (InterruptedException e) {
-		// dont stop this thread
+		LOG.error("Instance runner was stopped. ", e);
 	  }
 
 	}

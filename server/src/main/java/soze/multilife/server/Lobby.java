@@ -1,5 +1,7 @@
 package soze.multilife.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingType;
 import soze.multilife.messages.incoming.LoginMessage;
@@ -18,6 +20,8 @@ import java.util.stream.Collectors;
  * and assigns players to instances. It also passes messages along to appropriate rooms.
  */
 public class Lobby implements Runnable {
+
+  private static final Logger LOG = LoggerFactory.getLogger(Lobby.class);
 
   private final Map<Long, Connection> connections = new HashMap<>();
   private final Map<Long, Player> players = new HashMap<>();
@@ -42,7 +46,7 @@ public class Lobby implements Runnable {
 			.map(Instance::getId)
 			.collect(Collectors.toList());
 		instancesScheduledForRemoval.forEach(instances::remove);
-		System.out.println("Lobby's sweepin', removed instances: " + instancesScheduledForRemoval.size());
+		LOG.trace("Lobby's sweepin', removed [{}] instances.", instancesScheduledForRemoval.size());
 	  }
 
 	  try {
@@ -110,7 +114,7 @@ public class Lobby implements Runnable {
    * @param id
    */
   private void handleLoginMessage(LoginMessage message, long id) {
-	System.out.println("Player with name " + message.getName() + " is trying to login.");
+	LOG.info("Player with name [{}] is trying to login. ", message.getName());
 	Player player = createPlayer(connections.get(id), message.getName(), message.getRule());
 	players.put(id, player);
 	Instance instance = instanceFactory.getInstance();

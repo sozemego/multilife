@@ -1,6 +1,8 @@
 package soze.multilife.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webbitserver.BaseWebSocketHandler;
 import org.webbitserver.WebSocketConnection;
 import soze.multilife.messages.incoming.IncomingMessage;
@@ -13,6 +15,8 @@ import soze.multilife.server.connection.ConnectionFactory;
  */
 public class GameSocketHandler extends BaseWebSocketHandler {
 
+  private static final Logger LOG = LoggerFactory.getLogger(GameSocketHandler.class);
+
   private final Lobby lobby;
   private final ConnectionFactory connectionFactory;
   private final ObjectMapper mapper = new ObjectMapper();
@@ -24,13 +28,13 @@ public class GameSocketHandler extends BaseWebSocketHandler {
 
   @Override
   public void onOpen(WebSocketConnection connection) throws Exception {
-	System.out.println("User connected. ConnectionID: " + connection.httpRequest().id());
+	LOG.info("User connected. ConnectionID [{}].", connection.httpRequest().id());
 	lobby.onConnect(getConnection(connection));
   }
 
   @Override
   public void onClose(WebSocketConnection connection) throws Exception {
-	System.out.println("User disconnected. ConnectionID: " + connection.httpRequest().id());
+	LOG.info("User disconnected. ConnectionID [{}].", connection.httpRequest().id());
 	lobby.onDisconnect(getConnection(connection));
   }
 

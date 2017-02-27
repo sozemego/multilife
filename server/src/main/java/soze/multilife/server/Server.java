@@ -1,5 +1,7 @@
 package soze.multilife.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webbitserver.BaseWebSocketHandler;
 import org.webbitserver.HttpHandler;
 import org.webbitserver.WebServer;
@@ -18,6 +20,7 @@ import java.util.concurrent.ExecutionException;
  */
 public class Server {
 
+  private static final Logger LOG = LoggerFactory.getLogger(Server.class);
   private final WebServer webServer;
 
   private Server(
@@ -45,7 +48,7 @@ public class Server {
    */
   public void start() throws InterruptedException, ExecutionException {
 	webServer.start().get();
-	System.out.println("Server is listening on: " + webServer.getUri());
+	LOG.info("Server is listening on [{}]. ", webServer.getUri());
   }
 
   /**
