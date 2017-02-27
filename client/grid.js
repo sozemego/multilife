@@ -1,13 +1,13 @@
 class Grid {
 
-    constructor(width, height) {
+    constructor(width, height, playerData) {
         this.width = width;
         this.height = height;
         this.cells = {};
         this.activeCells = {};
         this.nextCells = {};
         this.rules = {};
-        this.playerColors = {0: "#000000"};
+        this.playerData = playerData;
         this.cellSize = 10;
         this.init();
     }
@@ -64,12 +64,8 @@ class Grid {
         return "x:" + x + "y:" + y;
     }
 
-    setPlayerColors(playerColors) {
-        this.playerColors = playerColors;
-    }
-
     getColor(ownerId) {
-        return this.playerColors[ownerId] || "#000000";
+        return this.playerData.colors[ownerId] || "#000000";
     }
 
     updateCells() {
@@ -169,6 +165,10 @@ class Grid {
                 this.cells[pos].render();
             }
         }
+    }
+
+    setPlayerData(playerData) {
+        this.playerData = playerData;
     }
 
 }

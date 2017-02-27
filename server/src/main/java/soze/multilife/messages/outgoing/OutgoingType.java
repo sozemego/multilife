@@ -5,6 +5,6 @@ package soze.multilife.messages.outgoing;
  */
 public enum OutgoingType {
 
-  CELL_LIST, MAP_DATA, PLAYER_IDENTITY;
+  CELL_LIST, MAP_DATA, PLAYER_IDENTITY, PLAYER_DATA;
 
 }

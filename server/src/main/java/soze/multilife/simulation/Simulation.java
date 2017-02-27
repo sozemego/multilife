@@ -3,6 +3,7 @@ package soze.multilife.simulation;
 import soze.multilife.messages.outgoing.CellData;
 import soze.multilife.messages.outgoing.CellList;
 import soze.multilife.messages.outgoing.MapData;
+import soze.multilife.messages.outgoing.PlayerData;
 import soze.multilife.simulation.rule.RuleFactory;
 import soze.multilife.simulation.rule.RuleType;
 
@@ -129,7 +130,7 @@ public class Simulation {
 	updateFreshPlayers();
 	if (!players.isEmpty()) {
 	  grid.update();
-	  sendActiveCellData();
+	  //sendActiveCellData(); //TODO send updates that players made
 	  grid.transferCells();
 	}
   }
@@ -157,6 +158,7 @@ public class Simulation {
 			it.remove();
 		  }
 
+		  sendPlayerData();
 		  sendMapData();
 		  sendAllCellData();
 		}
@@ -165,12 +167,36 @@ public class Simulation {
   }
 
   /**
+   * Sends data about all players in this instance.
+   */
+  private void sendPlayerData() {
+	PlayerData data = createPlayerData();
+	for(Player player: players.values()) {
+	  player.send(data);
+	}
+  }
+
+  private PlayerData createPlayerData() {
+    Map<Long, Long> points = new HashMap<>();
+	Map<Long, String> names = new HashMap<>();
+	Map<Long, String> colors = new HashMap<>();
+	Map<Long, String> rules = new HashMap<>();
+	for(Player player: players.values()) {
+	  points.put(player.getId(), 0L);
+	  names.put(player.getId(), player.getName());
+	  colors.put(player.getId(), playerColors.get(player.getId()));
+	  rules.put(player.getId(), player.getRule());
+	}
+	return new PlayerData(points, names, colors, rules);
+  }
+
+  /**
    * Assembles and returns MapData.
    *
    * @return
    */
   private MapData getMapData() {
-	return new MapData(width, height, playerColors);
+	return new MapData(width, height);
   }
 
   private void sendAllCellData() {
@@ -185,14 +211,6 @@ public class Simulation {
 	}
   }
 
-  /**
-   * Sends next active cells to all players.
-   */
-  private void sendActiveCellData() {
-	CellList list = getActiveCellData();
-	sendCellList(list);
-  }
-
   private void sendCellList(CellList list) {
 	synchronized (players) {
 	  for (Player p : players.values()) {
@@ -204,14 +222,6 @@ public class Simulation {
   private CellList getAllCellData() {
 	List<CellData> cellData = new ArrayList<>();
 	for (Cell cell : grid.getAllCells().stream().filter(Cell::isAlive).collect(Collectors.toList())) {
-	  cellData.add(new CellData(cell));
-	}
-	return new CellList(cellData);
-  }
-
-  private CellList getActiveCellData() {
-	List<CellData> cellData = new ArrayList<>();
-	for (Cell cell : grid.getActiveCells()) {
 	  cellData.add(new CellData(cell));
 	}
 	return new CellList(cellData);

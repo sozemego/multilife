@@ -12,12 +12,19 @@ let input;
 let button;
 let clicked = false;
 
-let simulation = {update: function(){}, render: function(){}, transferCells: function(){}};
+let simulation = {
+	update: function(){},
+	render: function(){},
+	transferCells: function(){},
+	setPlayerData: function(){}
+};
 
 let ticks = 0;
 let FPS = 60;
 let stepsPerSecond = 4;
 let stepPerFrames = FPS / stepsPerSecond;
+
+let playerData;
 
 function setup() {
 	canvas = createCanvas(600, 600);
@@ -137,6 +144,9 @@ function handleMessage(msg) {
     if(msg.type === "PLAYER_IDENTITY") {
         myId = msg.playerId;
     }
+    if(msg.type === "PLAYER_DATA") {
+        onPlayerData(msg);
+    }
     if(msg.type === "MAP_DATA") {
         onMapData(msg);
     }
@@ -146,17 +156,19 @@ function handleMessage(msg) {
     //console.log("Received message of type", msg.type);
 }
 
+function onPlayerData(msg) {
+    playerData = msg;
+    simulation.setPlayerData(msg);
+}
+
 function onMapData(data) {
     width = data.width;
     height = data.height;
     canvas.size(width * cellSize, height * cellSize);
-    simulation = new Simulation(width, height);
+    simulation = new Simulation(width, height, playerData);
 }
 
 function onMapUpdate(data) {
-    if(onMapUpdate.counter++ > 0) {
-        return;
-    }
     let newCells = data.cells;
     for(let i = 0; i < newCells.length; i++) {
         let newCell = newCells[i];
