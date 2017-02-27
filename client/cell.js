@@ -61,9 +61,9 @@ class Cell {
 	render() {
 		if(this.alive || this.active) {
 			this.actuallyRender();
-            textSize(16);
-            fill(125);
-            text(this.x + "," + this.y, this.x * this.cellSize, this.y * this.cellSize);
+      textSize(16);
+      fill(125);
+      text(this.x + "," + this.y, this.x * this.cellSize, this.y * this.cellSize);
 		}
 	}
 

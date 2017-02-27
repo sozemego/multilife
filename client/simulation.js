@@ -1,6 +1,3 @@
-/**
- * Created by KJurek on 27.02.2017.
- */
 
 class Simulation {
 
@@ -16,10 +13,16 @@ class Simulation {
         this.grid.setCellState(position, alive, ownerId);
     }
 
+		render() {
+			this.grid.render();
+		}
+
     update() {
         this.grid.updateCells();
-        this.grid.render();
-        this.grid.transferCells();
     }
+
+		transferCells() {
+			this.grid.transferCells();
+		}
 
 }

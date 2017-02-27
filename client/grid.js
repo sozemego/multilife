@@ -1,7 +1,3 @@
-/**
- * Created by KJurek on 27.02.2017.
- */
-
 class Grid {
 
     constructor(width, height) {
@@ -27,10 +23,17 @@ class Grid {
         }
     }
 
+    /**
+        Adds a rule for the player with given id.
+    */
     addRule(id, rule) {
         this.rules[id] = rule;
     }
 
+    /**
+        Sets the state of a cell at a given position.
+        The cell is in nextCells object.
+    */
     setCellState(position, alive, ownerId) {
         let cell = this.nextCells[this.getPositionKey(position)];
         if(!cell) {
@@ -39,6 +42,10 @@ class Grid {
         }
     }
 
+    /**
+        Transforms the position of a cell into the key used in maps
+        containing the cells.
+    */
     getPositionKey(position) {
         let x = position.x;
         let y = position.y;
@@ -66,14 +73,6 @@ class Grid {
     }
 
     updateCells() {
-        for(let pos in this.cells) {
-            if (this.cells.hasOwnProperty(pos)) {
-                let cell = this.cells[pos];
-                cell.update();
-            }
-        }
-
-        console.log(Object.keys(this.activeCells).length);
         for(let pos in this.activeCells) {
             if (this.activeCells.hasOwnProperty(pos)) {
                 let cell = this.activeCells[pos];
@@ -90,10 +89,13 @@ class Grid {
         }
     }
 
+    /**
+        Returns an array of alive cells neighbouring a cell at x, y.
+    */
     getAliveNeighbourCells(x, y) {
        let cells = [];
        for(let i = -1; i < 2; i++) {
-           for(let j = 0; j < 2; j++) {
+           for(let j = -1; j < 2; j++) {
                if(i === 0 && j === 0) continue;
                let positionKey = this.getPositionKey({x: i + x, y: j + y});
                let cell = this.cells[positionKey];
@@ -163,6 +165,7 @@ class Grid {
     render() {
         for(let pos in this.cells) {
             if(this.cells.hasOwnProperty(pos)) {
+				this.cells[pos].update();
                 this.cells[pos].render();
             }
         }

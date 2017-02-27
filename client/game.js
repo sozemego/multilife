@@ -12,11 +12,16 @@ let input;
 let button;
 let clicked = false;
 
-let simulation = {update: function(){}};
+let simulation = {update: function(){}, render: function(){}, transferCells: function(){}};
+
+let ticks = 0;
+let FPS = 60;
+let stepsPerSecond = 4;
+let stepPerFrames = FPS / stepsPerSecond;
 
 function setup() {
 	canvas = createCanvas(600, 600);
-	frameRate(4);
+	frameRate(FPS);
 
 	input = createInput();
 	input.position(300, 300);
@@ -33,7 +38,9 @@ function setup() {
 
 function draw() {
 	background(245);
-	updateCells();
+	ticks++;
+	update();
+	render();
 }
 
 /**
@@ -80,6 +87,8 @@ function onMouseMove() {
 		let indices = [];
 		for(let i = -4; i < 4; i++) {
 			for(let j = -4; j < 4; j++) {
+				// dont find indices here, just a list of coordinates passed down to simulation
+				// simulation will pass it down to a grid will activate appropriate cells
 				let index = getIndex(mouseX + (i * cellSize), mouseY + (j * cellSize));
 				if(!cells[index].isAlive()) {
 					cells[index].setAlive(true);
@@ -108,14 +117,20 @@ function getIndex(x, y) {
 }
 
 /**
-	Returns color of the player with a given id.
+	Updates the simulation.
 */
-function getColor(id) {
-    return playerColors[id] || "#000000";
+function update() {
+	if(ticks % stepPerFrames === 0) {
+    simulation.update();
+		simulation.transferCells();
+	}
 }
 
-function updateCells() {
-    simulation.update();
+/**
+	Renders cells.
+*/
+function render() {
+	simulation.render();
 }
 
 function handleMessage(msg) {
