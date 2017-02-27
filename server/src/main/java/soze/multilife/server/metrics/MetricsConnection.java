@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.webbitserver.WebSocketConnection;
 import soze.multilife.events.EventHandler;
 import soze.multilife.messages.outgoing.OutgoingMessage;
+import soze.multilife.server.connection.BaseConnection;
 import soze.multilife.server.connection.Connection;
 import soze.multilife.server.metrics.events.InstanceMetricEvent;
 import soze.multilife.server.metrics.events.SerializedMetricEvent;
@@ -13,20 +14,19 @@ import soze.multilife.server.metrics.events.SerializedMetricEvent;
  * A {@link Connection} implementation which measures various
  * metrics about outgoing messages.
  */
-public class MetricsConnection implements Connection {
+public class MetricsConnection extends BaseConnection {
 
-  private final WebSocketConnection connection;
   private final EventHandler eventHandler;
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   public MetricsConnection(WebSocketConnection connection, EventHandler eventHandler) {
-	this.connection = connection;
+    super(connection);
 	this.eventHandler = eventHandler;
   }
 
   @Override
   public long getId() {
-	return (long) connection.httpRequest().id();
+	return super.getId();
   }
 
   @Override
@@ -34,7 +34,7 @@ public class MetricsConnection implements Connection {
 	postEvent(message);
 	String serializedMessage = serialize(message);
 	postEvent(serializedMessage);
-	connection.send(serializedMessage);
+	super.send(message);
   }
 
   /**
