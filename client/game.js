@@ -12,9 +12,11 @@ let input;
 let button;
 let clicked = false;
 
+let simulation = {update: function(){}};
+
 function setup() {
 	canvas = createCanvas(600, 600);
-	frameRate(30);
+	frameRate(4);
 
 	input = createInput();
 	input.position(300, 300);
@@ -32,7 +34,6 @@ function setup() {
 function draw() {
 	background(245);
 	updateCells();
-	render();
 }
 
 /**
@@ -114,17 +115,7 @@ function getColor(id) {
 }
 
 function updateCells() {
-	for(let i = 0; i < cells.length; i++) {
-			let cell = cells[i];
-			cell.update();
-	}
-}
-
-function render() {
-    for(let i = 0; i < cells.length; i++) {
-        let cell = cells[i];
-				cell.render();
-    }
+    simulation.update();
 }
 
 function handleMessage(msg) {
@@ -143,24 +134,19 @@ function handleMessage(msg) {
 function onMapData(data) {
     width = data.width;
     height = data.height;
-		canvas.size(width * cellSize, height * cellSize);
-		playerColors = data.playerColors;
-    for(let i = 0; i < height; i++) {
-        for(let j = 0; j < width; j++) {
-            cells.push(new Cell(j, i, false, 0, cellSize, getColor(0), Cell.ellipseRenderFunction));
-        }
-    }
+    canvas.size(width * cellSize, height * cellSize);
+    simulation = new Simulation(width, height);
 }
 
 function onMapUpdate(data) {
-    //console.log(data.cells.length);
+    if(onMapUpdate.counter++ > 0) {
+        return;
+    }
     let newCells = data.cells;
-
     for(let i = 0; i < newCells.length; i++) {
         let newCell = newCells[i];
-        let index = getIndex(newCell.x * cellSize, newCell.y * cellSize);
-        cells[index].setAlive(newCell.alive);
-				cells[index].setOwnerId(newCell.ownerId);
-				cells[index].setColor(getColor(newCell.ownerId));
+        simulation.setCellState({x: newCell.x, y: newCell.y}, newCell.alive, newCell.ownerId);
     }
 }
+
+onMapUpdate.counter = 0;

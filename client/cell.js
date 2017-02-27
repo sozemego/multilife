@@ -1,6 +1,6 @@
 class Cell {
 
-	constructor(x, y, alive = false, ownerId = 0, size = 10, color, renderFunction) {
+	constructor(x, y, alive = false, ownerId = 0, size = 25, color, renderFunction) {
 		this.x = x;
 		this.y = y;
 		this.alive = alive;
@@ -61,6 +61,9 @@ class Cell {
 	render() {
 		if(this.alive || this.active) {
 			this.actuallyRender();
+            textSize(16);
+            fill(125);
+            text(this.x + "," + this.y, this.x * this.cellSize, this.y * this.cellSize);
 		}
 	}
 
@@ -71,6 +74,7 @@ class Cell {
 		(this.x * this.size) + (1 - cellSize) * 0.5,
 		(this.y * this.size) + (1 - cellSize) * 0.5,
 		cellSize, cellSize);
+
 	}
 
 	static get rectRenderFunction() {
