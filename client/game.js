@@ -11,6 +11,7 @@ let canvas;
 let input;
 let button;
 let clicked = false;
+let recentlyClicked = false;
 
 let simulation = {
 	update: function(){},
@@ -39,7 +40,6 @@ function setup() {
 
 	canvas.mousePressed(click);
 	canvas.mouseReleased(release);
-	canvas.mouseMoved(onMouseMove);
 
 }
 
@@ -80,31 +80,20 @@ function click() {
 }
 
 function release() {
-	clicked = false;
-}
-
-/**
-	Called when a mouse is moved.
-*/
-function onMouseMove() {
-	if(!clicked) {
-		return;
-	}
+    if(recentlyClicked) {
+        return;
+    }
 	if(ws) {
-		let indices = [];
-		for(let i = -4; i < 4; i++) {
-			for(let j = -4; j < 4; j++) {
-				let index = getIndex(mouseX + (i * cellSize), mouseY + (j * cellSize));
-				// if(!cells[index].isAlive()) {
-				// 	cells[index].setAlive(true);
-				// 	cells[index].setOwnerId(myId);
-				// 	cells[index].setColor(getColor(myId));
-				// }
-				indices.push(index);
-			}
-		}
-		ws.send(JSON.stringify({type:"CLICK", indices: indices}));
-	}
+    	let indices = [];
+    	for(let i = -4; i < 4; i++) {
+    		for(let j = -4; j < 4; j++) {
+    			let index = getIndex(mouseX + (i * cellSize), mouseY + (j * cellSize));
+    			indices.push(index);
+    		}
+    	}
+    	ws.send(JSON.stringify({type:"CLICK", indices: indices}));
+    	recentlyClicked = true;
+    }
 }
 
 /**
@@ -126,8 +115,9 @@ function getIndex(x, y) {
 */
 function update() {
 	if(ticks % stepPerFrames === 0) {
-    simulation.update();
+    	simulation.update();
 		simulation.transferCells();
+		recentlyClicked = false;
 	}
 }
 
@@ -173,5 +163,3 @@ function onMapUpdate(data) {
         simulation.setCellState({x: newCell.x, y: newCell.y}, newCell.alive, newCell.ownerId);
     }
 }
-
-onMapUpdate.counter = 0;
