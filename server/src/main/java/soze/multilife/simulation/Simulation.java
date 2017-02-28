@@ -1,5 +1,7 @@
 package soze.multilife.simulation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import soze.multilife.messages.outgoing.CellData;
 import soze.multilife.messages.outgoing.CellList;
 import soze.multilife.messages.outgoing.MapData;
@@ -15,6 +17,8 @@ import java.util.stream.Collectors;
  * An object which is the actual simulation of cells.
  */
 public class Simulation {
+
+  private static final Logger LOG = LoggerFactory.getLogger(Simulation.class);
 
   /**
    * A static cell, not located anywhere, in case we need to return invalid cell.
@@ -84,6 +88,7 @@ public class Simulation {
 		}
 	  }
 	}
+	grid.updateGrid();
   }
 
   /**
@@ -117,6 +122,7 @@ public class Simulation {
    * @param id
    */
   public void click(int[] indices, long id) {
+    LOG.trace("Player [{}] wants to click on [{}] cells.", id, indices.length);
     List<Cell> clickableCells = grid.findClickableCells(indices, id);
     if(clickableCells.size() == indices.length) {
 		grid.click(clickableCells);
