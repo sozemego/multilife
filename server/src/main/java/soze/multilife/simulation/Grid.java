@@ -106,19 +106,19 @@ public class Grid {
    * @param ownerId id of the player who clicked
    * @return a list of all clickable (by this player) \s
    */
-  public List<Cell> findClickableCells(int[] indices, long ownerId) {
-    List<Cell> cells = new ArrayList<>();
+  List<Cell> findClickableCells(int[] indices, long ownerId) {
+    List<Cell> clickableCells = new ArrayList<>();
 	for(int i: indices) {
 	  Point p = getPoint(i);
-	  Cell cell = nextCells.get(p); // TODO should this check cells or nextcells? or both, maybe cells because messages are handled BEFORE iteration
-	  if(cell == null) {
+	  Cell cell = cells.get(p);
+	  if(!cell.isAlive()) {
 		cell = new Cell(p.x, p.y);
 		cell.setIsAlive(true);
 		cell.setOwnerId(ownerId);
-		cells.add(cell);
+		clickableCells.add(cell);
 	  }
 	}
-	return cells;
+	return clickableCells;
   }
 
   /**
@@ -181,6 +181,15 @@ public class Grid {
    */
   private Cell getCell(int x, int y) {
 	return cells.get(getPoint(x, y));
+  }
+
+  /**
+   * Updates the cells and transfers the cells from nextCells to active cells
+   * and updates the underlying map.
+   */
+  void updateGrid() {
+    update();
+    transferCells();
   }
 
   /**
