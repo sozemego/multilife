@@ -6,9 +6,9 @@ class Grid {
         this.cells = {};
         this.activeCells = {};
         this.nextCells = {};
-        this.rules = {};
         this.playerData = playerData;
         this.cellSize = 10;
+        this.rules = new Rules();
         this.init();
     }
 
@@ -21,13 +21,6 @@ class Grid {
                 this.cells["x:" + i + "y:" + j] = new Cell(i, j, false, 0, this.cellSize, this.getColor(0), Cell.ellipseRenderFunction);
             }
         }
-    }
-
-    /**
-        Adds a rule for the player with given id.
-    */
-    addRule(id, rule) {
-        this.rules[id] = rule;
     }
 
     /**
@@ -76,7 +69,7 @@ class Grid {
                 let y = cell.y;
                 let aliveNeighbours = this.getAliveNeighbourCells(x, y);
                 let ownerId = cell.getOwnerId();
-                let state = this.rules[ownerId](aliveNeighbours.length, cell.isAlive());
+                let state = this.rules.getRule(this.playerData.rules[ownerId])(aliveNeighbours.length, cell.isAlive());
                 if (state != 0) {
                     let strongestOwnerId = this.getStrongestOwnerId(aliveNeighbours);
                     this.setCellState({x:x, y:y}, state > 0, strongestOwnerId == -1 ? cell.getOwnerId() : strongestOwnerId);
@@ -137,6 +130,7 @@ class Grid {
                 let c = this.cells[pos];
                 c.setAlive(oldCell.isAlive());
                 c.setOwnerId(oldCell.getOwnerId());
+                c.setColor(this.getColor(oldCell.getOwnerId()));
                 this.addToActive(c);
             }
         }
@@ -168,7 +162,7 @@ class Grid {
     }
 
     setPlayerData(playerData) {
-        this.playerData = playerData;
+        Object.assign(this.playerData, playerData);
     }
 
 }

@@ -5,8 +5,6 @@ class Simulation {
         this.width = width;
         this.height = height;
         this.grid = new Grid(width, height, playerData);
-        this.rules = new Rules();
-        this.grid.addRule(0, this.rules.getRule("BASIC"));
     }
 
     setCellState(position, alive, ownerId) {

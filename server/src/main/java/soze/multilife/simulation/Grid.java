@@ -89,23 +89,36 @@ public class Grid {
 	changeState(p, state, ownerId);
   }
 
+
   /**
-   * Changes the state of a cell at a given index,
-   * as if the cells were contained in an 1D array.
-   * If the cell is alive, this method does nothing.
-   *
-   * @param index
-   * @param ownerId
+   * Adds all of the cells to the next cells.
+   * @param cells
    */
-  void click(int index, long ownerId) {
-	Point p = getPoint(index);
-	Cell cell = nextCells.get(p);
-	if (cell == null) {
-	  cell = new Cell(p.x, p.y);
-	  cell.setIsAlive(true);
-	  cell.setOwnerId(ownerId);
-	  nextCells.put(p, cell);
+  void click(List<Cell> cells) {
+	for(Cell cell: cells) {
+	  nextCells.put(new Point(cell.getX(), cell.getY()), cell);
 	}
+  }
+
+  /**
+   * Finds all cells that are clickable by this player.
+   * @param indices array of indices of cells
+   * @param ownerId id of the player who clicked
+   * @return a list of all clickable (by this player) \s
+   */
+  public List<Cell> findClickableCells(int[] indices, long ownerId) {
+    List<Cell> cells = new ArrayList<>();
+	for(int i: indices) {
+	  Point p = getPoint(i);
+	  Cell cell = nextCells.get(p); // TODO should this check cells or nextcells? or both, maybe cells because messages are handled BEFORE iteration
+	  if(cell == null) {
+		cell = new Cell(p.x, p.y);
+		cell.setIsAlive(true);
+		cell.setOwnerId(ownerId);
+		cells.add(cell);
+	  }
+	}
+	return cells;
   }
 
   /**

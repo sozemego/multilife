@@ -94,14 +94,12 @@ function onMouseMove() {
 		let indices = [];
 		for(let i = -4; i < 4; i++) {
 			for(let j = -4; j < 4; j++) {
-				// dont find indices here, just a list of coordinates passed down to simulation
-				// simulation will pass it down to a grid will activate appropriate cells
 				let index = getIndex(mouseX + (i * cellSize), mouseY + (j * cellSize));
-				if(!cells[index].isAlive()) {
-					cells[index].setAlive(true);
-					cells[index].setOwnerId(myId);
-					cells[index].setColor(getColor(myId));
-				}
+				// if(!cells[index].isAlive()) {
+				// 	cells[index].setAlive(true);
+				// 	cells[index].setOwnerId(myId);
+				// 	cells[index].setColor(getColor(myId));
+				// }
 				indices.push(index);
 			}
 		}

@@ -32,6 +32,12 @@ public class Simulation {
   private final Map<Long, Player> players = new HashMap<>();
 
   /**
+   * All players ever in this instance.
+   */
+
+  private final Map<Long, Player> allPlayers = new HashMap<>();
+
+  /**
    * Maps playerId to color (#hex) of their alive cells.
    */
   private final Map<Long, String> playerColors = new HashMap<>();
@@ -99,22 +105,22 @@ public class Simulation {
   public void removePlayer(long id) {
 	synchronized (players) {
 	  players.remove(id);
-	  playerColors.remove(id);
 	}
   }
 
   /**
-   * Called when a player clicks on a grid. A player sends an array of indices
-   * of cells they supposedly marked. This method goes through all of these cells
-   * and if possible (dead cell) marks it as alive and sets its owner as the player who clicked.
-   *
+   * When a player sends an array of indices of cells they clicked,
+   * this method checks if all of them are currently not alive.
+   * If so, marks them as alive, sets their owner as the player who clicked
+   * and sends information to all players about newly alive cells.
    * @param indices
    * @param id
    */
   public void click(int[] indices, long id) {
-	for (int i = 0; i < indices.length; i++) {
-	  int index = indices[i];
-	  grid.click(index, id);
+    List<Cell> clickableCells = grid.findClickableCells(indices, id);
+    if(clickableCells.size() == indices.length) {
+		grid.click(clickableCells);
+		sendCellList(constructCellList(clickableCells));
 	}
   }
 
@@ -155,6 +161,7 @@ public class Simulation {
 		  while (it.hasNext()) {
 			Player player = it.next();
 			players.put(player.getId(), player);
+			allPlayers.put(player.getId(), player);
 			it.remove();
 		  }
 
@@ -181,7 +188,14 @@ public class Simulation {
 	Map<Long, String> names = new HashMap<>();
 	Map<Long, String> colors = new HashMap<>();
 	Map<Long, String> rules = new HashMap<>();
-	for(Player player: players.values()) {
+
+	// data for the simulation
+	points.put(0L, 0L);
+	names.put(0L, "AI");
+	colors.put(0L, "#000000");
+	rules.put(0L, "BASIC");
+
+	for(Player player: allPlayers.values()) {
 	  points.put(player.getId(), 0L);
 	  names.put(player.getId(), player.getName());
 	  colors.put(player.getId(), playerColors.get(player.getId()));
@@ -217,6 +231,14 @@ public class Simulation {
 		p.send(list);
 	  }
 	}
+  }
+
+  private CellList constructCellList(List<Cell> cells) {
+    List<CellData> cellData = new ArrayList<>();
+    for(Cell cell: cells) {
+      cellData.add(new CellData(cell));
+	}
+	return new CellList(cellData);
   }
 
   private CellList getAllCellData() {
