@@ -61,6 +61,8 @@ public class Simulation {
    */
   private final Grid grid;
 
+  private final Set<Cell> clickedCells = new HashSet<>();
+
   /**
    * Percent of alive cells spawned on simulation start.
    */
@@ -112,6 +114,7 @@ public class Simulation {
 	}
   }
 
+  //TODO game.js should send x, y pairs instead of indices
   /**
    * When a player sends an array of indices of cells they clicked,
    * this method checks if all of them are currently not alive.
@@ -124,8 +127,12 @@ public class Simulation {
     LOG.trace("Player [{}] wants to click on [{}] cells.", id, indices.length);
     List<Cell> clickableCells = grid.findClickableCells(indices, id);
     if(clickableCells.size() == indices.length) {
-		grid.click(clickableCells);
-		sendToPlayers(constructCellList(clickableCells));
+      for(Cell cell: clickableCells) {
+        if(clickedCells.contains(cell)) {
+          return;
+		}
+	  }
+	  clickedCells.addAll(clickableCells);
 	}
   }
 
@@ -137,6 +144,8 @@ public class Simulation {
   public void update() {
 	updateFreshPlayers();
 	if (!players.isEmpty()) {
+	  grid.click(clickedCells);
+	  sendClickedCells();
 	  grid.updateGrid();
 	  simulationSteps++;
 	  sendSimulationSteps();
@@ -239,7 +248,7 @@ public class Simulation {
    * @param cells cells
    * @return CellList
    */
-  private CellList constructCellList(List<Cell> cells) {
+  private CellList constructCellList(Collection<Cell> cells) {
     List<CellData> cellData = new ArrayList<>();
     for(Cell cell: cells) {
       cellData.add(new CellData(cell));
@@ -257,6 +266,15 @@ public class Simulation {
 	  cellData.add(new CellData(cell));
 	}
 	return new CellList(cellData);
+  }
+
+  /**
+   * Sends clicked cells updates to all players.
+   */
+  private void sendClickedCells() {
+    CellList list = constructCellList(clickedCells);
+    sendToPlayers(list);
+    clickedCells.clear();
   }
 
   /**

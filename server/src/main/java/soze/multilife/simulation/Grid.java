@@ -87,7 +87,7 @@ public class Grid {
    * Adds all given cells to the next cells.
    * @param cells
    */
-  void click(List<Cell> cells) {
+  void click(Collection<Cell> cells) {
 	for(Cell cell: cells) {
 	  nextCells.put(new Point(cell.getX(), cell.getY()), cell);
 	}
