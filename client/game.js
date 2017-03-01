@@ -28,7 +28,8 @@ let ticks = 0;
 let FPS = 60;
 let stepsPerSecond = 4;
 let stepPerFrames = FPS / stepsPerSecond;
-let simulationSteps = 0;
+let simulationSteps;
+let wait = false;
 
 let playerData;
 
@@ -123,11 +124,18 @@ function update() {
 		return;
 	}
 	if(ticks % stepPerFrames === 0) {
-    	simulation.update();
-		simulation.transferCells();
+    	advanceSimulation();
 		recentlyClicked = false;
-		simulationSteps++;
 	}
+}
+
+function advanceSimulation() {
+	if(wait) {
+		return;
+	}
+	simulation.update();
+	simulation.transferCells();
+	simulationSteps++;
 }
 
 /**
@@ -177,6 +185,17 @@ function onMapUpdate(data) {
 }
 
 function onTickData(data) {
+	wait = false;
+	if(simulationSteps === undefined) {
+		simulationSteps = data.simulationSteps;
+	}
 	let tick = data.simulationSteps;
+	let difference = tick - simulationSteps;
 	console.log("Sent tick " + tick + ". Client side ticks " + simulationSteps);
+	if(difference > 0) {
+		advanceSimulation();
+		console.log("Tick difference of " + difference + ", advancing.");
+	} else if (difference < 0) {
+		 wait = true;
+	}
 }
