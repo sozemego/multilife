@@ -18,11 +18,6 @@ public class Simulation {
   private static final Logger LOG = LoggerFactory.getLogger(Simulation.class);
 
   /**
-   * A static cell, not located anywhere, in case we need to return invalid cell.
-   */
-  private static final Cell nullCell = new Cell(-1, -1);
-
-  /**
    * Players which recently joined, have not received map data yet.
    */
   private final List<Player> freshPlayers = new ArrayList<>();
