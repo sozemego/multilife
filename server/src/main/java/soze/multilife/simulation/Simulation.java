@@ -2,10 +2,7 @@ package soze.multilife.simulation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import soze.multilife.messages.outgoing.CellData;
-import soze.multilife.messages.outgoing.CellList;
-import soze.multilife.messages.outgoing.MapData;
-import soze.multilife.messages.outgoing.PlayerData;
+import soze.multilife.messages.outgoing.*;
 import soze.multilife.simulation.rule.RuleFactory;
 import soze.multilife.simulation.rule.RuleType;
 
@@ -68,6 +65,8 @@ public class Simulation {
   private final float initialDensity = 0.05f;
 
   private final long simulationOwnerId = 0L;
+
+  private int simulationSteps = 0;
 
   public Simulation(int width, int height) {
 	this.width = width;
@@ -144,6 +143,8 @@ public class Simulation {
 	  grid.update();
 	  //sendActiveCellData(); //TODO send updates that players made
 	  grid.transferCells();
+	  simulationSteps++;
+	  sendSimulationSteps();
 	}
   }
 
@@ -253,6 +254,13 @@ public class Simulation {
 	  cellData.add(new CellData(cell));
 	}
 	return new CellList(cellData);
+  }
+
+  private void sendSimulationSteps() {
+	TickData tickData = new TickData(simulationSteps);
+	for(Player p: players.values()) {
+	  p.send(tickData);
+	}
   }
 
   public int getWidth() {

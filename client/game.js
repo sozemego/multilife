@@ -10,9 +10,13 @@ let canvas;
 
 let input;
 let button;
+let connected = false;
 let clicked = false;
 let recentlyClicked = false;
 
+/**
+	A NullObject simulation.
+*/
 let simulation = {
 	update: function(){},
 	render: function(){},
@@ -24,6 +28,7 @@ let ticks = 0;
 let FPS = 60;
 let stepsPerSecond = 4;
 let stepPerFrames = FPS / stepsPerSecond;
+let simulationSteps = 0;
 
 let playerData;
 
@@ -114,10 +119,14 @@ function getIndex(x, y) {
 	Updates the simulation.
 */
 function update() {
+	if(!connected) {
+		return;
+	}
 	if(ticks % stepPerFrames === 0) {
     	simulation.update();
 		simulation.transferCells();
 		recentlyClicked = false;
+		simulationSteps++;
 	}
 }
 
@@ -141,7 +150,9 @@ function handleMessage(msg) {
     if(msg.type === "CELL_LIST") {
         onMapUpdate(msg);
     }
-    //console.log("Received message of type", msg.type);
+    if(msg.type === "TICK_DATA") {
+    	onTickData(msg);
+    }
 }
 
 function onPlayerData(msg) {
@@ -157,9 +168,15 @@ function onMapData(data) {
 }
 
 function onMapUpdate(data) {
+	connected = true;
     let newCells = data.cells;
     for(let i = 0; i < newCells.length; i++) {
         let newCell = newCells[i];
         simulation.setCellState({x: newCell.x, y: newCell.y}, newCell.alive, newCell.ownerId);
     }
+}
+
+function onTickData(data) {
+	let tick = data.simulationSteps;
+	console.log("Sent tick " + tick + ". Client side ticks " + simulationSteps);
 }

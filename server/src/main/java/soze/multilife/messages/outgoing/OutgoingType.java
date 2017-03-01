@@ -1,10 +1,10 @@
 package soze.multilife.messages.outgoing;
 
 /**
- * Created by soze on 2/21/2017.
+ * Types of outgoing messages.
  */
 public enum OutgoingType {
 
-  CELL_LIST, MAP_DATA, PLAYER_IDENTITY, PLAYER_DATA;
+  CELL_LIST, MAP_DATA, PLAYER_IDENTITY, PLAYER_DATA, TICK_DATA;
 
 }
