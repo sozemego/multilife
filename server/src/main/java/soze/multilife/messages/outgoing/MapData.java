@@ -1,7 +1,7 @@
 package soze.multilife.messages.outgoing;
 
 /**
- * Created by KJurek on 22.02.2017.
+ * Overall data about one simulation.
  */
 public class MapData extends OutgoingMessage {
 

@@ -3,7 +3,7 @@ package soze.multilife.messages.outgoing;
 import java.util.List;
 
 /**
- * Created by soze on 2/21/2017.
+ * Data about a list of cells.
  */
 public class CellList extends OutgoingMessage {
 

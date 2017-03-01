@@ -3,7 +3,7 @@ package soze.multilife.messages.outgoing;
 import soze.multilife.simulation.Cell;
 
 /**
- * Created by soze on 2/21/2017.
+ * Data about one cell.
  */
 public class CellData {
 

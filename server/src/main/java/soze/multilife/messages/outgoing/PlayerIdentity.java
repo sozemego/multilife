@@ -1,7 +1,7 @@
 package soze.multilife.messages.outgoing;
 
 /**
- * Created by KJurek on 22.02.2017.
+ * Data about one player.
  */
 public class PlayerIdentity extends OutgoingMessage {
 

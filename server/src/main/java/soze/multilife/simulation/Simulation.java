@@ -258,8 +258,10 @@ public class Simulation {
 
   private void sendSimulationSteps() {
 	TickData tickData = new TickData(simulationSteps);
-	for(Player p: players.values()) {
-	  p.send(tickData);
+	synchronized(players) {
+		for(Player p: players.values()) {
+	  		p.send(tickData);
+		}
 	}
   }
 
