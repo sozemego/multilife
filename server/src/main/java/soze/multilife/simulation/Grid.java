@@ -42,6 +42,17 @@ public class Grid {
   }
 
   /**
+   * Populates the grid of all cells.
+   */
+  private void init() {
+	for (int i = 0; i < width; i++) {
+	  for (int j = 0; j < height; j++) {
+		cells.put(new Point(i, j), new Cell(i, j));
+	  }
+	}
+  }
+
+  /**
    * Adds a rule for a given player.
    *
    * @param ownerId id of the player this rule should apply to
@@ -52,28 +63,10 @@ public class Grid {
   }
 
   /**
-   * @return cells which will be active in the next iteration
-   */
-  Collection<Cell> getActiveCells() {
-	return nextCells.values();
-  }
-
-  /**
    * @return all cells in this grid
    */
   Collection<Cell> getAllCells() {
 	return cells.values();
-  }
-
-  /**
-   * Populates the grid of all cells.
-   */
-  private void init() {
-	for (int i = 0; i < width; i++) {
-	  for (int j = 0; j < height; j++) {
-		cells.put(new Point(i, j), new Cell(i, j));
-	  }
-	}
   }
 
   /**
@@ -91,7 +84,7 @@ public class Grid {
 
 
   /**
-   * Adds all of the cells to the next cells.
+   * Adds all given cells to the next cells.
    * @param cells
    */
   void click(List<Cell> cells) {
@@ -124,9 +117,9 @@ public class Grid {
   /**
    * Changes the state of a cell at a given point.
    *
-   * @param p
-   * @param state
-   * @param ownerId
+   * @param p point containing coordinates
+   * @param state alive/dead
+   * @param ownerId id of the owner
    */
   private void changeState(Point p, boolean state, long ownerId) {
 	Cell cell = nextCells.get(p);
@@ -139,24 +132,9 @@ public class Grid {
   }
 
   /**
-   * Switches active cells and next iteration active cells.
-   * After the switch, next iteration cells are cleared.
-   */
-  void transferCells() {
-	activeCells.clear();
-	for (Cell nextCell : nextCells.values()) {
-	  Cell cell = getCell(nextCell.getX(), nextCell.getY());
-	  cell.setIsAlive(nextCell.isAlive());
-	  cell.setOwnerId(nextCell.getOwnerId());
-	  addToActive(cell);
-	}
-	nextCells.clear();
-  }
-
-  /**
    * Adds this cell to the map of active cells.
    * This method also adds neighbours of this cell to active cells.
-   * If the cells already exist, cells are not replaced.
+   * If cells already exist, cells are not replaced.
    *
    * @param cell
    */
@@ -173,11 +151,11 @@ public class Grid {
 
   /**
    * Returns a cell at this position. If x or y is out of bounds,
-   * this method will wrap around.
+   * this method will wrap around the grid.
    *
    * @param x
    * @param y
-   * @return
+   * @return cell at given coordinates (from all cells)
    */
   private Cell getCell(int x, int y) {
 	return cells.get(getPoint(x, y));
@@ -196,7 +174,7 @@ public class Grid {
    * Goes through active cells and populates next iteration
    * active cells.
    */
-  void update() {
+  private void update() {
 	for (Cell cell : activeCells.values()) {
 	  int x = cell.getX();
 	  int y = cell.getY();
@@ -260,6 +238,21 @@ public class Grid {
 	}
 
 	return maxValue;
+  }
+
+  /**
+   * Switches active cells and next iteration active cells.
+   * After the switch, next iteration cells are cleared.
+   */
+  void transferCells() {
+	activeCells.clear();
+	for (Cell nextCell : nextCells.values()) {
+	  Cell cell = getCell(nextCell.getX(), nextCell.getY());
+	  cell.setIsAlive(nextCell.isAlive());
+	  cell.setOwnerId(nextCell.getOwnerId());
+	  addToActive(cell);
+	}
+	nextCells.clear();
   }
 
   /**

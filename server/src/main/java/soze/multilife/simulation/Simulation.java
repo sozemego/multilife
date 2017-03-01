@@ -12,10 +12,17 @@ import java.util.stream.Collectors;
 
 /**
  * An object which is the actual simulation of cells.
+ * This object is responsible for advancing the simulation and sending
+ * data to players.
  */
 public class Simulation {
 
   private static final Logger LOG = LoggerFactory.getLogger(Simulation.class);
+
+  /**
+   * playerId of this simulation.
+   */
+  private static final long SIMULATION_PLAYER_ID = 0L;
 
   /**
    * Players which recently joined, have not received map data yet.
@@ -30,22 +37,22 @@ public class Simulation {
   /**
    * All players ever in this instance.
    */
-
   private final Map<Long, Player> allPlayers = new HashMap<>();
 
   /**
    * Maps playerId to color (#hex) of their alive cells.
    */
   private final Map<Long, String> playerColors = new HashMap<>();
+
   /**
    * Colors which are available for players.
    */
   private final String[] availableColors = new String[]{"#ff0000", "#00ff00", "#0000ff", "#ffff00"};
-
   /**
    * Width and height of the game grid.
    */
   private final int width;
+
   private final int height;
 
   /**
@@ -59,36 +66,34 @@ public class Simulation {
    */
   private final float initialDensity = 0.05f;
 
-  private final long simulationOwnerId = 0L;
-
   private int simulationSteps = 0;
 
-  public Simulation(int width, int height) {
+  Simulation(int width, int height) {
 	this.width = width;
 	this.height = height;
 	this.grid = new Grid(width, height);
-	grid.addRule(simulationOwnerId, RuleFactory.getRule(RuleType.BASIC));
+	grid.addRule(SIMULATION_PLAYER_ID, RuleFactory.getRule(RuleType.BASIC));
   }
 
   /**
-   * Spawns cells for the entire game grid.
+   * Spawns initial living cells.
    */
   public void init() {
 	SecureRandom random = new SecureRandom();
 	for (int i = 0; i < width; i++) {
 	  for (int j = 0; j < height; j++) {
 		if (random.nextFloat() < initialDensity) {
-		  grid.changeState(i, j, true, simulationOwnerId);
+		  grid.changeState(i, j, true, SIMULATION_PLAYER_ID);
 		}
 	  }
 	}
-	grid.updateGrid();
+	grid.updateGrid(); // runs the simulation once, so that the first player logging can receive some data
   }
 
   /**
    * Adds a player to the simulation.
    *
-   * @param player
+   * @param player player
    */
   public void addPlayer(Player player) {
 	synchronized (freshPlayers) {
@@ -99,7 +104,7 @@ public class Simulation {
   /**
    * Removes a player from the simulation.
    *
-   * @param id
+   * @param id id of the player to remove
    */
   public void removePlayer(long id) {
 	synchronized (players) {
@@ -112,15 +117,15 @@ public class Simulation {
    * this method checks if all of them are currently not alive.
    * If so, marks them as alive, sets their owner as the player who clicked
    * and sends information to all players about newly alive cells.
-   * @param indices
-   * @param id
+   * @param indices indices of cells to click
+   * @param id id of the player
    */
   public void click(int[] indices, long id) {
     LOG.trace("Player [{}] wants to click on [{}] cells.", id, indices.length);
     List<Cell> clickableCells = grid.findClickableCells(indices, id);
     if(clickableCells.size() == indices.length) {
 		grid.click(clickableCells);
-		sendCellList(constructCellList(clickableCells));
+		sendToPlayers(constructCellList(clickableCells));
 	}
   }
 
@@ -129,15 +134,10 @@ public class Simulation {
    * advances the simulation by one iteration, sends data to players
    * and switches grids.
    */
-  //TODO think about moving all network related stuff
-  // up to Instance object. Instance would
-  // ask simulation (getters) for data to send.
   public void update() {
 	updateFreshPlayers();
 	if (!players.isEmpty()) {
-	  grid.update();
-	  //sendActiveCellData(); //TODO send updates that players made
-	  grid.transferCells();
+	  grid.updateGrid();
 	  simulationSteps++;
 	  sendSimulationSteps();
 	}
@@ -147,7 +147,7 @@ public class Simulation {
    * Processes players who recently joined.
    * Assigns them a color and loads their game of life rule.
    * It then adds them to the players collection, and updates all players
-   * with map data.
+   * with map data. Also notifies all players of all player data.
    */
   private void updateFreshPlayers() {
 	synchronized (freshPlayers) {
@@ -180,11 +180,14 @@ public class Simulation {
    */
   private void sendPlayerData() {
 	PlayerData data = createPlayerData();
-	for(Player player: players.values()) {
-	  player.send(data);
-	}
+	sendToPlayers(data);
   }
 
+  /**
+   * Creates {@link PlayerData} object.
+   * This object contains information about player points, names, colors and rules.
+   * @return PlayerData
+   */
   private PlayerData createPlayerData() {
     Map<Long, Long> points = new HashMap<>();
 	Map<Long, String> names = new HashMap<>();
@@ -209,32 +212,33 @@ public class Simulation {
   /**
    * Assembles and returns MapData.
    *
-   * @return
+   * @return MapData
    */
   private MapData getMapData() {
 	return new MapData(width, height);
   }
 
+  /**
+   * Sends data about all cells to all players.
+   */
   private void sendAllCellData() {
 	CellList list = getAllCellData();
-	sendCellList(list);
+	sendToPlayers(list);
   }
 
+  /**
+   * Sends map data (width, height) to all players.
+   */
   private void sendMapData() {
 	MapData mapData = getMapData();
-	for (Player p : players.values()) {
-	  p.send(mapData);
-	}
+	sendToPlayers(mapData);
   }
 
-  private void sendCellList(CellList list) {
-	synchronized (players) {
-	  for (Player p : players.values()) {
-		p.send(list);
-	  }
-	}
-  }
-
+  /**
+   * Assembles {@link CellList} from a given list of cells.
+   * @param cells cells
+   * @return CellList
+   */
   private CellList constructCellList(List<Cell> cells) {
     List<CellData> cellData = new ArrayList<>();
     for(Cell cell: cells) {
@@ -243,6 +247,10 @@ public class Simulation {
 	return new CellList(cellData);
   }
 
+  /**
+   * Assembles {@link CellList} from all cells.
+   * @return CellList
+   */
   private CellList getAllCellData() {
 	List<CellData> cellData = new ArrayList<>();
 	for (Cell cell : grid.getAllCells().stream().filter(Cell::isAlive).collect(Collectors.toList())) {
@@ -251,12 +259,24 @@ public class Simulation {
 	return new CellList(cellData);
   }
 
+  /**
+   * Sends data about simulation steps ({@link TickData})
+   * to all players.
+   */
   private void sendSimulationSteps() {
 	TickData tickData = new TickData(simulationSteps);
+	sendToPlayers(tickData);
+  }
+
+  /**
+   * Sends a given message to all players in this simulation.
+   * @param message message to send
+   */
+  private void sendToPlayers(OutgoingMessage message) {
 	synchronized(players) {
-		for(Player p: players.values()) {
-	  		p.send(tickData);
-		}
+	  for(Player p: players.values()) {
+		p.send(message);
+	  }
 	}
   }
 
