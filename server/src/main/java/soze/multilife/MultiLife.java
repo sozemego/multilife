@@ -2,6 +2,7 @@ package soze.multilife;
 
 import soze.multilife.events.EventBusHandler;
 import soze.multilife.events.EventHandler;
+import soze.multilife.helpers.UncaughtExceptionLogger;
 import soze.multilife.server.GameSocketHandler;
 import soze.multilife.server.Lobby;
 import soze.multilife.server.Server;
@@ -31,12 +32,14 @@ public class MultiLife {
   private final EventHandler eventHandler;
 
   private MultiLife() {
+	Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger());
 	this.eventHandler = new EventBusHandler();
 	this.connectionFactory = new ConnectionFactory(eventHandler);
 	this.lobby = new Lobby();
 	MetricsService metricsService = new MetricsService();
 	this.eventHandler.register(metricsService);
 	metricsHttpHandler = new MetricsHttpHandler(metricsService);
+
 	Executor executor = Executors.newCachedThreadPool();
 	executor.execute(lobby);
 	executor.execute(metricsService);
