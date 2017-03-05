@@ -273,8 +273,10 @@ public class Simulation {
    */
   private void sendClickedCells() {
     CellList list = constructCellList(clickedCells);
-    sendToPlayers(list);
-    clickedCells.clear();
+    if(!list.cells.isEmpty()) {
+	  sendToPlayers(list);
+	  clickedCells.clear();
+	}
   }
 
   /**
