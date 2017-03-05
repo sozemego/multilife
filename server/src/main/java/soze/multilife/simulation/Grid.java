@@ -271,6 +271,10 @@ public class Grid {
 
   private int getIndex(int x, int y) {
 	int index = x + (y * width); // find index
+	return wrapIndex(index); // wrap it
+  }
+
+  private int wrapIndex(int index) {
 	int maxSize = width * height;
 	if (index < 0) return index + (maxSize); // wrap around if neccesary
 	if (index >= maxSize) return index % (maxSize);
@@ -286,6 +290,7 @@ public class Grid {
    * @return
    */
   private Point getPoint(int index) {
+    index = wrapIndex(index);
 	return new Point(index % width, index / height);
   }
 
