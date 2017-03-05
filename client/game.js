@@ -50,8 +50,10 @@ function setup() {
 }
 
 function draw() {
+	canvas.size(window.innerWidth, window.innerHeight);
 	background(245);
 	ticks++;
+	renderPlayerPoints();
 	update();
 	render();
 }
@@ -67,14 +69,14 @@ function login() {
 	input.remove();
 	button.remove();
 
-  ws = new WebSocket("ws://127.0.0.1:8080/game");
-  ws.onopen = function() {
-  	ws.send(JSON.stringify(getLoginObject(name)));
-  };
+  	ws = new WebSocket("ws://127.0.0.1:8080/game");
+  	ws.onopen = function() {
+  		ws.send(JSON.stringify(getLoginObject(name)));
+  	};
 
-  ws.onmessage = function(msg) {
-    handleMessage(JSON.parse(msg.data));
-  };
+  	ws.onmessage = function(msg) {
+    	handleMessage(JSON.parse(msg.data));
+  	};
 }
 
 function getLoginObject(name) {
@@ -107,6 +109,9 @@ function release() {
 	x, y represents a point on a canvas (in pixels).
 */
 function getIndex(x, y) {
+	if(x > cellSize * width || y > cellSize * height) {
+		return;
+	}
     x = x / cellSize;
     y = y / cellSize;
     let index = Math.floor(x) + (Math.floor(y) * width);
@@ -114,6 +119,36 @@ function getIndex(x, y) {
     if(index < 0) return index + (maxSize); // wrap around if neccesary
     if(index >= maxSize) return index % (maxSize);
     return index; // return index if not neccesary to wrap
+}
+
+function renderPlayerPoints() {
+	if(!playerData) {
+		return;
+	}
+	let x = window.scrollX + canvas.width - 200;
+	let y = 50 + window.scrollY;
+	let size = 17;
+	let spacing = 4;
+
+	let i = 0;
+	for(let o in playerData.colors) {
+		if(playerData.colors.hasOwnProperty(o)) {
+			let color = playerData.colors[o];
+			let rule = playerData.rules[o];
+			let name = playerData.names[o];
+			let points = playerData.points[o];
+
+			fill(color);
+			rect(x, y + i * (size + spacing) - (size + spacing), size, size);
+
+			let ruleText = "(" + rule + ")";
+			textSize(size);
+			fill(0);
+			text(ruleText + " " + name + " -> " + points, x + size + spacing, y + i * (size + spacing));
+			i++;
+		}
+	}
+	
 }
 
 /**
@@ -171,7 +206,6 @@ function onPlayerData(msg) {
 function onMapData(data) {
     width = data.width;
     height = data.height;
-    canvas.size(width * cellSize, height * cellSize);
     simulation = new Simulation(width, height, playerData);
 }
 
