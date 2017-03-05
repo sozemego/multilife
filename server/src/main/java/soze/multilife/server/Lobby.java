@@ -6,6 +6,7 @@ import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingType;
 import soze.multilife.messages.incoming.LoginMessage;
 import soze.multilife.messages.outgoing.PlayerIdentity;
+import soze.multilife.messages.outgoing.PongMessage;
 import soze.multilife.server.connection.Connection;
 import soze.multilife.simulation.Player;
 
@@ -99,6 +100,10 @@ public class Lobby implements Runnable {
   void onMessage(IncomingMessage incMessage, long id) {
 	if (incMessage.getType() == IncomingType.LOGIN) {
 	  handleLoginMessage((LoginMessage) incMessage, id);
+	  return;
+	}
+	if(incMessage.getType() == IncomingType.PING) {
+	  connections.get(id).send(new PongMessage());
 	  return;
 	}
 	long instanceId = playerToInstance.get(id);

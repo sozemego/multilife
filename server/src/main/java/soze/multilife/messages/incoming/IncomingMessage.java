@@ -12,7 +12,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
   visible = true)
 @JsonSubTypes({
   @JsonSubTypes.Type(value = LoginMessage.class, name = "LOGIN"),
-  @JsonSubTypes.Type(value = ClickMessage.class, name = "CLICK")
+  @JsonSubTypes.Type(value = ClickMessage.class, name = "CLICK"),
+  @JsonSubTypes.Type(value = PingMessage.class, name = "PING")
 })
 public abstract class IncomingMessage {
 
