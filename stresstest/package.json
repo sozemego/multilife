@@ -1,0 +1,17 @@
+{
+  "name": "stresstest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "local": "node test.js --players 50 --loginDelay 50 --click true",
+    "remote": "node test.js --players 125 --loginDelay 50 --click false --path ws://138.68.89.151:8080/game"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "minimist": "^1.2.0",
+    "websocket": "^1.0.24"
+  }
+}
