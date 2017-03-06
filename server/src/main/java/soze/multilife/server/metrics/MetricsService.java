@@ -2,6 +2,8 @@ package soze.multilife.server.metrics;
 
 import com.google.common.eventbus.Subscribe;
 import soze.multilife.server.metrics.events.InstanceMetricEvent;
+import soze.multilife.server.metrics.events.PlayerDisconnectedEvent;
+import soze.multilife.server.metrics.events.PlayerLoggedEvent;
 import soze.multilife.server.metrics.events.SerializedMetricEvent;
 
 import java.util.HashMap;
@@ -16,12 +18,14 @@ public class MetricsService implements Runnable {
 
   private final Queue<InstanceMetricEvent> instanceMetricEventQueue = new ConcurrentLinkedQueue<>();
   private final Queue<SerializedMetricEvent> serializedMetricEventQueue = new ConcurrentLinkedQueue<>();
+  private final Queue<Object> playerEvents = new ConcurrentLinkedQueue<>();
 
   private long totalBytesSent = 0;
   private double averageBytesSent = 0d;
   private long totalMessagesSent = 0;
 
   private final Map<String, Long> typeCountMap = new HashMap<>();
+  private final Map<Long, Long> playerMap = new HashMap<>();
 
   @Override
   public void run() {
@@ -41,8 +45,32 @@ public class MetricsService implements Runnable {
 		  Long count = typeCountMap.get(type);
 		  typeCountMap.put(type, count == null ? 1 : ++count);
 		}
+	  }//TODO change those two to be the same as those below?
+
+	  Object playerEvent;
+	  while((playerEvent = playerEvents.poll()) != null) {
+	    if(playerEvent instanceof PlayerLoggedEvent) {
+		  process((PlayerLoggedEvent) playerEvent);
+		}
+		if(playerEvent instanceof PlayerDisconnectedEvent) {
+		  process((PlayerDisconnectedEvent) playerEvent);
+		}
 	  }
 
+	}
+  }
+
+  private void process(PlayerLoggedEvent playerEvent) {
+	synchronized (playerMap) {
+	  long playerId = playerEvent.getPlayerId();
+	  long instanceId = playerEvent.getInstanceId();
+	  playerMap.put(playerId, instanceId);
+	}
+  }
+
+  private void process(PlayerDisconnectedEvent playerEvent) {
+	synchronized (playerMap) {
+	  playerMap.remove(playerEvent.getPlayerId());
 	}
   }
 
@@ -54,6 +82,16 @@ public class MetricsService implements Runnable {
   @Subscribe
   public void handleSerializedMetricEvent(SerializedMetricEvent event) {
 	serializedMetricEventQueue.add(event);
+  }
+
+  @Subscribe
+  public void handlePlayerLoggedEvent(PlayerLoggedEvent event) {
+	playerEvents.add(event);
+  }
+
+  @Subscribe
+  public void handlePlayerDisconnectedEvent(PlayerDisconnectedEvent event) {
+    playerEvents.add(event);
   }
 
   public long getTotalBytesSent() {
@@ -70,5 +108,9 @@ public class MetricsService implements Runnable {
 
   public Map<String, Long> getTypeCountMap() {
 	return typeCountMap;
+  }
+
+  public Map<Long, Long> getPlayerMap() {
+    return playerMap;
   }
 }

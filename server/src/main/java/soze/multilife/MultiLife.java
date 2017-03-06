@@ -35,7 +35,7 @@ public class MultiLife {
 	Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger());
 	this.eventHandler = new EventBusHandler();
 	this.connectionFactory = new ConnectionFactory(eventHandler);
-	this.lobby = new Lobby();
+	this.lobby = new Lobby(eventHandler);
 	MetricsService metricsService = new MetricsService();
 	this.eventHandler.register(metricsService);
 	metricsHttpHandler = new MetricsHttpHandler(metricsService);

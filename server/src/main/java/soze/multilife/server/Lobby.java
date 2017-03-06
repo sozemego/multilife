@@ -2,12 +2,15 @@ package soze.multilife.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import soze.multilife.events.EventHandler;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingType;
 import soze.multilife.messages.incoming.LoginMessage;
 import soze.multilife.messages.outgoing.PlayerIdentity;
 import soze.multilife.messages.outgoing.PongMessage;
 import soze.multilife.server.connection.Connection;
+import soze.multilife.server.metrics.events.PlayerDisconnectedEvent;
+import soze.multilife.server.metrics.events.PlayerLoggedEvent;
 import soze.multilife.simulation.Player;
 
 import java.util.HashMap;
@@ -30,7 +33,10 @@ public class Lobby implements Runnable {
   private final Map<Long, Long> playerToInstance = new HashMap<>();
   private final InstanceFactory instanceFactory;
 
-  public Lobby() {
+  private final EventHandler eventHandler;
+
+  public Lobby(EventHandler eventHandler) {
+	this.eventHandler = eventHandler;
 	this.instanceFactory = new InstanceFactory(instances);
   }
 
@@ -89,6 +95,7 @@ public class Lobby implements Runnable {
 	players.remove(id);
 	long instanceId = playerToInstance.remove(id);
 	instances.get(instanceId).removePlayer(id);
+	eventHandler.post(new PlayerDisconnectedEvent(id));
   }
 
   /**
@@ -128,6 +135,7 @@ public class Lobby implements Runnable {
 	  instances.put(instance.getId(), instance);
 	}
 	playerToInstance.put(id, instance.getId());
+	eventHandler.post(new PlayerLoggedEvent(id, instance.getId()));
   }
 
   private Player createPlayer(Connection connection, String name, String rule) {
