@@ -58,8 +58,14 @@ class Cell {
 		}
 	}
 
-	render() {
+	render(viewport) {
 		if(this.alive || this.active) {
+		    if((this.x * this.size) < viewport.x || (this.x * this.size) > viewport.x + viewport.width) {
+		        return;
+		    }
+		    if((this.y * this.size) < viewport.y || (this.y * this.size) > viewport.y + viewport.height) {
+		        return;
+		    }
 			this.actuallyRender();
 		}
 	}

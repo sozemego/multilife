@@ -50,7 +50,7 @@ function setup() {
 }
 
 function draw() {
-	canvas.size(window.innerWidth, window.innerHeight);
+	canvas.size(Math.max(window.innerWidth, width * cellSize), Math.max(window.innerHeight, height * cellSize));
 	background(245);
 	ticks++;
 	renderPlayerPoints();
@@ -177,7 +177,13 @@ function advanceSimulation() {
 	Renders cells.
 */
 function render() {
-	simulation.render();
+    let viewport = {
+        x: window.scrollX,
+        y: window.scrollY,
+        width: window.innerWidth,
+        height: window.innerHeight
+    };
+	simulation.render(viewport);
 }
 
 function handleMessage(msg) {

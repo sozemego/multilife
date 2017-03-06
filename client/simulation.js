@@ -15,8 +15,8 @@ class Simulation {
         this.grid.setPlayerData(playerData);
     }
 
-	render() {
-		this.grid.render();
+	render(viewport) {
+		this.grid.render(viewport);
 	}
 
     update() {

@@ -152,11 +152,11 @@ class Grid {
 
     }
 
-    render() {
+    render(viewport) {
         for(let pos in this.cells) {
             if(this.cells.hasOwnProperty(pos)) {
 				this.cells[pos].update();
-                this.cells[pos].render();
+                this.cells[pos].render(viewport);
             }
         }
     }
