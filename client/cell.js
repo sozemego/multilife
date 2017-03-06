@@ -50,9 +50,9 @@ class Cell {
 		let p = this.currentPercentageSize;
 		let t = this.targetSizePercentage;
 		if(p < t) {
-			this.currentPercentageSize += 0.125;
+			this.currentPercentageSize += 0.250;
 		} else if (p > t) {
-			this.currentPercentageSize -= 0.125;
+			this.currentPercentageSize -= 0.250;
 		} else {
 			this.active = false;
 		}
