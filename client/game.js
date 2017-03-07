@@ -80,7 +80,14 @@ function login() {
 }
 
 function getLoginObject(name) {
-    return {type: "LOGIN", name: name, rule: "BASIC"};
+    return {type: "LOGIN", name: name, rule: getRandomRule()};
+}
+
+function getRandomRule() {
+    let rules = ["BASIC", "HIGHLIFE", "REPLICATOR",
+     "NO_NAME", "DIAMOEBA", "MORLEY", "FOUR",
+      "CORAL", "LIFE_34", "SEEDS", "ANNEAL"];
+      return rules[getRandomInt(0, rules.length - 1)];
 }
 
 function click() {
@@ -93,8 +100,8 @@ function release() {
     }
 	if(ws) {
     	let indices = [];
-    	for(let i = -4; i < 4; i++) {
-    		for(let j = -4; j < 4; j++) {
+    	for(let i = -4; i < 5; i++) {
+    		for(let j = -4; j < 5; j++) {
     			let index = getIndex(mouseX + (i * cellSize), mouseY + (j * cellSize));
     			indices.push(index);
     		}
@@ -125,7 +132,7 @@ function renderPlayerPoints() {
 	if(!playerData) {
 		return;
 	}
-	let x = window.scrollX + canvas.width - 200;
+	let x = window.scrollX + canvas.width - 400;
 	let y = 50 + window.scrollY;
 	let size = 17;
 	let spacing = 4;
@@ -241,4 +248,8 @@ function onTickData(data) {
 	} else if (difference < 0) {
 		 wait = true;
 	}
+}
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
