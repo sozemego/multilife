@@ -61,6 +61,9 @@ public class Simulation {
    */
   private final Grid grid;
 
+  /**
+   * Cells clicked by players this iteration.
+   */
   private final Set<Cell> clickedCells = new HashSet<>();
 
   /**
@@ -68,6 +71,9 @@ public class Simulation {
    */
   private final float initialDensity = 0.05f;
 
+  /**
+   * A count for how many times this simulation advanced.
+   */
   private int simulationSteps = 0;
 
   Simulation(int width, int height) {
@@ -94,7 +100,6 @@ public class Simulation {
 
   /**
    * Adds a player to the simulation.
-   *
    * @param player player
    */
   public void addPlayer(Player player) {
@@ -105,7 +110,6 @@ public class Simulation {
 
   /**
    * Removes a player from the simulation.
-   *
    * @param id id of the player to remove
    */
   public void removePlayer(long id) {
@@ -114,7 +118,6 @@ public class Simulation {
 	}
   }
 
-  //TODO game.js should send x, y pairs instead of indices
   /**
    * When a player sends an array of indices of cells they clicked,
    * this method checks if all of them are currently not alive.
@@ -220,7 +223,6 @@ public class Simulation {
 
   /**
    * Assembles and returns MapData.
-   *
    * @return MapData
    */
   private MapData getMapData() {
