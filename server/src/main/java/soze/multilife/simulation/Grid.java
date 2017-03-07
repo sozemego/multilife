@@ -35,6 +35,11 @@ public class Grid {
   private final int width;
   private final int height;
 
+  /**
+   * Map of playerId-playerPoints.
+   */
+  private final Map<Long, Long> playerPoints = new HashMap<>();
+
   Grid(int width, int height) {
 	this.width = width;
 	this.height = height;
@@ -183,6 +188,17 @@ public class Grid {
 	  int state = rules.get(ownerId).apply(aliveNeighbours.size(), cell.isAlive());
 	  if (state != 0) {
 		long strongestOwnerId = getStrongestOwnerId(aliveNeighbours);
+		// 0 -> 1 | point to strongest owner
+		// 1 -> 0 | point from cell owner
+		if (state == -1) {
+		  Long points = playerPoints.get(strongestOwnerId);
+		  playerPoints.put(strongestOwnerId, points == null ? 1L : ++points);
+		}
+		if(state == 1) {
+		  Long points = playerPoints.get(cell.getOwnerId());
+		  points = Math.max(points == null? 0L: --points, 0L);
+		  playerPoints.put(cell.getOwnerId(), points);
+		}
 		changeState(x, y, state > 0, strongestOwnerId == -1 ? cell.getOwnerId() : strongestOwnerId);
 	  }
 	}
@@ -292,6 +308,10 @@ public class Grid {
   private Point getPoint(int index) {
     index = wrapIndex(index);
 	return new Point(index % width, index / height);
+  }
+
+  public Map<Long, Long> getPlayerPoints() {
+    return playerPoints;
   }
 
 

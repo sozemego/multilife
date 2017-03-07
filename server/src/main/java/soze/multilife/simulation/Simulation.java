@@ -152,6 +152,7 @@ public class Simulation {
 	  grid.updateGrid();
 	  simulationSteps++;
 	  sendSimulationSteps();
+	  sendPlayerData();
 	}
   }
 
@@ -201,7 +202,7 @@ public class Simulation {
    * @return PlayerData
    */
   private PlayerData createPlayerData() {
-    Map<Long, Long> points = new HashMap<>();
+    Map<Long, Long> points = grid.getPlayerPoints();
 	Map<Long, String> names = new HashMap<>();
 	Map<Long, String> colors = new HashMap<>();
 	Map<Long, String> rules = new HashMap<>();
@@ -213,7 +214,6 @@ public class Simulation {
 	rules.put(0L, "BASIC");
 
 	for(Player player: allPlayers.values()) {
-	  points.put(player.getId(), 0L);
 	  names.put(player.getId(), player.getName());
 	  colors.put(player.getId(), playerColors.get(player.getId()));
 	  rules.put(player.getId(), player.getRule());
