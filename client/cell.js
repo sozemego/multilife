@@ -9,8 +9,8 @@ class Cell {
 		this.color = color;
 		this.renderFunction = renderFunction;
 
-		this.targetSizePercentage = 1;
-		this.currentPercentageSize = 1;
+		this.targetSizePercentage = alive ? 1 : 0;
+		this.currentPercentageSize = 0;
 		this.active = false;
 	}
 

@@ -212,6 +212,9 @@ function onPlayerData(msg) {
 function onMapData(data) {
     width = data.width;
     height = data.height;
+    if(simulation instanceof Simulation) {
+        return;
+    }
     simulation = new Simulation(width, height, playerData);
 }
 
@@ -226,7 +229,7 @@ function onMapUpdate(data) {
 
 function onTickData(data) {
 	wait = false;
-	if(simulationSteps === undefined) {
+	if(simulationSteps === undefined || isNaN(simulationSteps)) {
 		simulationSteps = data.simulationSteps;
 	}
 	let tick = data.simulationSteps;
