@@ -85,7 +85,7 @@ function getLoginObject(name) {
 
 function getRandomRule() {
     let rules = ["BASIC", "HIGHLIFE", "REPLICATOR",
-     "NO_NAME", "DIAMOEBA", "MORLEY", "FOUR",
+     "NO_NAME", "MORLEY", "FOUR",
       "CORAL", "LIFE_34", "SEEDS", "ANNEAL"];
       return rules[getRandomInt(0, rules.length - 1)];
 }
