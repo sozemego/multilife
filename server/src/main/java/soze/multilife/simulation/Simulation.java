@@ -65,6 +65,11 @@ public class Simulation {
    * Cells clicked by players this iteration.
    */
   private final Set<Cell> clickedCells = new HashSet<>();
+  /**
+   * A set of playerIds who clicked cells this iteration.
+   * For limiting purposes.
+   */
+  private final Set<Long> clickedPlayers = new HashSet<>();
 
   /**
    * Percent of alive cells spawned on simulation start.
@@ -123,11 +128,15 @@ public class Simulation {
    * this method checks if all of them are currently not alive.
    * If so, marks them as alive, sets their owner as the player who clicked
    * and sends information to all players about newly alive cells.
+   * If a player already clicked cells during this iteration, this method returns.
    * @param indices indices of cells to click
    * @param id id of the player
    */
   public void click(int[] indices, long id) {
-    LOG.trace("Player [{}] wants to click on [{}] cells.", id, indices.length);
+	if(clickedPlayers.contains(id)) { //only one click per iteration
+	  return;
+	}
+	LOG.trace("Player [{}] wants to click on [{}] cells.", id, indices.length);
     List<Cell> clickableCells = grid.findClickableCells(indices, id);
     if(clickableCells.size() == indices.length) {
       for(Cell cell: clickableCells) {
@@ -135,6 +144,7 @@ public class Simulation {
           return;
 		}
 	  }
+	  clickedPlayers.add(id);
 	  clickedCells.addAll(clickableCells);
 	}
   }
@@ -279,6 +289,7 @@ public class Simulation {
 	  sendToPlayers(list);
 	  clickedCells.clear();
 	}
+	clickedPlayers.clear();
   }
 
   /**
