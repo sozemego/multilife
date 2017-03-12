@@ -30,14 +30,14 @@ public class Simulation {
   private final List<Player> freshPlayers = new ArrayList<>();
 
   /**
+   * Ids of players which disconnected, but were not processed yet.
+   */
+  private final List<Long> leavingPlayerIds = new ArrayList<>();
+
+  /**
    * Players already in-game.
    */
   private final Map<Long, Player> players = new HashMap<>();
-
-  /**
-   * All players ever in this instance.
-   */
-  private final Map<Long, Player> allPlayers = new HashMap<>();
 
   /**
    * Maps playerId to color (#hex) of their alive cells.
@@ -118,8 +118,8 @@ public class Simulation {
    * @param id id of the player to remove
    */
   public void removePlayer(long id) {
-	synchronized (players) {
-	  players.remove(id);
+    synchronized (leavingPlayerIds) {
+	  leavingPlayerIds.add(id);
 	}
   }
 
@@ -155,6 +155,7 @@ public class Simulation {
    * and switches grids.
    */
   public void update() {
+	updateLeavingPlayers();
 	updateFreshPlayers();
 	if (!players.isEmpty()) {
 	  grid.click(clickedCells);
@@ -186,7 +187,6 @@ public class Simulation {
 		  while (it.hasNext()) {
 			Player player = it.next();
 			players.put(player.getId(), player);
-			allPlayers.put(player.getId(), player);
 			it.remove();
 		  }
 
@@ -195,6 +195,17 @@ public class Simulation {
 		  sendAllCellData();
 		}
 	  }
+	}
+  }
+
+  private void updateLeavingPlayers() {
+    synchronized (leavingPlayerIds) {
+	  for(long playerId: leavingPlayerIds) {
+	    playerColors.put(playerId, "#000000");
+	    players.remove(playerId);
+	    grid.killAll(playerId);
+	  }
+	  leavingPlayerIds.clear();
 	}
   }
 
@@ -223,7 +234,7 @@ public class Simulation {
 	colors.put(0L, "#000000");
 	rules.put(0L, "BASIC");
 
-	for(Player player: allPlayers.values()) {
+	for(Player player: players.values()) {
 	  names.put(player.getId(), player.getName());
 	  colors.put(player.getId(), playerColors.get(player.getId()));
 	  rules.put(player.getId(), player.getRule());

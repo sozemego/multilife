@@ -272,6 +272,19 @@ public class Grid {
   }
 
   /**
+   * Kills all cells belonging to a given playerId.
+   * @param playerId
+   */
+  void killAll(long playerId) {
+    for(Cell cell: cells.values()) {
+      if(cell.getOwnerId() == playerId) {
+        cell.setOwnerId(0L);
+        cell.setAlive(false);
+	  }
+	}
+  }
+
+  /**
    * Creates a point object with a given x, y values.
    * If the point lies out of bounds then x, y values
    * are wrapped around.

@@ -162,7 +162,49 @@ class Grid {
     }
 
     setPlayerData(playerData) {
+        this.removeDisconnectedPlayers(playerData);
         Object.assign(this.playerData, playerData);
+    }
+
+    removeDisconnectedPlayers(newPlayerData) {
+        let oldData = this.playerData;
+        let oldPlayerIds = this.getPlayerIds(oldData.rules);
+        let newPlayerIds = this.getPlayerIds(newPlayerData.rules);
+        let disconnectedPlayers = this.findDisconnectedPlayers(oldPlayerIds, newPlayerIds);
+        for(let i = 0; i < disconnectedPlayers.length; i++) {
+            let id = disconnectedPlayers[i];
+            for(let pos in this.cells) {
+                if(this.cells.hasOwnProperty(pos)) {
+                    let cell = this.cells[pos];
+                    if(cell.ownerId == id) {
+                        cell.setAlive(false);
+                        cell.setOwnerId(0);
+                    }
+                }
+            }
+        }
+    }
+
+    getPlayerIds(playerData) {
+        let arr = [];
+        for(let id in playerData) {
+            if(playerData.hasOwnProperty(id)) {
+                arr.push(id);
+            }
+        }
+        return arr;
+    }
+
+    findDisconnectedPlayers(oldPlayerIds, newPlayerIds) {
+        let disconnectedPlayers = [];
+        for(let i = 0; i < oldPlayerIds.length; i++) {
+            let oldPlayerId = oldPlayerIds[i];
+            let index = newPlayerIds.findIndex((i) => i === oldPlayerId);
+            if(index === -1) {
+                disconnectedPlayers.push(oldPlayerId);
+            }
+        }
+        return disconnectedPlayers;
     }
 
 }
