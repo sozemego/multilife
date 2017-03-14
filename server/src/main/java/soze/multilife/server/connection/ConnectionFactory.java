@@ -18,11 +18,12 @@ public class ConnectionFactory {
 
   /**
    * Returns a default connection wrappers for webbit specific implementation.
+   *
    * @param connection
    * @return
    */
   public Connection getConnection(WebSocketConnection connection) {
-    return getMetricsConnection(connection);
+	return getMetricsConnection(connection);
   }
 
   private Connection getMetricsConnection(WebSocketConnection connection) {

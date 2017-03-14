@@ -105,6 +105,7 @@ public class Simulation {
 
   /**
    * Adds a player to the simulation.
+   *
    * @param player player
    */
   public void addPlayer(Player player) {
@@ -115,10 +116,11 @@ public class Simulation {
 
   /**
    * Removes a player from the simulation.
+   *
    * @param id id of the player to remove
    */
   public void removePlayer(long id) {
-    synchronized (leavingPlayerIds) {
+	synchronized (leavingPlayerIds) {
 	  leavingPlayerIds.add(id);
 	}
   }
@@ -129,19 +131,20 @@ public class Simulation {
    * If so, marks them as alive, sets their owner as the player who clicked
    * and sends information to all players about newly alive cells.
    * If a player already clicked cells during this iteration, this method returns.
+   *
    * @param indices indices of cells to click
-   * @param id id of the player
+   * @param id      id of the player
    */
   public void click(int[] indices, long id) {
-	if(clickedPlayers.contains(id)) { //only one click per iteration
+	if (clickedPlayers.contains(id)) { //only one click per iteration
 	  return;
 	}
 	LOG.trace("Player [{}] wants to click on [{}] cells.", id, indices.length);
-    List<Cell> clickableCells = grid.findClickableCells(indices, id);
-    if(clickableCells.size() == indices.length) {
-      for(Cell cell: clickableCells) {
-        if(clickedCells.contains(cell)) {
-          return;
+	List<Cell> clickableCells = grid.findClickableCells(indices, id);
+	if (clickableCells.size() == indices.length) {
+	  for (Cell cell : clickableCells) {
+		if (clickedCells.contains(cell)) {
+		  return;
 		}
 	  }
 	  clickedPlayers.add(id);
@@ -199,11 +202,11 @@ public class Simulation {
   }
 
   private void updateLeavingPlayers() {
-    synchronized (leavingPlayerIds) {
-	  for(long playerId: leavingPlayerIds) {
-	    playerColors.put(playerId, "#000000");
-	    players.remove(playerId);
-	    grid.killAll(playerId);
+	synchronized (leavingPlayerIds) {
+	  for (long playerId : leavingPlayerIds) {
+		playerColors.put(playerId, "#000000");
+		players.remove(playerId);
+		grid.killAll(playerId);
 	  }
 	  leavingPlayerIds.clear();
 	}
@@ -220,10 +223,11 @@ public class Simulation {
   /**
    * Creates {@link PlayerData} object.
    * This object contains information about player points, names, colors and rules.
+   *
    * @return PlayerData
    */
   private PlayerData createPlayerData() {
-    Map<Long, Long> points = grid.getPlayerPoints();
+	Map<Long, Long> points = grid.getPlayerPoints();
 	Map<Long, String> names = new HashMap<>();
 	Map<Long, String> colors = new HashMap<>();
 	Map<Long, String> rules = new HashMap<>();
@@ -234,7 +238,7 @@ public class Simulation {
 	colors.put(0L, "#000000");
 	rules.put(0L, "BASIC");
 
-	for(Player player: players.values()) {
+	for (Player player : players.values()) {
 	  names.put(player.getId(), player.getName());
 	  colors.put(player.getId(), playerColors.get(player.getId()));
 	  rules.put(player.getId(), player.getRule());
@@ -244,6 +248,7 @@ public class Simulation {
 
   /**
    * Assembles and returns MapData.
+   *
    * @return MapData
    */
   private MapData getMapData() {
@@ -268,19 +273,21 @@ public class Simulation {
 
   /**
    * Assembles {@link CellList} from a given list of cells.
+   *
    * @param cells cells
    * @return CellList
    */
   private CellList constructCellList(Collection<Cell> cells) {
-    List<CellData> cellData = new ArrayList<>();
-    for(Cell cell: cells) {
-      cellData.add(new CellData(cell));
+	List<CellData> cellData = new ArrayList<>();
+	for (Cell cell : cells) {
+	  cellData.add(new CellData(cell));
 	}
 	return new CellList(cellData);
   }
 
   /**
    * Assembles {@link CellList} from all cells.
+   *
    * @return CellList
    */
   private CellList getAllCellData() {
@@ -295,8 +302,8 @@ public class Simulation {
    * Sends clicked cells updates to all players.
    */
   private void sendClickedCells() {
-    CellList list = constructCellList(clickedCells);
-    if(!list.cells.isEmpty()) {
+	CellList list = constructCellList(clickedCells);
+	if (!list.cells.isEmpty()) {
 	  sendToPlayers(list);
 	  clickedCells.clear();
 	}
@@ -314,11 +321,12 @@ public class Simulation {
 
   /**
    * Sends a given message to all players in this simulation.
+   *
    * @param message message to send
    */
   private void sendToPlayers(OutgoingMessage message) {
-	synchronized(players) {
-	  for(Player p: players.values()) {
+	synchronized (players) {
+	  for (Player p : players.values()) {
 		p.send(message);
 	  }
 	}

@@ -39,7 +39,7 @@ public class MetricsService implements Runnable {
 	  }
 
 	  InstanceMetricEvent instanceMetricEvent;
-	  while((instanceMetricEvent = instanceMetricEventQueue.poll()) != null) {
+	  while ((instanceMetricEvent = instanceMetricEventQueue.poll()) != null) {
 		String type = instanceMetricEvent.getType();
 		synchronized (typeCountMap) {
 		  Long count = typeCountMap.get(type);
@@ -48,11 +48,11 @@ public class MetricsService implements Runnable {
 	  }//TODO change those two to be the same as those below?
 
 	  Object playerEvent;
-	  while((playerEvent = playerEvents.poll()) != null) {
-	    if(playerEvent instanceof PlayerLoggedEvent) {
+	  while ((playerEvent = playerEvents.poll()) != null) {
+		if (playerEvent instanceof PlayerLoggedEvent) {
 		  process((PlayerLoggedEvent) playerEvent);
 		}
-		if(playerEvent instanceof PlayerDisconnectedEvent) {
+		if (playerEvent instanceof PlayerDisconnectedEvent) {
 		  process((PlayerDisconnectedEvent) playerEvent);
 		}
 	  }
@@ -91,7 +91,7 @@ public class MetricsService implements Runnable {
 
   @Subscribe
   public void handlePlayerDisconnectedEvent(PlayerDisconnectedEvent event) {
-    playerEvents.add(event);
+	playerEvents.add(event);
   }
 
   public long getTotalBytesSent() {
@@ -111,6 +111,6 @@ public class MetricsService implements Runnable {
   }
 
   public Map<Long, Long> getPlayerMap() {
-    return playerMap;
+	return playerMap;
   }
 }

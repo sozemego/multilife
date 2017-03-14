@@ -20,7 +20,7 @@ public class MetricsConnection extends BaseConnection {
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   public MetricsConnection(WebSocketConnection connection, EventHandler eventHandler) {
-    super(connection);
+	super(connection);
 	this.eventHandler = eventHandler;
   }
 
@@ -60,6 +60,7 @@ public class MetricsConnection extends BaseConnection {
 
   /**
    * Assembles and posts an event based on this data.
+   *
    * @param message
    */
   private void postEvent(String message) {
@@ -69,6 +70,7 @@ public class MetricsConnection extends BaseConnection {
 
   /**
    * Creates an event based on this message.
+   *
    * @param message
    * @return
    */
@@ -78,11 +80,11 @@ public class MetricsConnection extends BaseConnection {
   }
 
   private String serialize(OutgoingMessage message) {
-    try {
-      return objectMapper.writeValueAsString(message);
+	try {
+	  return objectMapper.writeValueAsString(message);
 	} catch (JsonProcessingException e) {
-      e.printStackTrace();
-      return "";
+	  e.printStackTrace();
+	  return "";
 	}
   }
 

@@ -2,6 +2,7 @@ package soze.multilife.server.metrics.events;
 
 /**
  * Event constructed based on the instance of outgoing data.
+ *
  * @see soze.multilife.messages.outgoing.OutgoingMessage
  */
 public class InstanceMetricEvent {

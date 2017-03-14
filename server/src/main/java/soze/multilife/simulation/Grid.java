@@ -90,26 +90,28 @@ public class Grid {
 
   /**
    * Adds all given cells to the next cells.
+   *
    * @param cells
    */
   void click(Collection<Cell> cells) {
-	for(Cell cell: cells) {
+	for (Cell cell : cells) {
 	  nextCells.put(new Point(cell.getX(), cell.getY()), cell);
 	}
   }
 
   /**
    * Finds all cells that are clickable by this player.
+   *
    * @param indices array of indices of cells
    * @param ownerId id of the player who clicked
    * @return a list of all clickable (by this player) \s
    */
   List<Cell> findClickableCells(int[] indices, long ownerId) {
-    List<Cell> clickableCells = new ArrayList<>();
-	for(int i: indices) {
+	List<Cell> clickableCells = new ArrayList<>();
+	for (int i : indices) {
 	  Point p = getPoint(i);
 	  Cell cell = cells.get(p);
-	  if(!cell.isAlive()) {
+	  if (!cell.isAlive()) {
 		cell = new Cell(p.x, p.y);
 		cell.setIsAlive(true);
 		cell.setOwnerId(ownerId);
@@ -122,8 +124,8 @@ public class Grid {
   /**
    * Changes the state of a cell at a given point.
    *
-   * @param p point containing coordinates
-   * @param state alive/dead
+   * @param p       point containing coordinates
+   * @param state   alive/dead
    * @param ownerId id of the owner
    */
   private void changeState(Point p, boolean state, long ownerId) {
@@ -171,8 +173,8 @@ public class Grid {
    * and updates the underlying map.
    */
   void updateGrid() {
-    update();
-    transferCells();
+	update();
+	transferCells();
   }
 
   /**
@@ -194,9 +196,9 @@ public class Grid {
 		  Long points = playerPoints.get(strongestOwnerId);
 		  playerPoints.put(strongestOwnerId, points == null ? 1L : ++points);
 		}
-		if(state == 1) {
+		if (state == 1) {
 		  Long points = playerPoints.get(cell.getOwnerId());
-		  points = Math.max(points == null? 0L: --points, 0L);
+		  points = Math.max(points == null ? 0L : --points, 0L);
 		  playerPoints.put(cell.getOwnerId(), points);
 		}
 		changeState(x, y, state > 0, strongestOwnerId == -1 ? cell.getOwnerId() : strongestOwnerId);
@@ -226,12 +228,13 @@ public class Grid {
   /**
    * Finds the most frequently (mode) occuring ownerId among given cells.
    * If there are no cells, returns -1.
+   *
    * @param cells
    * @return
    */
   private long getStrongestOwnerId(List<Cell> cells) {
-    if(cells.isEmpty()) {
-      return -1;
+	if (cells.isEmpty()) {
+	  return -1;
 	}
 	List<Long> ownerIds = cells.stream()
 	  .map(Cell::getOwnerId)
@@ -273,13 +276,14 @@ public class Grid {
 
   /**
    * Kills all cells belonging to a given playerId.
+   *
    * @param playerId
    */
   void killAll(long playerId) {
-    for(Cell cell: cells.values()) {
-      if(cell.getOwnerId() == playerId) {
-        cell.setOwnerId(0L);
-        cell.setAlive(false);
+	for (Cell cell : cells.values()) {
+	  if (cell.getOwnerId() == playerId) {
+		cell.setOwnerId(0L);
+		cell.setAlive(false);
 	  }
 	}
   }
@@ -319,12 +323,12 @@ public class Grid {
    * @return
    */
   private Point getPoint(int index) {
-    index = wrapIndex(index);
+	index = wrapIndex(index);
 	return new Point(index % width, index / height);
   }
 
   public Map<Long, Long> getPlayerPoints() {
-    return playerPoints;
+	return playerPoints;
   }
 
 

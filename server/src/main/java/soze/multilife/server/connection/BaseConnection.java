@@ -29,11 +29,11 @@ public class BaseConnection implements Connection {
   }
 
   private String serialize(OutgoingMessage message) {
-    try {
-      return mapper.writeValueAsString(message);
+	try {
+	  return mapper.writeValueAsString(message);
 	} catch (JsonProcessingException e) {
-      e.printStackTrace();
-      return "";
+	  e.printStackTrace();
+	  return "";
 	}
   }
 

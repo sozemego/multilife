@@ -109,7 +109,7 @@ public class Lobby implements Runnable {
 	  handleLoginMessage((LoginMessage) incMessage, id);
 	  return;
 	}
-	if(incMessage.getType() == IncomingType.PING) {
+	if (incMessage.getType() == IncomingType.PING) {
 	  connections.get(id).send(new PongMessage());
 	  return;
 	}

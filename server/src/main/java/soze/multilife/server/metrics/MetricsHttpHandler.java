@@ -38,8 +38,8 @@ public class MetricsHttpHandler implements HttpHandler {
 	String typeCountMapString = "";
 
 	synchronized (typeCountMap) {
-	  for(Map.Entry<String, Long> entry: typeCountMap.entrySet()) {
-		typeCountMapString += "Type: " + entry.getKey() + " -> [" +entry.getValue() + "]\n";
+	  for (Map.Entry<String, Long> entry : typeCountMap.entrySet()) {
+		typeCountMapString += "Type: " + entry.getKey() + " -> [" + entry.getValue() + "]\n";
 	  }
 	}
 
@@ -48,15 +48,15 @@ public class MetricsHttpHandler implements HttpHandler {
 
 	synchronized (playerMap) {
 	  Multimap<Long, Long> instancePlayerMap = HashMultimap.create();
-	  for(Map.Entry<Long, Long> entry: playerMap.entrySet()) {
-	    long playerId = entry.getKey();
-	    long instanceId = entry.getValue();
-	    instancePlayerMap.put(instanceId, playerId);
+	  for (Map.Entry<Long, Long> entry : playerMap.entrySet()) {
+		long playerId = entry.getKey();
+		long instanceId = entry.getValue();
+		instancePlayerMap.put(instanceId, playerId);
 	  }
-	  for(Map.Entry<Long, Collection<Long>> entry: instancePlayerMap.asMap().entrySet()) {
-	    long instanceId = entry.getKey();
-	    Collection<Long> players = entry.getValue();
-	    playerMapString += "Instance [" + instanceId + "] players [" + players.size() + "]\n";
+	  for (Map.Entry<Long, Collection<Long>> entry : instancePlayerMap.asMap().entrySet()) {
+		long instanceId = entry.getKey();
+		Collection<Long> players = entry.getValue();
+		playerMapString += "Instance [" + instanceId + "] players [" + players.size() + "]\n";
 	  }
 	}
 

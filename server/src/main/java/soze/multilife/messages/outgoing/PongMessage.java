@@ -6,6 +6,6 @@ package soze.multilife.messages.outgoing;
 public class PongMessage extends OutgoingMessage {
 
   public PongMessage() {
-    setType(OutgoingType.PONG);
+	setType(OutgoingType.PONG);
   }
 }
