@@ -74,7 +74,7 @@ public class Simulation {
   /**
    * Percent of alive cells spawned on simulation start.
    */
-  private final float initialDensity = 0.05f;
+  private final float initialDensity = 0.5f;
 
   /**
    * A count for how many times this simulation advanced.
@@ -167,6 +167,7 @@ public class Simulation {
 	  simulationSteps++;
 	  sendSimulationSteps();
 	  sendPlayerData();
+	  synchronize();
 	}
   }
 
@@ -195,7 +196,8 @@ public class Simulation {
 
 		  sendPlayerData();
 		  sendMapData();
-		  sendAllCellData();
+//		  sendAllAliveCellData();
+		  synchronize();
 		}
 	  }
 	}
@@ -256,10 +258,10 @@ public class Simulation {
   }
 
   /**
-   * Sends data about all cells to all players.
+   * Sends data about all alive cells to all players.
    */
-  private void sendAllCellData() {
-	CellList list = getAllCellData();
+  private void sendAllAliveCellData() {
+	CellList list = getAllAliveCellData();
 	sendToPlayers(list);
   }
 
@@ -286,13 +288,25 @@ public class Simulation {
   }
 
   /**
-   * Assembles {@link CellList} from all cells.
+   * Assembles {@link CellList} from all alive cells.
    *
+   * @return CellList
+   */
+  private CellList getAllAliveCellData() {
+	List<CellData> cellData = new ArrayList<>();
+	for (Cell cell : grid.getAllCells().stream().filter(Cell::isAlive).collect(Collectors.toList())) {
+	  cellData.add(new CellData(cell));
+	}
+	return new CellList(cellData);
+  }
+
+  /**
+   * Assembles {@link CellList} from all cells.
    * @return CellList
    */
   private CellList getAllCellData() {
 	List<CellData> cellData = new ArrayList<>();
-	for (Cell cell : grid.getAllCells().stream().filter(Cell::isAlive).collect(Collectors.toList())) {
+	for (Cell cell : grid.getAllCells()) {
 	  cellData.add(new CellData(cell));
 	}
 	return new CellList(cellData);
@@ -330,6 +344,15 @@ public class Simulation {
 		p.send(message);
 	  }
 	}
+  }
+
+  /**
+   * Sends all CellData to all players
+   */
+  private void synchronize() {
+    //if(simulationSteps % 300 == 0) {
+	  sendToPlayers(getAllCellData());
+	//}
   }
 
   public int getWidth() {

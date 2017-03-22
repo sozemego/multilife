@@ -29,13 +29,17 @@ let simulation = {
 };
 
 let ticks = 0;
-let FPS = 60;
-let stepsPerSecond = 4;
+let FPS = 1;
+let stepsPerSecond = 40;
 let stepPerFrames = FPS / stepsPerSecond;
 let simulationSteps;
 let wait = false;
 
 let playerData;
+
+let actualCells = [];
+
+let firstMapData = true;
 
 function setup() {
   canvas = createCanvas(600, 600);
@@ -175,7 +179,7 @@ function update() {
 	return;
   }
   if (ticks % stepPerFrames === 0) {
-	advanceSimulation();
+	//advanceSimulation();
 	recentlyClicked = false;
   }
 }
@@ -187,19 +191,24 @@ function advanceSimulation() {
   simulation.update();
   simulation.transferCells();
   simulationSteps++;
+
 }
 
 /**
  Renders cells.
  */
 function render() {
-  let viewport = {
+  actualCells.forEach((c) => c.render(getViewport()));
+  simulation.render(getViewport());
+}
+
+function getViewport() {
+  return {
 	x: window.scrollX,
 	y: window.scrollY,
 	width: window.innerWidth,
 	height: window.innerHeight
   };
-  simulation.render(viewport);
 }
 
 function handleMessage(msg) {
@@ -237,9 +246,29 @@ function onMapData(data) {
 function onMapUpdate(data) {
   connected = true;
   let newCells = data.cells;
+  if(newCells.length === width * height) {
+	actualCells = [];
+    console.log("Received all data.");
+	for (let i = 0; i < newCells.length; i++) {
+	  let newCell = newCells[i];
+	  let {x, y, alive, ownerId} = newCell;
+	  let cell = new Cell(x, y, alive, ownerId, cellSize, "#0000ff", Cell.rectRenderFunction);
+	  if(alive) {
+	    cell.currentPercentageSize = 1;
+	  }
+	  actualCells.push(cell);
+	}
+	if(!firstMapData) {
+	  return;
+	}
+  }
   for (let i = 0; i < newCells.length; i++) {
 	let newCell = newCells[i];
 	simulation.setCellState({x: newCell.x, y: newCell.y}, newCell.alive, newCell.ownerId);
+  }
+  if(firstMapData) {
+    advanceSimulation();
+    firstMapData = false;
   }
 }
 
@@ -251,8 +280,9 @@ function onTickData(data) {
   let tick = data.simulationSteps;
   let difference = tick - simulationSteps;
   console.log("Sent tick " + tick + ". Client side ticks " + simulationSteps);
+  advanceSimulation();
   if (difference > 0) {
-	advanceSimulation();
+	//advanceSimulation();
 	console.log("Tick difference of " + difference + ", advancing.");
   } else if (difference < 0) {
 	wait = true;

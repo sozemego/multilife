@@ -3,7 +3,7 @@ class Cell {
 	constructor(x, y, alive = false, ownerId = 0, size = 25, color, renderFunction) {
 		this.x = x;
 		this.y = y;
-		this.alive = alive;
+		this.alive = this.setAlive(alive);
 		this.ownerId = ownerId;
 		this.size = size;
 		this.color = color;
@@ -28,6 +28,7 @@ class Cell {
 		} else {
 			this.targetSizePercentage = 0;
 		}
+		return alive;
 	}
 
 	getOwnerId() {
@@ -59,7 +60,7 @@ class Cell {
 	}
 
 	render(viewport) {
-		if(this.alive || this.active) {
+		if(this.alive) {
 		    if((this.x * this.size) < viewport.x || (this.x * this.size) > viewport.x + viewport.width) {
 		        return;
 		    }
@@ -72,6 +73,7 @@ class Cell {
 
 	actuallyRender() {
 		fill(this.color);
+		this.currentPercentageSize = 1;
 		let cellSize = this.size * this.currentPercentageSize;
 		this.renderFunction(
 		(this.x * this.size) + (1 - cellSize) * 0.5,

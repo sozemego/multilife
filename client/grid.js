@@ -40,21 +40,16 @@ class Grid {
         containing the cells.
     */
     getPositionKey(position) {
-        let x = position.x;
-        let y = position.y;
-        if(x < 0) {
-            x = this.width - 1;
-        }
-        if(x === this.width) {
-            x = 0;
-        }
-        if(y < 0) {
-            y = this.height - 1;
-        }
-        if(y === this.height) {
-            y = 0;
-        }
-        return "x:" + x + "y:" + y;
+        let {x, y} = position;
+		let index = x + (y * width); // find index
+	    let maxSize = width * height;
+	  	if (index < 0) index = index + (maxSize); // wrap around if neccesary
+	  	if (index >= maxSize) index = index % (maxSize);
+
+	  	let wrappedX = index % width;
+	  	let wrappedY = Math.floor(index / width);
+
+	  	return "x:" + wrappedX + "y:" + wrappedY;
     }
 
     getColor(ownerId) {
