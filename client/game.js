@@ -29,8 +29,8 @@ let simulation = {
 };
 
 let ticks = 0;
-let FPS = 1;
-let stepsPerSecond = 40;
+let FPS = 30;
+let stepsPerSecond = 4;
 let stepPerFrames = FPS / stepsPerSecond;
 let simulationSteps;
 let wait = false;

@@ -12,7 +12,7 @@ public class InstanceRunner implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(InstanceRunner.class);
 
   private static final int TIME_INACTIVE_TO_DESTROY_IN_SECONDS = 15;
-  private static final long TICK_TIME_MS = 5000;
+  private static final long TICK_TIME_MS = 250;
 
   private final Instance instance;
   /**
