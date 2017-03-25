@@ -14,18 +14,58 @@ let connected = false;
 let clicked = false;
 let recentlyClicked = false;
 
-let rules = ["BASIC", "HIGHLIFE", "REPLICATOR",
-  "NO_NAME", "MORLEY", "FOUR", "CORAL",
-  "LIFE_34", "SEEDS", "ANNEAL"];
+// let rules = ["BASIC", "HIGHLIFE", "REPLICATOR",
+//   "NO_NAME", "MORLEY", "FOUR", "CORAL",
+//   "LIFE_34", "SEEDS", "ANNEAL"];
+let rules = ["BASIC"];
+
+let shapeMap = {};
+let selectedShape = undefined;
+
+(function (shapeMap) {
+
+  function parseShape(str) {
+	let tokens = str.split(",");
+	let rows = tokens.length;
+	let columns = tokens[0].length;
+	let offsets = [];
+	for (let i = 0; i < rows; i++) {
+	  for (let j = 0; j < columns; j++) {
+		let bit = tokens[i].charAt(j);
+		offsets.push({x: i, y: j, bit: bit});
+	  }
+	}
+	return offsets;
+  }
+
+  // INIT BASIC RULES
+  let block = parseShape("11,11");
+  let hive = parseShape("0110,1001,0110");
+  let loaf = parseShape("0010,0101,1001,0110");
+  let tub = parseShape("010,101,010");
+  shapeMap[81] = {name: "block", shape: block};
+  shapeMap[87] = {name: "hive", shape: hive};
+  shapeMap[69] = {name: "loaf", shape: loaf};
+  shapeMap[82] = {name: "tub", shape: tub};
+  shapeMap[65] = {name: "blinker", shape: parseShape("1,1,1")};
+  shapeMap[83] = {name: "floodgate", shape: parseShape("1110000,0100000,0000000,0000000,0000001,0000011,0000001")};
+  shapeMap[68] = {name: "tub", shape: tub};
+  shapeMap[70] = {name: "tub", shape: tub};
+
+})(shapeMap);
 
 /**
  A NullObject simulation.
  */
 let simulation = {
-  update: function () {},
-  render: function () {},
-  transferCells: function () {},
-  setPlayerData: function () {}
+  update: function () {
+  },
+  render: function () {
+  },
+  transferCells: function () {
+  },
+  setPlayerData: function () {
+  }
 };
 
 let ticks = 0;
@@ -49,24 +89,30 @@ function setup() {
   canvas.mouseReleased(release);
 }
 
+function keyPressed(event) {
+  if(connected) {
+	selectedShape = shapeMap[event.keyCode];
+  }
+}
+
 function createLoginView() {
-	let dom = document.getElementById("login");
+  let dom = document.getElementById("login");
 
-	let name = document.createElement("input");
-	name.setAttribute("id", "name");
-	dom.appendChild(name);
+  let name = document.createElement("input");
+  name.setAttribute("id", "name");
+  dom.appendChild(name);
 
-	let buttonRow = document.createElement("div");
-	dom.appendChild(buttonRow);
-	for(let i = 0; i < rules.length; i++) {
-	  let button = document.createElement("button");
-	  button.appendChild(document.createTextNode(rules[i]));
-	  button.setAttribute("val", rules[i]);
-	  button.addEventListener("click", (event) => {
-		login(event.target.getAttribute("val"));
-	  });
-	  buttonRow.appendChild(button);
-	}
+  let buttonRow = document.createElement("div");
+  dom.appendChild(buttonRow);
+  for (let i = 0; i < rules.length; i++) {
+	let button = document.createElement("button");
+	button.appendChild(document.createTextNode(rules[i]));
+	button.setAttribute("val", rules[i]);
+	button.addEventListener("click", (event) => {
+	  login(event.target.getAttribute("val"));
+	});
+	buttonRow.appendChild(button);
+  }
 }
 
 function draw() {
@@ -111,17 +157,32 @@ function release() {
   if (recentlyClicked) {
 	return;
   }
+
   if (ws) {
-	let indices = [];
-	for (let i = -4; i < 5; i++) {
-	  for (let j = -4; j < 5; j++) {
-		let index = getIndex(mouseX + (i * cellSize), mouseY + (j * cellSize));
-		indices.push(index);
-	  }
-	}
-	ws.send(JSON.stringify({type: "CLICK", indices: indices}));
+
+    sendShape(selectedShape.shape);
+
 	recentlyClicked = true;
   }
+}
+
+function sendShape(shape) {
+  if(!shape) {
+    return;
+  }
+  let indices = [];
+  for(let i = 0; i < shape.length; i++) {
+	let el = shape[i];
+	if(el.bit === "1") {
+	  let index = getIndexMouseWithOffset(el.x, el.y);
+	  indices.push(index);
+	}
+  }
+  ws.send(JSON.stringify({type: "CLICK", indices: indices}));
+}
+
+function getIndexMouseWithOffset(xOffset, yOffset) {
+  return getIndex(mouseX + (xOffset * cellSize), mouseY + (yOffset * cellSize));
 }
 
 /**
@@ -198,8 +259,43 @@ function advanceSimulation() {
  Renders cells.
  */
 function render() {
-  actualCells.forEach((c) => c.render(getViewport()));
+  renderSelectedShape();
+  //actualCells.forEach((c) => c.render(getViewport()));
   simulation.render(getViewport());
+}
+
+function renderSelectedShape() {
+  if(!selectedShape) {
+    return;
+  }
+
+  let shape = selectedShape.shape;
+  let indices = findIndices(shape.filter((p) => p.bit === "1").map((p) => {
+    return {x: p.x, y: p.y}
+  }));
+
+  let positions = findPositions(indices);
+  fill("#adeedd");
+  for(let i = 0; i < positions.length; i++) {
+    let p = positions[i];
+    Cell.rectRenderFunction(p.x + (1 - cellSize) * 0.5, p.y + (1 - cellSize) * 0.5, cellSize, cellSize);
+  }
+}
+
+function findPositions(indices) {
+	return indices.map((i) => {
+	  let x = i % width;
+	  let y = Math.floor(i / width);
+	  return {x: x * cellSize, y: y * cellSize};
+	});
+}
+
+function findIndices(positions) {
+  let indices = [];
+  for(let i = 0; i < positions.length; i++) {
+    indices.push(getIndexMouseWithOffset(positions[i].x, positions[i].y));
+  }
+  return indices;
 }
 
 function getViewport() {
@@ -246,19 +342,19 @@ function onMapData(data) {
 function onMapUpdate(data) {
   connected = true;
   let newCells = data.cells;
-  if(newCells.length === width * height) {
+  if (newCells.length === width * height) {
 	actualCells = [];
-    console.log("Received all data.");
+	console.log("Received all data.");
 	for (let i = 0; i < newCells.length; i++) {
 	  let newCell = newCells[i];
 	  let {x, y, alive, ownerId} = newCell;
 	  let cell = new Cell(x, y, alive, ownerId, cellSize, "#0000ff", Cell.rectRenderFunction);
-	  if(alive) {
-	    cell.currentPercentageSize = 1;
+	  if (alive) {
+		cell.currentPercentageSize = 1;
 	  }
 	  actualCells.push(cell);
 	}
-	if(!firstMapData) {
+	if (!firstMapData) {
 	  return;
 	}
   }
@@ -266,9 +362,9 @@ function onMapUpdate(data) {
 	let newCell = newCells[i];
 	simulation.setCellState({x: newCell.x, y: newCell.y}, newCell.alive, newCell.ownerId);
   }
-  if(firstMapData) {
-    advanceSimulation();
-    firstMapData = false;
+  if (firstMapData) {
+	advanceSimulation();
+	firstMapData = false;
   }
 }
 
