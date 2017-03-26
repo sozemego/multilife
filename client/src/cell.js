@@ -1,4 +1,4 @@
-class Cell {
+export default class Cell {
 
 	constructor(x, y, alive = false, ownerId = 0, size = 25, color, renderFunction) {
 		this.x = x;
@@ -83,14 +83,16 @@ class Cell {
 	}
 
 	static get rectRenderFunction() {
-		return function(x, y, width, height) {
-			rect(x, y, width, height);
+		return function(x, y, width, height, color, sketch) {
+		  sketch.fill(color);
+			sketch.rect(x, y, width, height);
 		};
 	}
 
 	static get ellipseRenderFunction() {
-		return function(x, y, width, height) {
-			ellipse(x + width / 2, y + height / 2, width, height);
+		return function(x, y, width, height, color, sketch) {
+		  sketch.fill(color);
+		  sketch.ellipse(x + width / 2, y + height / 2, width, height);
 		};
 	}
 

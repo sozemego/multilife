@@ -49,7 +49,7 @@ public class MultiLife {
 	Server server = new Server.ServerBuilder(8080)
 	  .withWebSocketHandler("/game", new GameSocketHandler(lobby, connectionFactory))
 	  .withHttpHandler("/metrics", metricsHttpHandler)
-	  .withStaticFileHandler("client")
+	  .withStaticFileHandler("client/public")
 	  .build();
 	server.start();
   }
