@@ -1,12 +1,22 @@
 import p5 from "p5";
 import Simulation from "./Simulation";
-import Cell from "./cell";
+import Cell from "./Cell";
 
 // let rules = ["BASIC", "HIGHLIFE", "REPLICATOR",
 //   "NO_NAME", "MORLEY", "FOUR", "CORAL",
 //   "LIFE_34", "SEEDS", "ANNEAL"];
 
 class Game {
+
+  keys = {
+    Q: 81,
+	W: 87,
+	E: 69,
+	R: 82,
+	A: 65,
+	S: 83,
+	D: 68
+  };
 
   constructor(canvas, sketch) {
     this.sketch = sketch;
@@ -18,7 +28,7 @@ class Game {
 	this.wait = false;
     this.canvas = canvas;
 	this.canvas.mouseReleased(this._release);
-	this.simulation = new Simulation(0, 0, {});
+	this.simulation = new Simulation(0, 0, {}, sketch, 200);
   	this.cells = [];
   	this.width = 0;
   	this.height = 0;
@@ -42,7 +52,7 @@ class Game {
 	  return;
 	}
 
-	if (this.ws) {
+	if (this.webSocket && this.selectedShape) {
 	  this._sendShape(this.selectedShape.shape);
 	  this.recentlyClicked = true;
 	}
@@ -60,18 +70,20 @@ class Game {
 		indices.push(index);
 	  }
 	}
-	this.ws.send(JSON.stringify({type: "CLICK", indices: indices}));
+	this.webSocket.send(JSON.stringify({type: "CLICK", indices: indices}));
   };
 
   _initShapes = () => {
     let shapeMap = this.shapeMap = {};
+    let keys = this.keys;
 	// INIT BASIC RULES
-	shapeMap[81] = {name: "block", shape: this._parseShape("11,11")};
-	shapeMap[87] = {name: "hive", shape: this._parseShape("0110,1001,0110")};
-	shapeMap[69] = {name: "loaf", shape: this._parseShape("0010,0101,1001,0110")};
-	shapeMap[82] = {name: "tub", shape: this._parseShape("010,101,010")};
-	shapeMap[65] = {name: "blinker", shape: this._parseShape("1,1,1")};
-	shapeMap[83] = {name: "floodgate", shape: this._parseShape("1110000,0100000,0000000,0000000,0000001,0000011,0000001")};
+	shapeMap[keys.Q] = {name: "block", shape: this._parseShape("11,11")};
+	shapeMap[keys.W] = {name: "hive", shape: this._parseShape("0110,1001,0110")};
+	shapeMap[keys.E] = {name: "loaf", shape: this._parseShape("0010,0101,1001,0110")};
+	shapeMap[keys.R] = {name: "tub", shape: this._parseShape("010,101,010")};
+	shapeMap[keys.A] = {name: "blinker", shape: this._parseShape("1,1,1")};
+	shapeMap[keys.S] = {name: "floodgate", shape: this._parseShape("1110000,0100000,0000000,0000000,0000001,0000011,0000001")};
+
   };
 
   _parseShape = (str) => {
@@ -116,7 +128,7 @@ class Game {
 
 	this.webSocket = new WebSocket("ws://127.0.0.1:8080/game");
 	this.webSocket.onopen = () => {
-	  this.ws.send(JSON.stringify({type: "LOGIN", name: name, rule: rule}));
+	  this.webSocket.send(JSON.stringify({type: "LOGIN", name: name, rule: rule}));
 	  document.getElementById("login").classList.add("logged");
 	};
 
@@ -126,7 +138,7 @@ class Game {
   };
 
   _getIndexMouseWithOffset = (xOffset, yOffset) => {
-	return this._getIndex(mouseX + (xOffset * this.cellSize), mouseY + (yOffset * this.cellSize));
+	return this._getIndex(this.sketch.mouseX + (xOffset * this.cellSize), this.sketch.mouseY + (yOffset * this.cellSize));
   };
 
   /**
@@ -147,22 +159,56 @@ class Game {
   };
 
   draw = () => {
-    let c = this.canvas.canvas;
-    c.width = Math.max(window.innerWidth, this.width * this.cellSize);
-    c.height = Math.max(window.innerHeight, this.height * this.cellSize);
     this.sketch.background(245);
 	this.ticks++;
 	this._renderPlayerPoints();
+	this._renderAvailableShapes();
 	this._update();
 	this._render();
+  };
+
+  _renderAvailableShapes = () => {
+
+    let keys = this.keys;
+    let shapeMap = this.shapeMap;
+
+	let fontSize = 17;
+	let y = this.canvas.height;
+	let x = 5 + window.scrollX;
+	let i = 0;
+
+    for(let k in shapeMap) {
+      if(shapeMap.hasOwnProperty(k)) {
+
+        let shape = shapeMap[k];
+        let shapeName = shape.name;
+        let key = this._getKey(keys, k);
+		this.sketch.textSize(fontSize);
+		this.sketch.fill(0);
+		this.sketch.text(key + ": " + shapeName, x, y - (i * fontSize));
+
+		i++;
+	  }
+	}
+
+  };
+
+  _getKey = (obj, value) => {
+    for(let key in obj) {
+      if(obj.hasOwnProperty(key)) {
+		if(obj[key] == value) {
+		  return key;
+		}
+	  }
+	}
   };
 
   _renderPlayerPoints = () => {
 	if (!this.playerData) {
 	  return;
 	}
-	let x = window.scrollX + this.canvas.width - 400;
-	let y = 50 + window.scrollY;
+	let x = 5 + window.scrollX;
+	let y = 25 + window.scrollY;
 	let size = 17;
 	let spacing = 4;
 
@@ -180,7 +226,7 @@ class Game {
 		let ruleText = "(" + rule + ")";
 		this.sketch.textSize(size);
 		this.sketch.fill(0);
-		this.sketch.text(ruleText + " " + name + " -> " + points, x + size + spacing, y + i * (size + spacing));
+		this.sketch.text(ruleText + " " + name + " -> " + points, x + size + spacing, y + i * (size + spacing), 200);
 		i++;
 	  }
 	}
@@ -229,10 +275,11 @@ class Game {
 	}));
 
 	let positions = this._findPositions(indices);
-	fill("#adeedd");
 	for(let i = 0; i < positions.length; i++) {
 	  let p = positions[i];
-	  Cell.rectRenderFunction(p.x + (1 - this.cellSize) * 0.5, p.y + (1 - this.cellSize) * 0.5, this.cellSize, this.cellSize);
+	  Cell.rectRenderFunction(
+	    p.x + (1 - this.cellSize) * 0.5, p.y + (1 - this.cellSize) * 0.5,
+		this.cellSize, this.cellSize, "#adeedd", this.sketch);
 	}
   };
 
@@ -288,7 +335,7 @@ class Game {
   _onMapData = (data) => {
 	this.width = data.width;
 	this.height = data.height;
-	this.simulation = new Simulation(this.width, this.height, this.playerData);
+	this.simulation = new Simulation(this.width, this.height, this.playerData, this.sketch);
   };
 
   _onMapUpdate = (data) => {
@@ -300,7 +347,7 @@ class Game {
 	  for (let i = 0; i < newCells.length; i++) {
 		let newCell = newCells[i];
 		let {x, y, alive, ownerId} = newCell;
-		let cell = new Cell(x, y, alive, ownerId, this.cellSize, "#0000ff", Cell.rectRenderFunction);
+		let cell = new Cell(x, y, alive, ownerId, this.cellSize, "#0000ff", Cell.rectRenderFunction, this.sketch);
 		if (alive) {
 		  cell.currentPercentageSize = 1;
 		}
@@ -354,12 +401,19 @@ let sketch = new p5((p) => {
 
   p.keyPressed = (event) => {
 	if(game.connected) {
-	  game.selectedShape = shapeMap[event.keyCode]; //TODO FIX
+	  game.selectedShape = game.shapeMap[event.keyCode]; //TODO FIX
 	}
   };
 
   p.draw = () => {
 	game.draw();
+  };
+
+  p.windowResized = () => {
+	p.resizeCanvas(
+	  Math.max(window.innerWidth, game.width * game.cellSize),
+	  Math.max(window.innerHeight, game.height * game.cellSize)
+	);
   };
 
 });

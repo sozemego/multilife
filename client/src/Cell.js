@@ -1,6 +1,6 @@
 export default class Cell {
 
-	constructor(x, y, alive = false, ownerId = 0, size = 25, color, renderFunction) {
+	constructor(x, y, alive = false, ownerId = 0, size = 25, color, renderFunction, sketch) {
 		this.x = x;
 		this.y = y;
 		this.alive = this.setAlive(alive);
@@ -12,6 +12,7 @@ export default class Cell {
 		this.targetSizePercentage = alive ? 1 : 0;
 		this.currentPercentageSize = 0;
 		this.active = false;
+		this.sketch = sketch;
 	}
 
 	isAlive() {
@@ -72,19 +73,18 @@ export default class Cell {
 	}
 
 	actuallyRender() {
-		fill(this.color);
 		this.currentPercentageSize = 1;
 		let cellSize = this.size * this.currentPercentageSize;
 		this.renderFunction(
 		(this.x * this.size) + (1 - cellSize) * 0.5,
 		(this.y * this.size) + (1 - cellSize) * 0.5,
-		cellSize, cellSize);
+		cellSize, cellSize, this.color, this.sketch);
 
 	}
 
 	static get rectRenderFunction() {
 		return function(x, y, width, height, color, sketch) {
-		  sketch.fill(color);
+		  	sketch.fill(color);
 			sketch.rect(x, y, width, height);
 		};
 	}

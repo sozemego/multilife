@@ -3,7 +3,7 @@ import Rules from "./Rules";
 
 export default class Simulation {
 
-  constructor(width, height, playerData) {
+  constructor(width, height, playerData, sketch) {
 	this.width = width;
 	this.height = height;
 	this.width = width;
@@ -14,6 +14,7 @@ export default class Simulation {
 	this.playerData = playerData;
 	this.cellSize = 10;
 	this.rules = new Rules();
+	this.sketch = sketch;
 	this._init();
   }
 
@@ -23,7 +24,7 @@ export default class Simulation {
   _init = () => {
 	for(let i = 0; i < this.width; i++) {
 	  for(let j = 0; j < this.height; j++) {
-		this.cells["x:" + i + "y:" + j] = new Cell(i, j, false, 0, this.cellSize, this._getColor(0), Cell.ellipseRenderFunction);
+		this.cells["x:" + i + "y:" + j] = new Cell(i, j, false, 0, this.cellSize, this._getColor(0), Cell.ellipseRenderFunction, this.sketch);
 	  }
 	}
   };
@@ -31,7 +32,7 @@ export default class Simulation {
   setCellState = (position, alive, ownerId) => {
 	let cell = this.nextCells[this._getPositionKey(position)];
 	if(!cell) {
-	  cell = new Cell(position.x, position.y, alive, ownerId, this.cellSize, this._getColor(ownerId), Cell.ellipseRenderFunction);
+	  cell = new Cell(position.x, position.y, alive, ownerId, this.cellSize, this._getColor(ownerId), Cell.ellipseRenderFunction, this.sketch);
 	  this.nextCells[this._getPositionKey(position)] = cell;
 	}
   };
