@@ -114,13 +114,13 @@ class Game {
 	  return;
 	}
 
-	this.ws = new WebSocket("ws://127.0.0.1:8080/game");
-	this.ws.onopen = () => {
+	this.webSocket = new WebSocket("ws://127.0.0.1:8080/game");
+	this.webSocket.onopen = () => {
 	  this.ws.send(JSON.stringify({type: "LOGIN", name: name, rule: rule}));
 	  document.getElementById("login").classList.add("logged");
 	};
 
-	this.ws.onmessage = (msg) => {
+	this.webSocket.onmessage = (msg) => {
 	  this._handleMessage(JSON.parse(msg.data));
 	};
   };
