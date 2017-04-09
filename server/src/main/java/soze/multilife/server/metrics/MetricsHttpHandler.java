@@ -2,10 +2,9 @@ package soze.multilife.server.metrics;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import org.webbitserver.HttpControl;
-import org.webbitserver.HttpHandler;
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
 import java.util.Collection;
 import java.util.Map;
@@ -13,7 +12,7 @@ import java.util.Map;
 /**
  * A http handler for /metrics endpoint.
  */
-public class MetricsHttpHandler implements HttpHandler {
+public class MetricsHttpHandler implements Route {
 
   private final MetricsService metricsService;
 
@@ -22,10 +21,9 @@ public class MetricsHttpHandler implements HttpHandler {
   }
 
   @Override
-  public void handleHttpRequest(HttpRequest request, HttpResponse response, HttpControl control) throws Exception {
-	response.header("Content-type", "text-html")
-	  .content(createResponse())
-	  .end();
+  public Object handle(Request request, Response response) throws Exception {
+	response.header("Content-type", "text-html");
+	return createResponse();
   }
 
   private String createResponse() {

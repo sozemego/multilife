@@ -5,7 +5,7 @@ module.exports = {
   entry: "./src/Game.js",
   output: {
     filename: "game.js",
-	path: path.resolve(__dirname, "public")
+	path: path.resolve(__dirname, "../server/src/main/resources/public")
   },
   devtool: "source-map",
   module: {

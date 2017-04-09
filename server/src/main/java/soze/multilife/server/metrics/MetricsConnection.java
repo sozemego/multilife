@@ -2,7 +2,7 @@ package soze.multilife.server.metrics;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.webbitserver.WebSocketConnection;
+import org.eclipse.jetty.websocket.api.Session;
 import soze.multilife.events.EventHandler;
 import soze.multilife.messages.outgoing.OutgoingMessage;
 import soze.multilife.server.connection.BaseConnection;
@@ -19,14 +19,9 @@ public class MetricsConnection extends BaseConnection {
   private final EventHandler eventHandler;
   private final ObjectMapper objectMapper = new ObjectMapper();
 
-  public MetricsConnection(WebSocketConnection connection, EventHandler eventHandler) {
-	super(connection);
+  public MetricsConnection(long id, Session session, EventHandler eventHandler) {
+	super(id, session);
 	this.eventHandler = eventHandler;
-  }
-
-  @Override
-  public long getId() {
-	return super.getId();
   }
 
   @Override

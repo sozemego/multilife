@@ -5,7 +5,7 @@ import soze.multilife.events.EventHandler;
 import soze.multilife.helpers.UncaughtExceptionLogger;
 import soze.multilife.server.GameSocketHandler;
 import soze.multilife.server.Lobby;
-import soze.multilife.server.Server;
+import soze.multilife.server.Server.ServerBuilder;
 import soze.multilife.server.connection.ConnectionFactory;
 import soze.multilife.server.metrics.MetricsHttpHandler;
 import soze.multilife.server.metrics.MetricsService;
@@ -46,12 +46,11 @@ public class MultiLife {
   }
 
   private void start() throws InterruptedException, ExecutionException {
-	Server server = new Server.ServerBuilder(8080)
+	new ServerBuilder(8080)
 	  .withWebSocketHandler("/game", new GameSocketHandler(lobby, connectionFactory))
 	  .withHttpHandler("/metrics", metricsHttpHandler)
-	  .withStaticFileHandler("client/public")
+	  .withStaticFileHandler("/public")
 	  .build();
-	server.start();
   }
 
 }

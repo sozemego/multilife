@@ -2,16 +2,13 @@ package soze.multilife.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webbitserver.BaseWebSocketHandler;
-import org.webbitserver.HttpHandler;
-import org.webbitserver.WebServer;
-import org.webbitserver.WebServers;
-import org.webbitserver.handler.StaticFileHandler;
+import spark.Route;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
+
+import static spark.Spark.*;
 
 
 /**
@@ -21,34 +18,24 @@ import java.util.concurrent.ExecutionException;
 public class Server {
 
   private static final Logger LOG = LoggerFactory.getLogger(Server.class);
-  private final WebServer webServer;
 
   private Server(
 	int port,
-	List<ServerBuilder.PathHandlerPair<HttpHandler>> pathHandlerPairs,
-	List<ServerBuilder.PathHandlerPair<BaseWebSocketHandler>> pathWebSocketHandlerPairs,
-	List<String> staticFileHandlerPaths) {
-	this.webServer = WebServers.createWebServer(port);
-	for (ServerBuilder.PathHandlerPair<HttpHandler> pair : pathHandlerPairs) {
-	  webServer.add(pair.getPath(), pair.getHandler());
-	}
-	for (ServerBuilder.PathHandlerPair<BaseWebSocketHandler> pair : pathWebSocketHandlerPairs) {
-	  webServer.add(pair.getPath(), pair.getHandler());
+	List<PathHandlerPair<Route>> pathHandlerPairs,
+	List<PathHandlerPair<Object>> pathWebSocketHandlerPairs,
+	List<String> staticFileHandlerPaths
+  ) {
+
+    port(port);
+	for (PathHandlerPair<Object> pair : pathWebSocketHandlerPairs) {
+	  webSocket(pair.getPath(), pair.getHandler());
 	}
 	for (String path : staticFileHandlerPaths) {
-	  webServer.add(new StaticFileHandler(path));
+	  staticFileLocation(path);
 	}
-  }
-
-  /**
-   * Starts the server. This call is blocking until the server is ready to accept incoming requests.
-   *
-   * @throws InterruptedException
-   * @throws ExecutionException
-   */
-  public void start() throws InterruptedException, ExecutionException {
-	webServer.start().get();
-	LOG.info("Server is listening on [{}]. ", webServer.getUri());
+	for (PathHandlerPair<Route> pair : pathHandlerPairs) {
+	  get(pair.getPath(), pair.getHandler());
+	}
   }
 
   /**
@@ -58,8 +45,8 @@ public class Server {
   public static class ServerBuilder {
 
 	private final int port;
-	private final List<PathHandlerPair<HttpHandler>> pathHandlerPairs = new ArrayList<>();
-	private final List<PathHandlerPair<BaseWebSocketHandler>> pathWebSocketHandlerPairs = new ArrayList<>();
+	private final List<PathHandlerPair<Route>> pathHandlerPairs = new ArrayList<>();
+	private final List<PathHandlerPair<Object>> pathWebSocketHandlerPairs = new ArrayList<>();
 	private final List<String> staticFileHandlerPaths = new ArrayList<>();
 
 	public ServerBuilder(int port) {
@@ -69,12 +56,12 @@ public class Server {
 	  this.port = port;
 	}
 
-	public ServerBuilder withWebSocketHandler(String path, BaseWebSocketHandler handler) {
+	public ServerBuilder withWebSocketHandler(String path, Object handler) {
 	  pathWebSocketHandlerPairs.add(new PathHandlerPair<>(path, handler));
 	  return this;
 	}
 
-	public ServerBuilder withHttpHandler(String path, HttpHandler handler) {
+	public ServerBuilder withHttpHandler(String path, Route handler) {
 	  pathHandlerPairs.add(new PathHandlerPair<>(path, handler));
 	  return this;
 	}
@@ -88,25 +75,25 @@ public class Server {
 	  return new Server(port, pathHandlerPairs, pathWebSocketHandlerPairs, staticFileHandlerPaths);
 	}
 
-	private static class PathHandlerPair<T> {
+  }
 
-	  private final String path;
-	  private final T handler;
+  private static class PathHandlerPair<T> {
 
-	  PathHandlerPair(String path, T handler) {
-		this.path = Objects.requireNonNull(path);
-		this.handler = Objects.requireNonNull(handler);
-	  }
+	private final String path;
+	private final T handler;
 
-	  String getPath() {
-		return path;
-	  }
-
-	  T getHandler() {
-		return handler;
-	  }
+	PathHandlerPair(String path, T handler) {
+	  this.path = Objects.requireNonNull(path);
+	  this.handler = Objects.requireNonNull(handler);
 	}
 
+	String getPath() {
+	  return path;
+	}
+
+	T getHandler() {
+	  return handler;
+	}
   }
 
 }

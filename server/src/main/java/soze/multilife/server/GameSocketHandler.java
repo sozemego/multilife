@@ -1,24 +1,34 @@
 package soze.multilife.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.webbitserver.BaseWebSocketHandler;
-import org.webbitserver.WebSocketConnection;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.server.connection.Connection;
 import soze.multilife.server.connection.ConnectionFactory;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A basic delegate which handles web socket events and passes them along
  * to the simulation. Incoming messages are deserialized.
  */
-public class GameSocketHandler extends BaseWebSocketHandler {
+@WebSocket
+public class GameSocketHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(GameSocketHandler.class);
 
   private final Lobby lobby;
   private final ConnectionFactory connectionFactory;
+  private final AtomicLong id = new AtomicLong(0L);
+  private final Map<Session, Long> sessionIdMap = new ConcurrentHashMap<>();
   private final ObjectMapper mapper = new ObjectMapper();
 
   public GameSocketHandler(Lobby lobby, ConnectionFactory connectionFactory) {
@@ -26,26 +36,29 @@ public class GameSocketHandler extends BaseWebSocketHandler {
 	this.connectionFactory = connectionFactory;
   }
 
-  @Override
-  public void onOpen(WebSocketConnection connection) throws Exception {
-	LOG.info("User connected. ConnectionID [{}].", connection.httpRequest().id());
-	lobby.onConnect(getConnection(connection));
+  @OnWebSocketConnect
+  public void onOpen(Session session) throws Exception {
+    long nextId = id.incrementAndGet();
+	LOG.info("User connected. ConnectionID [{}].", nextId);
+	sessionIdMap.put(session, nextId);
+	lobby.onConnect(getConnection(nextId, session));
   }
 
-  @Override
-  public void onClose(WebSocketConnection connection) throws Exception {
-	LOG.info("User disconnected. ConnectionID [{}].", connection.httpRequest().id());
-	lobby.onDisconnect(getConnection(connection));
+  @OnWebSocketClose
+  public void onClose(Session session, int statusCode, String reason) throws Exception {
+    long userId = sessionIdMap.remove(session);
+	LOG.info("User disconnected. ConnectionID [{}]. Status code [{}]. Reason [{}]", userId, statusCode, reason);
+	lobby.onDisconnect(getConnection(userId, session));
   }
 
-  @Override
-  public void onMessage(WebSocketConnection connection, String msg) throws Throwable {
+  @OnWebSocketMessage
+  public void onMessage(Session session, String msg) throws Exception {
 	IncomingMessage inc = mapper.readValue(msg, IncomingMessage.class);
-	lobby.onMessage(inc, (long) connection.httpRequest().id());
+	lobby.onMessage(inc, sessionIdMap.get(session));
   }
 
-  private Connection getConnection(WebSocketConnection connection) {
-	return connectionFactory.getConnection(connection);
+  private Connection getConnection(long id, Session connection) {
+	return connectionFactory.getConnection(id, connection);
   }
 
 }

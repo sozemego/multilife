@@ -1,6 +1,6 @@
 package soze.multilife.server.connection;
 
-import org.webbitserver.WebSocketConnection;
+import org.eclipse.jetty.websocket.api.Session;
 import soze.multilife.events.EventHandler;
 import soze.multilife.server.metrics.MetricsConnection;
 
@@ -17,17 +17,15 @@ public class ConnectionFactory {
   }
 
   /**
-   * Returns a default connection wrappers for webbit specific implementation.
-   *
-   * @param connection
+   * Returns a default connection wrapper.
    * @return
    */
-  public Connection getConnection(WebSocketConnection connection) {
-	return getMetricsConnection(connection);
+  public Connection getConnection(long id, Session session) {
+	return getMetricsConnection(id, session);
   }
 
-  private Connection getMetricsConnection(WebSocketConnection connection) {
-	return new MetricsConnection(connection, eventHandler);
+  private Connection getMetricsConnection(long id, Session session) {
+	return new MetricsConnection(id, session, eventHandler);
   }
 
 }
