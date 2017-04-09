@@ -1,6 +1,6 @@
 export default class Cell {
 
-	constructor(x, y, alive = false, ownerId = 0, size = 25, color, renderFunction, sketch) {
+	constructor(x, y, alive = false, ownerId, size, color, renderFunction, sketch) {
 		this.x = x;
 		this.y = y;
 		this.alive = this.setAlive(alive);
