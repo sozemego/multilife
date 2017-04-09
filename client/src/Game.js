@@ -2,10 +2,6 @@ import p5 from "p5";
 import Simulation from "./Simulation";
 import Cell from "./Cell";
 
-// let rules = ["BASIC", "HIGHLIFE", "REPLICATOR",
-//   "NO_NAME", "MORLEY", "FOUR", "CORAL",
-//   "LIFE_34", "SEEDS", "ANNEAL"];
-
 class Game {
 
   keys = {
@@ -41,6 +37,7 @@ class Game {
 	this.playerData = {};
 	this.actualCells = [];
 	this.firstMapData = true;
+	this.shapeMap = {};
 	this._initShapes();
 	this._createLoginView();
   }
@@ -82,7 +79,7 @@ class Game {
    * @private
    */
   _initShapes = () => {
-    let shapeMap = this.shapeMap = {};
+    let shapeMap = this.shapeMap;
     let keys = this.keys;
 	// INIT BASIC RULES
 	shapeMap[keys.Q] = {name: "block", shape: this._parseShape("11,11")};
