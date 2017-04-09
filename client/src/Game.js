@@ -82,12 +82,12 @@ class Game {
     let shapeMap = this.shapeMap;
     let keys = this.keys;
 	// INIT BASIC RULES
-	shapeMap[keys.Q] = {name: "block", shape: this._parseShape("11,11")};
-	shapeMap[keys.W] = {name: "hive", shape: this._parseShape("0110,1001,0110")};
-	shapeMap[keys.E] = {name: "loaf", shape: this._parseShape("0010,0101,1001,0110")};
-	shapeMap[keys.R] = {name: "tub", shape: this._parseShape("010,101,010")};
-	shapeMap[keys.A] = {name: "blinker", shape: this._parseShape("1,1,1")};
-	shapeMap[keys.S] = {name: "floodgate", shape: this._parseShape("1110000,0100000,0000000,0000000,0000001,0000011,0000001")};
+	shapeMap[keys.Q] = { name: "block", shape: this._parseShape("11,11") };
+	shapeMap[keys.W] = { name: "hive", shape: this._parseShape("0110,1001,0110") };
+	shapeMap[keys.E] = { name: "loaf", shape: this._parseShape("0010,0101,1001,0110") };
+	shapeMap[keys.R] = { name: "tub", shape: this._parseShape("010,101,010") };
+	shapeMap[keys.A] = { name: "blinker", shape: this._parseShape("1,1,1") };
+	shapeMap[keys.S] = { name: "floodgate", shape: this._parseShape("1110000,0100000,0000000,0000000,0000001,0000011,0000001") };
 
   };
 
