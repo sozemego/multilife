@@ -61,7 +61,7 @@ export default class Cell {
 	}
 
 	render(viewport) {
-		if(this.alive) {
+		if(this.alive || this.active) {
 		    if((this.x * this.size) < viewport.x || (this.x * this.size) > viewport.x + viewport.width) {
 		        return;
 		    }
@@ -73,7 +73,6 @@ export default class Cell {
 	}
 
 	actuallyRender() {
-		this.currentPercentageSize = 1;
 		let cellSize = this.size * this.currentPercentageSize;
 		this.renderFunction(
 		(this.x * this.size) + (1 - cellSize) * 0.5,
