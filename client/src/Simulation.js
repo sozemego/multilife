@@ -1,11 +1,12 @@
 import Cell from "./Cell";
 import Rules from "./Rules";
 
+/**
+ * Class responsible for the simulation of game of life.
+ */
 export default class Simulation {
 
   constructor(width, height, playerData, cellSize, sketch) {
-	this.width = width;
-	this.height = height;
 	this.width = width;
 	this.height = height;
 	this.cells = {};
@@ -15,6 +16,7 @@ export default class Simulation {
 	this.cellSize = cellSize;
 	this.rules = new Rules();
 	this.sketch = sketch;
+	this.defaultOwnerId = 0;
 	this._init();
   }
 
@@ -24,22 +26,41 @@ export default class Simulation {
   _init = () => {
 	for(let i = 0; i < this.width; i++) {
 	  for(let j = 0; j < this.height; j++) {
-		this.cells["x:" + i + "y:" + j] = new Cell(i, j, false, 0, this.cellSize, this._getColor(0), Cell.ellipseRenderFunction, this.sketch);
+		this.cells["x:" + i + "y:" + j] =
+		  new Cell(
+		    i, j, false, this.defaultOwnerId,
+			this.cellSize, this._getColor(this.defaultOwnerId),
+			Cell.ellipseRenderFunction, this.sketch
+		  );
 	  }
 	}
   };
 
+  /**
+   * Sets the state of a cell at a given position. This does not update
+   * the current cell state, but next cell state (will be used in the next iteration).
+   * @param position
+   * @param alive
+   * @param ownerId
+   */
   setCellState = (position, alive, ownerId) => {
 	let cell = this.nextCells[this._getPositionKey(position)];
 	if(!cell) {
-	  cell = new Cell(position.x, position.y, alive, ownerId, this.cellSize, this._getColor(ownerId), Cell.ellipseRenderFunction, this.sketch);
+	  cell = new Cell(
+	    position.x, position.y, alive, ownerId,
+		this.cellSize, this._getColor(ownerId),
+		Cell.ellipseRenderFunction, this.sketch
+	  );
 	  this.nextCells[this._getPositionKey(position)] = cell;
 	}
   };
 
   /**
-   Transforms the position of a cell into the key used in maps
-   containing the cells.
+   * Transforms the position of a cell into the key used in maps
+   * containing the cells. The position is wrapped around the grid.
+   * @param position
+   * @returns {string}
+   * @private
    */
   _getPositionKey = (position) => {
 	let {x, y} = position;
@@ -62,8 +83,7 @@ export default class Simulation {
 	for(let pos in this.activeCells) {
 	  if (this.activeCells.hasOwnProperty(pos)) {
 		let cell = this.activeCells[pos];
-		let x = cell.x;
-		let y = cell.y;
+		let {x, y} = cell;
 		let aliveNeighbours = this._getAliveNeighbourCells(x, y);
 		let ownerId = cell.getOwnerId();
 		let state = this.rules.getRule(this.playerData.rules[ownerId])(aliveNeighbours.length, cell.isAlive());
@@ -134,9 +154,14 @@ export default class Simulation {
 	this.nextCells = {};
   };
 
+  /**
+   * Takes a cell and adds its to active cells. This cell and its neighbours
+   * are added to active cells.
+   * @param cell
+   * @private
+   */
   _addToActive = (cell) => {
-	let x = cell.x;
-	let y = cell.y;
+	let {x, y} = cell;
 	for(let i = -1; i < 2; i++) {
 	  for(let j = -1; j < 2; j++) {
 		let position = this._getPositionKey({x: i + x, y: j + y});
@@ -162,6 +187,12 @@ export default class Simulation {
 	Object.assign(this.playerData, playerData);
   };
 
+  /**
+   * Analyzes new player data and removes players from current player data that are no longer
+   * active (they disconnected). All cells belonging to disconnected players are killed.
+   * @param newPlayerData
+   * @private
+   */
   _removeDisconnectedPlayers = (newPlayerData) => {
 	let oldData = this.playerData;
 	let oldPlayerIds = this._getPlayerIds(oldData.rules);
