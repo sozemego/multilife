@@ -3,7 +3,7 @@ import Rules from "./Rules";
 
 export default class Simulation {
 
-  constructor(width, height, playerData, sketch) {
+  constructor(width, height, playerData, cellSize, sketch) {
 	this.width = width;
 	this.height = height;
 	this.width = width;
@@ -12,7 +12,7 @@ export default class Simulation {
 	this.activeCells = {};
 	this.nextCells = {};
 	this.playerData = playerData;
-	this.cellSize = 10;
+	this.cellSize = cellSize;
 	this.rules = new Rules();
 	this.sketch = sketch;
 	this._init();

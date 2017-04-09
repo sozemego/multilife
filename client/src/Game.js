@@ -24,21 +24,19 @@ class Game {
 	this.FPS = 30;
 	this.stepsPerSecond = 4;
 	this.stepPerFrames = this.FPS / this.stepsPerSecond;
-	this.simulationSteps;
-	this.wait = false;
+	this.simulationSteps = -1;
     this.canvas = canvas;
-	this.canvas.mouseReleased(this._release);
-	this.simulation = new Simulation(0, 0, {}, sketch, 200);
-  	this.cells = [];
-  	this.width = 0;
-  	this.height = 0;
-  	this.cellSize = 10;
+	this.canvas.mouseReleased(this._onMouseUp);
+	this.cellSize = 10;
+	this.simulation = new Simulation(0, 0, {}, this.cellSize, sketch);
+	this.cells = [];
+	this.width = 0;
+	this.height = 0;
   	this.webSocket = undefined;
   	this.myId = 0;
   	this.playerColors = {};
   	this.rules = ["BASIC"];
 	this.connected = false;
-	this.clicked = false;
 	this.recentlyClicked = false;
 	this.playerData = {};
 	this.actualCells = [];
@@ -47,21 +45,27 @@ class Game {
 	this._createLoginView();
   }
 
-  _release = () => {
+  _onMouseUp = () => {
 	if (this.recentlyClicked) {
 	  return;
 	}
 
-	if (this.webSocket && this.selectedShape) {
+	if (this.selectedShape) {
 	  this._sendShape(this.selectedShape.shape);
 	  this.recentlyClicked = true;
 	}
   };
 
+  /**
+   * Tries to inform the back-end that a players wants to spawn a given shape.
+   * @param shape
+   * @private
+   */
   _sendShape = (shape) => {
-	if(!shape) {
+	if(!shape || !this.webSocket) {
 	  return;
 	}
+
 	let indices = [];
 	for(let i = 0; i < shape.length; i++) {
 	  let el = shape[i];
@@ -73,6 +77,10 @@ class Game {
 	this.webSocket.send(JSON.stringify({type: "CLICK", indices: indices}));
   };
 
+  /**
+   * Creates shapes that player is able to spawn.
+   * @private
+   */
   _initShapes = () => {
     let shapeMap = this.shapeMap = {};
     let keys = this.keys;
@@ -86,6 +94,15 @@ class Game {
 
   };
 
+  /**
+   * Parses a given string into a shape. Each row in a shape is delimited with a comma.
+   * Character 0 means dead cell, 1 means alive cell.
+   * Returns an array of objects, where each object specifies the offset
+   * (x, y) form origin (top-left) and specifies if a cell is dead or alive.
+   * @param str
+   * @returns {Array}
+   * @private
+   */
   _parseShape = (str) => {
 	let tokens = str.split(",");
 	let rows = tokens.length;
@@ -247,9 +264,6 @@ class Game {
   };
 
   _advanceSimulation = () => {
-	if (this.wait) {
-	  return;
-	}
 	this.simulation.update();
 	this.simulation.transferCells();
 	this.simulationSteps++;
@@ -335,7 +349,7 @@ class Game {
   _onMapData = (data) => {
 	this.width = data.width;
 	this.height = data.height;
-	this.simulation = new Simulation(this.width, this.height, this.playerData, this.sketch);
+	this.simulation = new Simulation(this.width, this.height, this.playerData, this.cellSize, this.sketch);
   };
 
   _onMapUpdate = (data) => {
@@ -368,8 +382,7 @@ class Game {
   };
 
   _onTickData = (data) => {
-	this.wait = false;
-	if (this.simulationSteps === undefined || isNaN(this.simulationSteps)) {
+	if (this.simulationSteps === -1) {
 	  this.simulationSteps = data.simulationSteps;
 	}
 	let tick = data.simulationSteps;
@@ -379,8 +392,6 @@ class Game {
 	if (difference > 0) {
 	  //advanceSimulation();
 	  console.log("Tick difference of " + difference + ", advancing.");
-	} else if (difference < 0) {
-	  this.wait = true;
 	}
   };
 
