@@ -21,3 +21,5 @@ p5*.js
 *.log
 log/
 node_modules/
+
+client/public/game.js
