@@ -5,26 +5,33 @@ export default class Rules {
 	this.constructRuleTable();
   }
 
-  constructRuleTable() {
-	let {table} = this;
-	table["BASIC"] = this.createRule("B3/S23");
-	table["HIGHLIFE"] = this.createRule("B36/S23");
-	table["LIFE_WITHOUT_DEATH"] = this.createRule("B3/S0123456789");
-	table["DIAMOEBA"] = this.createRule("B35678/S5678");
-	table["MORLEY"] = this.createRule("B368/S245");
-	table["LIFE_34"] = this.createRule("B34/S34");
-	table["CORAL"] = this.createRule("B3/S45678");
-	table["SEEDS"] = this.createRule("B2/S");
-	table["ANNEAL"] = this.createRule("B4678/S3567");
-	table["FOUR"] = this.createRule("B36/S125");
-	table["NO_NAME"] = this.createRule("B25/S4");
-	table["REPLICATOR"] = this.createRule("B1357/S1357");
-  }
-
   getRule(name) {
 	return this.table[name];
   }
 
+  constructRuleTable() {
+	let {table} = this;
+	table["BASIC"] = this.createRule("B3/S23");
+	/**
+	 * The game supports arbitrary rules, but only the basic game of life
+	 * is used in the game.
+	 */
+  }
+
+  /**
+   * Parses a string into a game of life rule.
+   * The string should have the following format:
+   * birthdigits/survivedigits
+   * eg. B3/S23, B356/S89
+   * Non-digit characters are discarded, but can be used for ease of
+   * reading.
+   * Returns a function which accepts as first argument number of
+   * alive neighbours and state (alive/dead) as second argument.
+   * This function returns an integer. 0 means that state of the cell
+   * should not change, -1 means cell dies, 1 means cell comes alive.
+   * @param ruleString
+   * @returns {Function}
+   */
   createRule(ruleString) {
 	let tokens = ruleString.split("/");
 	let birthNumbers = this.extractNumbers(tokens[0]);
