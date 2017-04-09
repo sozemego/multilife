@@ -1,17 +1,19 @@
+/**
+ * Represents a single cell on a grid.
+ */
 export default class Cell {
 
-	constructor(x, y, alive = false, ownerId, size, color, renderFunction, sketch) {
+	constructor(x, y, alive, ownerId, size, color, renderFunction, sketch) {
 		this.x = x;
 		this.y = y;
 		this.alive = this.setAlive(alive);
 		this.ownerId = ownerId;
-		this.size = size;
-		this.color = color;
+		this.size = size || 10;
+		this.color = color || "#000000";
 		this.renderFunction = renderFunction;
 
 		this.targetSizePercentage = alive ? 1 : 0;
 		this.currentPercentageSize = 0;
-		this.active = false;
 		this.sketch = sketch;
 	}
 
@@ -20,9 +22,6 @@ export default class Cell {
 	}
 
 	setAlive(alive) {
-		if(this.alive !== alive) {
-			this.active = true;
-		}
 		this.alive = alive;
 		if(alive) {
 			this.targetSizePercentage = 1;
@@ -61,7 +60,7 @@ export default class Cell {
 	}
 
 	render(viewport) {
-		if(this.alive || this.active) {
+	  	if(this.currentPercentageSize > 0) {
 		    if((this.x * this.size) < viewport.x || (this.x * this.size) > viewport.x + viewport.width) {
 		        return;
 		    }
@@ -75,9 +74,10 @@ export default class Cell {
 	actuallyRender() {
 		let cellSize = this.size * this.currentPercentageSize;
 		this.renderFunction(
-		(this.x * this.size) + (1 - cellSize) * 0.5,
-		(this.y * this.size) + (1 - cellSize) * 0.5,
-		cellSize, cellSize, this.color, this.sketch);
+			(this.x * this.size) + (1 - cellSize) * 0.5,
+			(this.y * this.size) + (1 - cellSize) * 0.5,
+			cellSize, cellSize, this.color, this.sketch
+		);
 
 	}
 
