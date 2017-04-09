@@ -1,4 +1,5 @@
 let path = require("path");
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: "./src/Game.js",
@@ -19,5 +20,11 @@ module.exports = {
 		]
 	  }
 	]
-  }
+  },
+  plugins: [
+	new CopyWebpackPlugin([
+	  { from: "src/index.html" },
+	  { from: "src/main.css" }
+	])
+  ]
 };
