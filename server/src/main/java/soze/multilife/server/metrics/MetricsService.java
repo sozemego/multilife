@@ -16,6 +16,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class MetricsService implements Runnable {
 
+  private static final long CALCULATE_METRICS_INTERVAL = 1000 * 60;
+
   private final Queue<InstanceMetricEvent> instanceMetricEventQueue = new ConcurrentLinkedQueue<>();
   private final Queue<SerializedMetricEvent> serializedMetricEventQueue = new ConcurrentLinkedQueue<>();
   private final Queue<Object> playerEvents = new ConcurrentLinkedQueue<>();
@@ -57,6 +59,11 @@ public class MetricsService implements Runnable {
 		}
 	  }
 
+	  try {
+	    Thread.sleep(CALCULATE_METRICS_INTERVAL);
+	  } catch (InterruptedException e) {
+	    e.printStackTrace();
+	  }
 	}
   }
 
