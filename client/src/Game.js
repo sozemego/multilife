@@ -23,6 +23,7 @@ class Game {
 	this.simulationSteps = -1;
     this.canvas = canvas;
 	this.canvas.mouseReleased(this._onMouseUp);
+	this._styleCanvas(canvas);
 	this.cellSize = 10;
 	this.simulation = new Simulation(0, 0, {}, this.cellSize, sketch);
 	this.cells = [];
@@ -119,22 +120,21 @@ class Game {
 
 	let name = document.createElement("input");
 	name.setAttribute("id", "name");
+	name.setAttribute("placeholder", "Type your name");
 	dom.appendChild(name);
 
-	let buttonRow = document.createElement("div");
-	dom.appendChild(buttonRow);
-	for (let i = 0; i < this.rules.length; i++) {
-	  let button = document.createElement("button");
-	  button.appendChild(document.createTextNode(this.rules[i]));
-	  button.setAttribute("val", this.rules[i]);
-	  button.addEventListener("click", (event) => {
-		this._login(event.target.getAttribute("val"));
-	  });
-	  buttonRow.appendChild(button);
-	}
+	let button = document.createElement("button");
+	button.appendChild(document.createTextNode("ENTER!"));
+	button.classList.add("login-button");
+	button.addEventListener("click", (event) => {
+	  this._login();
+	});
+
+	dom.appendChild(button);
+
   };
 
-  _login = (rule) => {
+  _login = () => {
 	let name = document.getElementById("name").value;
 	if (!name) {
 	  return;
@@ -142,13 +142,17 @@ class Game {
 
 	this.webSocket = new WebSocket("ws://127.0.0.1:8080/game");
 	this.webSocket.onopen = () => {
-	  this.webSocket.send(JSON.stringify({type: "LOGIN", name: name, rule: rule}));
-	  document.getElementById("login").classList.add("logged");
+	  this.webSocket.send(JSON.stringify({type: "LOGIN", name: name, rule: "BASIC"}));
+	  document.getElementById("login-container").classList.add("logged");
 	};
 
 	this.webSocket.onmessage = (msg) => {
 	  this._handleMessage(JSON.parse(msg.data));
 	};
+  };
+
+  _styleCanvas = (p5Canvas) => {
+	p5Canvas.canvas.classList.add("canvas");
   };
 
   _getIndexMouseWithOffset = (xOffset, yOffset) => {
@@ -403,7 +407,7 @@ let sketch = new p5((p) => {
   let game;
 
   p.setup = () => {
-	game = new Game(p.createCanvas(600, 600), p);
+	game = new Game(p.createCanvas(window.innerWidth, window.innerHeight), p);
 	p.frameRate(game.getFPS());
   };
 
