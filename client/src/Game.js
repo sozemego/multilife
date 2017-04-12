@@ -44,7 +44,7 @@ class Game {
   }
 
   _onMouseUp = () => {
-	if (this.recentlyClicked) {
+	if (this.recentlyClicked || !this.connected) {
 	  return;
 	}
 
@@ -419,6 +419,10 @@ let sketch = new p5((p) => {
 
   p.draw = () => {
 	game.draw();
+  };
+
+  p.mouseReleased = () => {
+    game._onMouseUp();
   };
 
   p.windowResized = () => {
