@@ -25,7 +25,7 @@ class Game {
 	this.canvas.mouseReleased(this._onMouseUp);
 	this._styleCanvas(canvas);
 	this.cellSize = 10;
-	this.simulation = new Simulation(0, 0, {}, this.cellSize, sketch);
+	this.simulation = new Simulation(0, 0, {}, this.cellSize, this.rectRenderFunction);
 	this.cells = [];
 	this.width = 0;
 	this.height = 0;
@@ -350,7 +350,7 @@ class Game {
   _onMapData = (data) => {
 	this.width = data.width;
 	this.height = data.height;
-	this.simulation = new Simulation(this.width, this.height, this.playerData, this.cellSize, this.sketch);
+	this.simulation = new Simulation(this.width, this.height, this.playerData, this.cellSize, this.rectRenderFunction);
   };
 
   _onMapUpdate = (data) => {
@@ -398,6 +398,16 @@ class Game {
 
   getFPS = () => {
     return this.FPS;
+  };
+
+  rectRenderFunction = (color, x, y, width, height) => {
+	this.sketch.fill(color);
+	this.sketch.rect(x, y, width, height);
+  };
+
+  ellipseRenderFunction = (color, x, y, width, height) => {
+	this.sketch.fill(color);
+	this.sketch.ellipse(x + width / 2, y + height / 2, width, height);
   };
 
 }

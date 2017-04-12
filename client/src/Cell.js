@@ -3,7 +3,7 @@
  */
 export default class Cell {
 
-	constructor(x, y, alive, ownerId, size, color, renderFunction, sketch) {
+	constructor(x, y, alive, ownerId, size, color, renderFunction) {
 		this.x = x;
 		this.y = y;
 		this.alive = this.setAlive(alive);
@@ -14,7 +14,6 @@ export default class Cell {
 
 		this.targetSizePercentage = alive ? 1 : 0;
 		this.currentPercentageSize = 0;
-		this.sketch = sketch;
 	}
 
 	isAlive() {
@@ -76,23 +75,9 @@ export default class Cell {
 		this.renderFunction(
 			(this.x * this.size) + (1 - cellSize) * 0.5,
 			(this.y * this.size) + (1 - cellSize) * 0.5,
-			cellSize, cellSize, this.color, this.sketch
+			cellSize, cellSize, this.getColor()
 		);
 
-	}
-
-	static get rectRenderFunction() {
-		return function(x, y, width, height, color, sketch) {
-		  	sketch.fill(color);
-			sketch.rect(x, y, width, height);
-		};
-	}
-
-	static get ellipseRenderFunction() {
-		return function(x, y, width, height, color, sketch) {
-		  sketch.fill(color);
-		  sketch.ellipse(x + width / 2, y + height / 2, width, height);
-		};
 	}
 
 }

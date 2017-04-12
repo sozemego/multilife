@@ -6,7 +6,7 @@ import Rules from "./Rules";
  */
 export default class Simulation {
 
-  constructor(width, height, playerData, cellSize, sketch) {
+  constructor(width, height, playerData, cellSize, sketch, renderFunction) {
 	this.width = width;
 	this.height = height;
 	this.cells = {};
@@ -17,6 +17,7 @@ export default class Simulation {
 	this.rules = new Rules();
 	this.sketch = sketch;
 	this.defaultOwnerId = 0;
+	this.renderFunction = renderFunction;
 	this._init();
   }
 
@@ -30,7 +31,7 @@ export default class Simulation {
 		  new Cell(
 		    i, j, false, this.defaultOwnerId,
 			this.cellSize, this._getColor(this.defaultOwnerId),
-			Cell.ellipseRenderFunction, this.sketch
+			this.renderFunction
 		  );
 	  }
 	}
@@ -49,7 +50,7 @@ export default class Simulation {
 	  cell = new Cell(
 	    position.x, position.y, alive, ownerId,
 		this.cellSize, this._getColor(ownerId),
-		Cell.ellipseRenderFunction, this.sketch
+		this.renderFunction
 	  );
 	  this.nextCells[this._getPositionKey(position)] = cell;
 	}
