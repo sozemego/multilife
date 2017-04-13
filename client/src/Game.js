@@ -39,6 +39,8 @@ class Game {
 	this.actualCells = [];
 	this.firstMapData = true;
 	this.shapeMap = {};
+	this.offsets = {};
+	this.onWindowResize(window.innerWidth, window.innerHeight);
 	this._initShapes();
 	this._createLoginView();
   }
@@ -64,6 +66,8 @@ class Game {
 	  return;
 	}
 
+	this._translateMouse();
+
 	let indices = [];
 	for(let i = 0; i < shape.length; i++) {
 	  let el = shape[i];
@@ -72,6 +76,7 @@ class Game {
 		indices.push(index);
 	  }
 	}
+	this._untranslateMouse();
 	this.webSocket.send(JSON.stringify({type: "CLICK", indices: indices}));
   };
 
@@ -284,6 +289,8 @@ class Game {
 	  return;
 	}
 
+	this._translateMouse();
+
 	let shape = this.selectedShape.shape;
 	let indices = this._findIndices(shape.filter((p) => p.bit === "1").map((p) => {
 	  return {x: p.x, y: p.y}
@@ -292,12 +299,30 @@ class Game {
 	let positions = this._findPositions(indices);
 	for(let i = 0; i < positions.length; i++) {
 	  let p = positions[i];
-	  Cell.rectRenderFunction(
+	  this.rectRenderFunction(
 	    p.x + (1 - this.cellSize) * 0.5, p.y + (1 - this.cellSize) * 0.5,
-		this.cellSize, this.cellSize, "#adeedd", this.sketch);
+		this.cellSize, this.cellSize, "#adeedd");
 	}
+
+	this._untranslateMouse();
+
   };
 
+  _translateMouse = () => {
+	this.mouseSnapshotX = this.sketch.mouseX;
+	this.mouseSnapshotY = this.sketch.mouseY;
+
+	this.sketch.mouseX -= this.offsets.x;
+	this.sketch.mouseY -= this.offsets.y;
+  };
+
+  _untranslateMouse = () => {
+    if(this.mouseSnapshotX === undefined || this.mouseSnapshotY === undefined) {
+      throw new Error("You did not translate");
+	}
+	this.sketch.mouseX = this.mouseSnapshotX;
+	this.sketch.mouseY = this.mouseSnapshotY;
+  };
 
   _findPositions = (indices) => {
 	return indices.map((i) => {
@@ -362,7 +387,7 @@ class Game {
 	  for (let i = 0; i < newCells.length; i++) {
 		let newCell = newCells[i];
 		let {x, y, alive, ownerId} = newCell;
-		let cell = new Cell(x, y, alive, ownerId, this.cellSize, "#0000ff", Cell.rectRenderFunction, this.sketch);
+		let cell = new Cell(x, y, alive, ownerId, this.cellSize, "#0000ff", this.rectRenderFunction);
 		if (alive) {
 		  cell.currentPercentageSize = 1;
 		}
@@ -400,14 +425,43 @@ class Game {
     return this.FPS;
   };
 
-  rectRenderFunction = (color, x, y, width, height) => {
+  rectRenderFunction = (x, y, width, height, color) => {
+	let pos = this._translateOffsets(x, y);
 	this.sketch.fill(color);
-	this.sketch.rect(x, y, width, height);
+	this.sketch.rect(pos.x, pos.y, width, height);
   };
 
-  ellipseRenderFunction = (color, x, y, width, height) => {
+  ellipseRenderFunction = (x, y, width, height, color) => {
+	let pos = this._translateOffsets(x, y);
 	this.sketch.fill(color);
-	this.sketch.ellipse(x + width / 2, y + height / 2, width, height);
+	this.sketch.ellipse(pos.x + width / 2, pos.y + height / 2, width, height);
+  };
+
+  /**
+   * Called when a window is resized. Used to calculate stuff based on window size
+   * (e.g. offset from top-left so that rendering area is in the middle).
+   * @param width
+   * @param height
+   */
+  onWindowResize(width, height) {
+	let widthTaken = this.width * this.cellSize;
+	let heightTaken = this.height * this.cellSize;
+	this.offsets.x = (width - widthTaken) / 2;
+	this.offsets.y = (height - heightTaken) / 2;
+  }
+
+  /**
+   * Translates x and y coordinates of a cell, so that the rendering area
+   * is in the middle of the screen.
+   * @param x
+   * @param y
+   * @private
+   */
+  _translateOffsets = (x, y) => {
+	return {
+	  x: x + this.offsets.x,
+	  y: y + this.offsets.y
+	};
   };
 
 }
@@ -440,6 +494,7 @@ let sketch = new p5((p) => {
 	  Math.max(window.innerWidth, game.width * game.cellSize),
 	  Math.max(window.innerHeight, game.height * game.cellSize)
 	);
+	game.onWindowResize(window.innerWidth, window.innerHeight);
   };
 
 });

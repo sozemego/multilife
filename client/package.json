@@ -4,7 +4,7 @@
   "description": "client for multilife",
   "main": "game.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "webpack --watch --progress --colors"
   },
   "author": "kamil jurek",
   "license": "ISC",

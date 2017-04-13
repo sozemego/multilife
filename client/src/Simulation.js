@@ -6,7 +6,7 @@ import Rules from "./Rules";
  */
 export default class Simulation {
 
-  constructor(width, height, playerData, cellSize, sketch, renderFunction) {
+  constructor(width, height, playerData, cellSize, renderFunction) {
 	this.width = width;
 	this.height = height;
 	this.cells = {};
@@ -15,7 +15,6 @@ export default class Simulation {
 	this.playerData = playerData;
 	this.cellSize = cellSize;
 	this.rules = new Rules();
-	this.sketch = sketch;
 	this.defaultOwnerId = 0;
 	this.renderFunction = renderFunction;
 	this._init();
