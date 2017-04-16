@@ -149,6 +149,8 @@ class Game {
 	this.webSocket.onopen = () => {
 	  this.webSocket.send(JSON.stringify({type: "LOGIN", name: name, rule: "BASIC"}));
 	  document.getElementById("login-container").classList.add("logged");
+	  this.connected = true;
+	  this._renderAvailableShapes();
 	};
 
 	this.webSocket.onmessage = (msg) => {
@@ -195,6 +197,10 @@ class Game {
   }
 
   _renderAvailableShapes = () => {
+
+    if(!this.connected) {
+      return;
+	}
 
     let keys = this.keys;
     let shapeMap = this.shapeMap;
@@ -411,7 +417,6 @@ class Game {
   };
 
   _onMapUpdate = (data) => {
-	this.connected = true;
 	let newCells = data.cells;
 	if (newCells.length === this.width * this.height) {
 	  this.actualCells = [];
