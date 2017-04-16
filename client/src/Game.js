@@ -184,7 +184,7 @@ class Game {
   draw = () => {
     this.sketch.background(245);
 	this.ticks++;
-	this._renderPlayerPoints();
+	this.onWindowResize(window.innerWidth, window.innerHeight);
 	this._renderAvailableShapes();
 	this._update();
 	this._render();
@@ -219,7 +219,7 @@ class Game {
   _getKey = (obj, value) => {
     for(let key in obj) {
       if(obj.hasOwnProperty(key)) {
-		if(obj[key] == value) {
+		if(obj[key] === value) {
 		  return key;
 		}
 	  }
@@ -230,27 +230,42 @@ class Game {
 	if (!this.playerData) {
 	  return;
 	}
-	let x = 5 + window.scrollX;
-	let y = 25 + window.scrollY;
-	let size = 17;
-	let spacing = 4;
 
-	let i = 0;
+	let dom = document.getElementById("player-points");
+	dom.innerHTML = "";
+
 	for (let o in this.playerData.colors) {
 	  if (this.playerData.colors.hasOwnProperty(o)) {
 		let color = this.playerData.colors[o];
-		let rule = this.playerData.rules[o];
 		let name = this.playerData.names[o];
 		let points = this.playerData.points[o];
 
-		this.sketch.fill(color);
-		this.sketch.rect(x, y + i * (size + spacing) - (size + spacing), size, size);
+		let listElement = document.createElement("div");
+		listElement.classList.add("player-points-element");
 
-		let ruleText = "(" + rule + ")";
-		this.sketch.textSize(size);
-		this.sketch.fill(0);
-		this.sketch.text(ruleText + " " + name + " -> " + points, x + size + spacing, y + i * (size + spacing), 200);
-		i++;
+		let playerColorElement = document.createElement("span");
+		playerColorElement.classList.add("player-points-color");
+		playerColorElement.style.backgroundColor = color;
+
+		listElement.appendChild(playerColorElement);
+
+		points = points === undefined ? "0" : points;
+
+		let nameElement = document.createElement("span");
+		nameElement.classList.add("player-points-name");
+		let nameNode = document.createTextNode(name);
+		nameElement.appendChild(nameNode);
+		listElement.appendChild(nameElement);
+
+		let pointsElement = document.createElement("span");
+		pointsElement.classList.add("player-points-points");
+
+		let pointsNode = document.createTextNode(points);
+		pointsElement.appendChild(pointsNode);
+
+		listElement.appendChild(pointsElement);
+
+		dom.appendChild(listElement);
 	  }
 	}
   };
@@ -370,6 +385,7 @@ class Game {
   _onPlayerData = (msg) => {
 	this.playerData = msg;
 	this.simulation.setPlayerData(msg);
+	this._renderPlayerPoints();
   };
 
   _onMapData = (data) => {

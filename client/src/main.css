@@ -33,6 +33,39 @@
     z-index: -5;
 }
 
+.player-points {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 5px;
+}
+
+.player-points-element {
+    margin: 2px;
+    display: flex;
+}
+
+.player-points-color {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+}
+
+.player-points-name {
+    margin-left: 10px;
+    display: inline-block;
+    width: 100px;
+    line-height: 24px;
+    max-width: 100px;
+    overflow: hidden;
+}
+
+.player-points-points {
+    color: gray;
+    line-height: 24px;
+    display: inline-block;
+}
+
 html, body {
     width: 100%;
     height: 100%;
