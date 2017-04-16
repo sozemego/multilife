@@ -15,6 +15,7 @@ class InstanceFactory {
   private final Executor executor = Executors.newCachedThreadPool();
   private final Map<Long, Instance> instances;
   private final int maxPlayers = 4;
+  private final long defaultTimeToLive = 1000 * 60 * 5;
   private final SimulationFactory simulationFactory = new SimulationFactory();
   private long currentId = 0;
 
@@ -42,7 +43,7 @@ class InstanceFactory {
 	// not a single instance was found, so let's create a new one.
 	Simulation simulation = simulationFactory.getSimulation();
 	simulation.init(); //TODO decide if this should be here
-	Instance instance = new Instance(++currentId, simulation, maxPlayers);
+	Instance instance = new Instance(++currentId, simulation, maxPlayers, defaultTimeToLive);
 	executor.execute(new InstanceRunner(instance));
 	return instance;
   }

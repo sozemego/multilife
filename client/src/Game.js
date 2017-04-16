@@ -393,6 +393,9 @@ class Game {
 	if (msg.type === "TICK_DATA") {
 	  this._onTickData(msg);
 	}
+	if(msg.type === "TIME_REMAINING") {
+	  this._onRemainingTime(msg);
+	}
   };
 
   _onPlayerData = (msg) => {
@@ -491,6 +494,32 @@ class Game {
 	  x: x + this.offsets.x,
 	  y: y + this.offsets.y
 	};
+  };
+
+  _onRemainingTime = (msg) => {
+    let remainingTime = msg.remainingTime;
+
+    let dom = document.getElementById("remaining-time");
+    dom.innerHTML = "";
+
+    let span = document.createElement("span");
+    span.appendChild(document.createTextNode(this._parseRemainingTime(remainingTime)));
+    dom.appendChild(span);
+
+  };
+
+  _parseRemainingTime = (remainingTime) => {
+    remainingTime = parseInt(remainingTime);
+	let second = Math.max(Math.floor((remainingTime / 1000) % 60), 0);
+	let minute = Math.max(Math.floor((remainingTime / (1000 * 60)) % 60), 0);
+
+	second = "" + second;
+	second = ("00" + second).substr(second.length);
+
+	minute = "" + minute;
+	minute = ("00" + minute).substr(minute.length);
+
+	return minute + ":" + second;
   };
 
 }
