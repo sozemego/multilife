@@ -94,7 +94,7 @@ class Game {
 	shapeMap[keys.R] = { name: "tub", shape: this._parseShape("010,101,010") };
 	shapeMap[keys.A] = { name: "blinker", shape: this._parseShape("1,1,1") };
 	shapeMap[keys.S] = { name: "floodgate", shape: this._parseShape("1110000,0100000,0000000,0000000,0000001,0000011,0000001") };
-
+	this._renderAvailableShapes();
   };
 
   /**
@@ -185,32 +185,45 @@ class Game {
     this.sketch.background(245);
 	this.ticks++;
 	this.onWindowResize(window.innerWidth, window.innerHeight);
-	this._renderAvailableShapes();
 	this._update();
 	this._render();
   };
+
+  selectShape(keyCode) {
+	this.selectedShape = this.shapeMap[keyCode];
+	this._renderAvailableShapes();
+  }
 
   _renderAvailableShapes = () => {
 
     let keys = this.keys;
     let shapeMap = this.shapeMap;
 
-	let fontSize = 17;
-	let y = this.canvas.height;
-	let x = 5 + window.scrollX;
-	let i = 0;
+    let dom = document.getElementById("available-shapes");
+    dom.innerHTML = "";
 
     for(let k in shapeMap) {
       if(shapeMap.hasOwnProperty(k)) {
 
-        let shape = shapeMap[k];
-        let shapeName = shape.name;
-        let key = this._getKey(keys, k);
-		this.sketch.textSize(fontSize);
-		this.sketch.fill(0);
-		this.sketch.text(key + ": " + shapeName, x, y - (i * fontSize));
+		let shape = shapeMap[k];
+		let shapeName = shape.name;
+		let key = this._getKey(keys, k);
 
-		i++;
+        let container = document.createElement("div");
+        container.addEventListener("click", () => {
+		  this.selectShape(k);
+		});
+
+        let textElement = document.createElement("span");
+        textElement.style.display = "inline-block";
+        textElement.appendChild(document.createTextNode(key + " " + shapeName));
+
+        if(this.selectedShape && shapeName === this.selectedShape.name) {
+          textElement.style.backgroundColor = "red";
+		}
+
+		container.appendChild(textElement);
+		dom.appendChild(container);
 	  }
 	}
 
@@ -219,7 +232,7 @@ class Game {
   _getKey = (obj, value) => {
     for(let key in obj) {
       if(obj.hasOwnProperty(key)) {
-		if(obj[key] === value) {
+		if(obj[key] == value) {
 		  return key;
 		}
 	  }
@@ -493,7 +506,7 @@ let sketch = new p5((p) => {
 
   p.keyPressed = (event) => {
 	if(game.connected) {
-	  game.selectedShape = game.shapeMap[event.keyCode]; //TODO FIX
+	  game.selectShape(event.keyCode);
 	}
   };
 

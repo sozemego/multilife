@@ -66,6 +66,13 @@
     display: inline-block;
 }
 
+.available-shapes {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin: 5px;
+}
+
 html, body {
     width: 100%;
     height: 100%;
