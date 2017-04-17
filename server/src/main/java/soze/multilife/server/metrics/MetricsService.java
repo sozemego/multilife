@@ -18,9 +18,7 @@ public class MetricsService implements Runnable {
 
   private static final long CALCULATE_METRICS_INTERVAL = 1000 * 60;
 
-  private final Queue<InstanceMetricEvent> instanceMetricEventQueue = new ConcurrentLinkedQueue<>();
-  private final Queue<SerializedMetricEvent> serializedMetricEventQueue = new ConcurrentLinkedQueue<>();
-  private final Queue<Object> playerEvents = new ConcurrentLinkedQueue<>();
+  private final Queue<Object> events = new ConcurrentLinkedQueue<>();
 
   private long totalBytesSent = 0;
   private double averageBytesSent = 0d;
@@ -33,29 +31,19 @@ public class MetricsService implements Runnable {
   public void run() {
 	while (true) {
 
-	  SerializedMetricEvent serializedMetricEvent;
-	  while ((serializedMetricEvent = serializedMetricEventQueue.poll()) != null) {
-		totalBytesSent += serializedMetricEvent.getBytesSent();
-		totalMessagesSent++;
-		averageBytesSent = totalBytesSent / totalMessagesSent;
-	  }
-
-	  InstanceMetricEvent instanceMetricEvent;
-	  while ((instanceMetricEvent = instanceMetricEventQueue.poll()) != null) {
-		String type = instanceMetricEvent.getType();
-		synchronized (typeCountMap) {
-		  Long count = typeCountMap.get(type);
-		  typeCountMap.put(type, count == null ? 1 : ++count);
+	  Object event;
+	  while ((event = events.poll()) != null) {
+		if (event instanceof PlayerLoggedEvent) {
+		  process((PlayerLoggedEvent) event);
 		}
-	  }//TODO change those two to be the same as those below?
-
-	  Object playerEvent;
-	  while ((playerEvent = playerEvents.poll()) != null) {
-		if (playerEvent instanceof PlayerLoggedEvent) {
-		  process((PlayerLoggedEvent) playerEvent);
+		if (event instanceof PlayerDisconnectedEvent) {
+		  process((PlayerDisconnectedEvent) event);
 		}
-		if (playerEvent instanceof PlayerDisconnectedEvent) {
-		  process((PlayerDisconnectedEvent) playerEvent);
+		if(event instanceof SerializedMetricEvent) {
+		  process((SerializedMetricEvent) event);
+		}
+		if(event instanceof InstanceMetricEvent) {
+		  process((InstanceMetricEvent) event);
 		}
 	  }
 
@@ -81,24 +69,38 @@ public class MetricsService implements Runnable {
 	}
   }
 
+  private void process(SerializedMetricEvent event) {
+	totalBytesSent += event.getBytesSent();
+	totalMessagesSent++;
+	averageBytesSent = totalBytesSent / totalMessagesSent;
+  }
+
+  private void process(InstanceMetricEvent event) {
+	String type = event.getType();
+	synchronized (typeCountMap) {
+	  Long count = typeCountMap.get(type);
+	  typeCountMap.put(type, count == null ? 1 : ++count);
+	}
+  }
+
   @Subscribe
   public void handleInstanceMetricEvent(InstanceMetricEvent event) {
-	instanceMetricEventQueue.add(event);
+	events.add(event);
   }
 
   @Subscribe
   public void handleSerializedMetricEvent(SerializedMetricEvent event) {
-	serializedMetricEventQueue.add(event);
+	events.add(event);
   }
 
   @Subscribe
   public void handlePlayerLoggedEvent(PlayerLoggedEvent event) {
-	playerEvents.add(event);
+	events.add(event);
   }
 
   @Subscribe
   public void handlePlayerDisconnectedEvent(PlayerDisconnectedEvent event) {
-	playerEvents.add(event);
+	events.add(event);
   }
 
   public long getTotalBytesSent() {
