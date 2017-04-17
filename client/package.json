@@ -4,7 +4,8 @@
   "description": "client for multilife",
   "main": "game.js",
   "scripts": {
-    "start": "webpack --watch --progress --colors"
+    "start": "webpack --watch --progress --colors",
+    "build": "webpack -p --config webpack-production.config.js"
   },
   "author": "kamil jurek",
   "license": "ISC",

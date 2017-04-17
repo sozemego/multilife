@@ -17,7 +17,7 @@ class Game {
   constructor(canvas, sketch) {
     this.sketch = sketch;
 	this.ticks = 0;
-	this.FPS = 30;
+	this.FPS = 60;
 	this.stepsPerSecond = 4;
 	this.stepPerFrames = this.FPS / this.stepsPerSecond;
 	this.simulationSteps = -1;
@@ -31,7 +31,6 @@ class Game {
 	this.height = 0;
   	this.webSocket = undefined;
   	this.myId = 0;
-  	this.playerColors = {};
   	this.rules = ["BASIC"];
 	this.connected = false;
 	this.recentlyClicked = false;
@@ -44,41 +43,6 @@ class Game {
 	this._initShapes();
 	this._createLoginView();
   }
-
-  _onMouseUp = () => {
-	if (this.recentlyClicked || !this.connected) {
-	  return;
-	}
-
-	if (this.selectedShape) {
-	  this._sendShape(this.selectedShape.shape);
-	  this.recentlyClicked = true;
-	}
-  };
-
-  /**
-   * Tries to inform the back-end that a players wants to spawn a given shape.
-   * @param shape
-   * @private
-   */
-  _sendShape = (shape) => {
-	if(!shape || !this.webSocket) {
-	  return;
-	}
-
-	this._translateMouse();
-
-	let indices = [];
-	for(let i = 0; i < shape.length; i++) {
-	  let el = shape[i];
-	  if(el.bit === "1") {
-		let index = this._getIndexMouseWithOffset(el.x, el.y);
-		indices.push(index);
-	  }
-	}
-	this._untranslateMouse();
-	this.webSocket.send(JSON.stringify({type: "CLICK", indices: indices}));
-  };
 
   /**
    * Creates shapes that player is able to spawn.
@@ -140,7 +104,7 @@ class Game {
   };
 
   _login = () => {
-	let name = document.getElementById("name").value;
+	let name = document.getElementById("name").value.trim();
 	if (!name) {
 	  return;
 	}
@@ -162,18 +126,29 @@ class Game {
 	p5Canvas.canvas.classList.add("canvas");
   };
 
-  _getIndexMouseWithOffset = (xOffset, yOffset) => {
-	return this._getIndex(this.sketch.mouseX + (xOffset * this.cellSize), this.sketch.mouseY + (yOffset * this.cellSize));
+  /**
+   * Returns index of a cell that is (xOffset, yOffset) away from mouse cursor.
+   * xOffset and yOffset should be in pixels.
+   * @param xOffset
+   * @param yOffset
+   * @private
+   */
+  _getIndexOffsetFromMouse = (xOffset, yOffset) => {
+	return this._getIndex(
+	  this.sketch.mouseX + (xOffset * this.cellSize),
+	  this.sketch.mouseY + (yOffset * this.cellSize)
+	);
   };
 
   /**
-   Returns a index in the cell array of a point at location x, y.
-   x, y represents a point on a canvas (in pixels).
+   * Returns a index in the cell array of a point at location x, y.
+   * x, y represents a point on a canvas (in pixels).
+   * @param x
+   * @param y
+   * @returns {number}
+   * @private
    */
   _getIndex = (x, y) => {
-	if (x > this.cellSize * this.width || y > this.cellSize * this.height) {
-	  return;
-	}
 	x = x / this.cellSize;
 	y = y / this.cellSize;
 	let index = Math.floor(x) + (Math.floor(y) * this.width);
@@ -305,7 +280,6 @@ class Game {
 
   _advanceSimulation = () => {
 	this.simulation.update();
-	this.simulation.transferCells();
 	this.simulationSteps++;
   };
 
@@ -314,7 +288,6 @@ class Game {
    */
   _render = () =>  {
 	this._renderSelectedShape();
-	//actualCells.forEach((c) => c.render(getViewport()));
 	this.simulation.render(this._getViewport());
   };
 
@@ -358,6 +331,16 @@ class Game {
 	this.sketch.mouseY = this.mouseSnapshotY;
   };
 
+  /**
+   * Finds x,y positions of a given array of indices.
+   * The indices are indices of a 1D array which represents
+   * cells.
+   * Returned positions are multiplied by cellSize, so they represent
+   * coordinates were cell should be drawn.
+   * @param indices
+   * @returns {Number|*|Array}
+   * @private
+   */
   _findPositions = (indices) => {
 	return indices.map((i) => {
 	  let x = i % this.width;
@@ -366,10 +349,18 @@ class Game {
 	});
   };
 
+  /**
+   * Finds indices in 1D array of x, y positions.
+   * The positions are translated by current mouse coorinates,
+   * so they are positions in relation to the mouse cursor.
+   * @param positions
+   * @returns {Array}
+   * @private
+   */
   _findIndices = (positions) => {
 	let indices = [];
 	for(let i = 0; i < positions.length; i++) {
-	  indices.push(this._getIndexMouseWithOffset(positions[i].x, positions[i].y));
+	  indices.push(this._getIndexOffsetFromMouse(positions[i].x, positions[i].y));
 	}
 	return indices;
   };
@@ -474,6 +465,42 @@ class Game {
 	this.sketch.ellipse(pos.x + width / 2, pos.y + height / 2, width, height);
   };
 
+  _onMouseUp = () => {
+	if (this.recentlyClicked || !this.connected) {
+	  return;
+	}
+
+	if (this.selectedShape) {
+	  this._sendShape(this.selectedShape.shape);
+	  this.recentlyClicked = true;
+	}
+  };
+
+  /**
+   * Tries to inform the back-end that a players wants to spawn a given shape.
+   * @param shape
+   * @private
+   */
+  _sendShape = (shape) => {
+	if(!shape || !this.webSocket) {
+	  return;
+	}
+
+	this._translateMouse();
+
+	let indices = [];
+	for(let i = 0; i < shape.length; i++) {
+	  let el = shape[i];
+	  if(el.bit === "1") {
+		let index = this._getIndexOffsetFromMouse(el.x, el.y);
+		indices.push(index);
+	  }
+	}
+	this._untranslateMouse();
+	this.webSocket.send(JSON.stringify({type: "CLICK", indices: indices}));
+  };
+
+
   /**
    * Called when a window is resized. Used to calculate stuff based on window size
    * (e.g. offset from top-left so that rendering area is in the middle).
@@ -501,6 +528,11 @@ class Game {
 	};
   };
 
+  /**
+   * Handler for when the client receives RemainingTime message.
+   * @param msg
+   * @private
+   */
   _onRemainingTime = (msg) => {
     let remainingTime = msg.remainingTime;
 
@@ -513,6 +545,12 @@ class Game {
 
   };
 
+  /**
+   * Parses remaining time in milliseconds to be in the mm:ss format.
+   * @param remainingTime
+   * @returns {string}
+   * @private
+   */
   _parseRemainingTime = (remainingTime) => {
     remainingTime = parseInt(remainingTime);
 	let second = Math.max(Math.floor((remainingTime / 1000) % 60), 0);

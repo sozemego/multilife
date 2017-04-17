@@ -93,6 +93,7 @@ export default class Simulation {
 		}
 	  }
 	}
+	this.transferCells();
   };
 
   /**
