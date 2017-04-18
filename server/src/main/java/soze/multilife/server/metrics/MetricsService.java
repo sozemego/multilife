@@ -6,9 +6,9 @@ import soze.multilife.server.metrics.events.PlayerDisconnectedEvent;
 import soze.multilife.server.metrics.events.PlayerLoggedEvent;
 import soze.multilife.server.metrics.events.SerializedMetricEvent;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class MetricsService implements Runnable {
 
-  private static final long CALCULATE_METRICS_INTERVAL = 1000 * 60;
+  private static final long CALCULATE_METRICS_INTERVAL = 1000 * 5;
 
   private final Queue<Object> events = new ConcurrentLinkedQueue<>();
 
@@ -24,8 +24,8 @@ public class MetricsService implements Runnable {
   private double averageBytesSent = 0d;
   private long totalMessagesSent = 0;
 
-  private final Map<String, Long> typeCountMap = new HashMap<>();
-  private final Map<Long, Long> playerMap = new HashMap<>();
+  private final Map<String, Long> typeCountMap = new ConcurrentHashMap<>();
+  private final Map<Long, Long> playerMap = new ConcurrentHashMap<>();
 
   @Override
   public void run() {
@@ -56,17 +56,17 @@ public class MetricsService implements Runnable {
   }
 
   private void process(PlayerLoggedEvent playerEvent) {
-	synchronized (playerMap) {
+	//synchronized (playerMap) {
 	  long playerId = playerEvent.getPlayerId();
 	  long instanceId = playerEvent.getInstanceId();
 	  playerMap.put(playerId, instanceId);
-	}
+	//}
   }
 
   private void process(PlayerDisconnectedEvent playerEvent) {
-	synchronized (playerMap) {
+	//synchronized (playerMap) {
 	  playerMap.remove(playerEvent.getPlayerId());
-	}
+	//}
   }
 
   private void process(SerializedMetricEvent event) {
@@ -77,10 +77,10 @@ public class MetricsService implements Runnable {
 
   private void process(InstanceMetricEvent event) {
 	String type = event.getType();
-	synchronized (typeCountMap) {
+	//synchronized (typeCountMap) {
 	  Long count = typeCountMap.get(type);
 	  typeCountMap.put(type, count == null ? 1 : ++count);
-	}
+	//}
   }
 
   @Subscribe

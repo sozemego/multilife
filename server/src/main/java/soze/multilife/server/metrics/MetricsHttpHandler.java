@@ -1,20 +1,25 @@
 package soze.multilife.server.metrics;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import java.util.Collection;
-import java.util.Map;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * A http handler for /metrics endpoint.
  */
 public class MetricsHttpHandler implements Route {
 
+  private static final Logger LOG = LoggerFactory.getLogger(MetricsHttpHandler.class);
+
   private final MetricsService metricsService;
+  private String html;
 
   public MetricsHttpHandler(MetricsService metricsService) {
 	this.metricsService = metricsService;
@@ -27,43 +32,20 @@ public class MetricsHttpHandler implements Route {
   }
 
   private String createResponse() {
-	long totalBytesSent = metricsService.getTotalBytesSent();
-	long messagesSent = metricsService.getTotalMessagesSent();
-	double averageBytesSent = metricsService.getAverageBytesSent();
+    //if(html == null) {
+      loadHtml();
+	//}
+	return html;
+  }
 
-	Map<String, Long> typeCountMap = metricsService.getTypeCountMap();
-
-	String typeCountMapString = "";
-
-	synchronized (typeCountMap) {
-	  for (Map.Entry<String, Long> entry : typeCountMap.entrySet()) {
-		typeCountMapString += "Type: " + entry.getKey() + " -> [" + entry.getValue() + "]\n";
-	  }
+  private void loadHtml() {
+    try {
+      //TODO MAKE THIS PATH DEPENDENT ON SOME ENVIROMENT VARIABLE
+	  List<String> lines = Files.readAllLines(Paths.get("server/src/main/resources/public/metrics.html"));
+	  html = lines.stream().reduce("", (prev, curr) -> prev += curr + "\n");
+	} catch (IOException e) {
+      LOG.error("Could not load metrics.html file. [{}]", e);
 	}
-
-	Map<Long, Long> playerMap = metricsService.getPlayerMap();
-	String playerMapString = "";
-
-	synchronized (playerMap) {
-	  Multimap<Long, Long> instancePlayerMap = HashMultimap.create();
-	  for (Map.Entry<Long, Long> entry : playerMap.entrySet()) {
-		long playerId = entry.getKey();
-		long instanceId = entry.getValue();
-		instancePlayerMap.put(instanceId, playerId);
-	  }
-	  for (Map.Entry<Long, Collection<Long>> entry : instancePlayerMap.asMap().entrySet()) {
-		long instanceId = entry.getKey();
-		Collection<Long> players = entry.getValue();
-		playerMapString += "Instance [" + instanceId + "] players [" + players.size() + "]\n";
-	  }
-	}
-
-	return "Total bytes sent: " + totalBytesSent +
-	  ".\nTotal megabytes sent: " + (totalBytesSent / 1e6) +
-	  ".\nAverage bytes per message: " + averageBytesSent +
-	  ".\nTotal messages sent: " + messagesSent +
-	  ".\n" + typeCountMapString +
-	  ".\n" + playerMapString;
   }
 
 

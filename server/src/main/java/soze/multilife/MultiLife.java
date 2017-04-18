@@ -9,6 +9,7 @@ import soze.multilife.server.Server.ServerBuilder;
 import soze.multilife.server.connection.ConnectionFactory;
 import soze.multilife.server.metrics.MetricsHttpHandler;
 import soze.multilife.server.metrics.MetricsService;
+import soze.multilife.server.metrics.MetricsWebSocketHandler;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -28,26 +29,31 @@ public class MultiLife {
 
   private final ConnectionFactory connectionFactory;
   private final Lobby lobby;
+  private final MetricsWebSocketHandler metricsWebSocketHandler;
   private final MetricsHttpHandler metricsHttpHandler;
   private final EventHandler eventHandler;
+  private final MetricsService metricsService;
 
   private MultiLife() {
 	Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger());
 	this.eventHandler = new EventBusHandler();
 	this.connectionFactory = new ConnectionFactory(eventHandler);
 	this.lobby = new Lobby(eventHandler);
-	MetricsService metricsService = new MetricsService();
+	this.metricsService = new MetricsService();
 	this.eventHandler.register(metricsService);
 	metricsHttpHandler = new MetricsHttpHandler(metricsService);
+	this.metricsWebSocketHandler = new MetricsWebSocketHandler(metricsService, connectionFactory);
 
 	Executor executor = Executors.newCachedThreadPool();
 	executor.execute(lobby);
 	executor.execute(metricsService);
+	executor.execute(metricsWebSocketHandler);
   }
 
   private void start() throws InterruptedException, ExecutionException {
 	new ServerBuilder(8080)
 	  .withWebSocketHandler("/game", new GameSocketHandler(lobby, connectionFactory))
+	  .withWebSocketHandler("/metrics-live", metricsWebSocketHandler)
 	  .withHttpHandler("/metrics", metricsHttpHandler)
 	  .withStaticFileHandler("/public")
 	  .build();

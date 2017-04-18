@@ -25,6 +25,7 @@ module.exports = {
   plugins: [
 	new CopyWebpackPlugin([
 	  { from: "src/index.html" },
+	  { from: "src/metrics.html"},
 	  { from: "src/main.css" },
 	  { from: "src/login_background.gif"}
 	])

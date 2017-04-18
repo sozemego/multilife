@@ -57,8 +57,8 @@ public class GameSocketHandler {
 	lobby.onMessage(inc, sessionIdMap.get(session));
   }
 
-  private Connection getConnection(long id, Session connection) {
-	return connectionFactory.getConnection(id, connection);
+  private Connection getConnection(long id, Session session) {
+	return connectionFactory.getConnection(id, session);
   }
 
 }

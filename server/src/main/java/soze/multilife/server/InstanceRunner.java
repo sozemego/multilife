@@ -44,7 +44,7 @@ public class InstanceRunner implements Runnable {
 	  time = System.nanoTime();
 
 	  if(instance.isOutOfTime()) {
-	    LOG.info("Game in instance [{}] has ended, closing.");
+	    LOG.info("Game in instance [{}] has ended, closing.", instance.getId());
 	    break;
 	  }
 
