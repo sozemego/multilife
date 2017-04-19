@@ -73,23 +73,23 @@ export default class Metrics {
   };
 
   _displayAverageBytesChart = (averageBytes) => {
-    this.averageBytes.push({bytes: averageBytes, time: new Date()});
+    this.averageBytes.push({kb: averageBytes, time: new Date()});
+
+    let max = d3.max(this.averageBytes.map(d => d.bytes)) * 1.25;
 
 	let x = d3.scaleLinear().domain([0, 400]).range([0, 400]);
-	let y = d3.scaleLinear().domain([0, 50000]).range([0, 200]);
+	let y = d3.scaleLinear().domain([0, max]).range([0, 200]);
 
 	let i = 0;
 
 	let line = d3.line()
 	  .x(d => x(i += 5))
-	  .y(d => y(50000 - d.bytes));
+	  .y(d => y(max - d.bytes));
 
 	this.averageBytesChart.exit().remove();
 
 	this.averageBytesChart.selectAll("path")
-	  .data(this.averageBytes, data => {
-	    return data.bytes;
-	  })
+	  .data(this.averageBytes, data => data.bytes)
 	  .enter()
 	  .append("path")
 	  .attr("d", line(this.averageBytes))
