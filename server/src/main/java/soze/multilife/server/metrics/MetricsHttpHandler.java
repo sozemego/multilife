@@ -18,11 +18,10 @@ public class MetricsHttpHandler implements Route {
 
   private static final Logger LOG = LoggerFactory.getLogger(MetricsHttpHandler.class);
 
-  private final MetricsService metricsService;
   private String html;
 
-  public MetricsHttpHandler(MetricsService metricsService) {
-	this.metricsService = metricsService;
+  public MetricsHttpHandler() {
+
   }
 
   @Override
@@ -40,7 +39,8 @@ public class MetricsHttpHandler implements Route {
 
   private void loadHtml() {
     try {
-      //TODO MAKE THIS PATH DEPENDENT ON SOME ENVIROMENT VARIABLE
+      //TODO MAKE THIS PATH DEPENDENT ON SOME ENVIRONMENT VARIABLE
+	  //TODO no, make it load from resources/public always
 	  List<String> lines = Files.readAllLines(Paths.get("server/src/main/resources/public/metrics.html"));
 	  html = lines.stream().reduce("", (prev, curr) -> prev += curr + "\n");
 	} catch (IOException e) {

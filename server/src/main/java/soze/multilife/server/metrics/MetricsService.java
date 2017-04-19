@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class MetricsService implements Runnable {
 
-  private static final long CALCULATE_METRICS_INTERVAL = 1000 * 5;
+  private final long calculateMetricsInterval;
 
   private final Queue<Object> events = new ConcurrentLinkedQueue<>();
 
@@ -26,6 +26,10 @@ public class MetricsService implements Runnable {
 
   private final Map<String, Long> typeCountMap = new ConcurrentHashMap<>();
   private final Map<Long, Long> playerMap = new ConcurrentHashMap<>();
+
+  public MetricsService(long calculateMetricsInterval) {
+	this.calculateMetricsInterval = calculateMetricsInterval;
+  }
 
   @Override
   public void run() {
@@ -48,7 +52,7 @@ public class MetricsService implements Runnable {
 	  }
 
 	  try {
-	    Thread.sleep(CALCULATE_METRICS_INTERVAL);
+	    Thread.sleep(calculateMetricsInterval);
 	  } catch (InterruptedException e) {
 	    e.printStackTrace();
 	  }

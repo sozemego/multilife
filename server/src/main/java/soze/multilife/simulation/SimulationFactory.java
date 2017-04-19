@@ -5,11 +5,16 @@ package soze.multilife.simulation;
  */
 public class SimulationFactory {
 
-  private final int defaultWidth = 50;
-  private final int defaultHeight = 50;
+  private final int width;
+  private final int height;
+
+  public SimulationFactory(int width, int height) {
+	this.width = width;
+	this.height = height;
+  }
 
   public Simulation getSimulation() {
-	return new Simulation(defaultWidth, defaultHeight);
+	return new Simulation(width, height);
   }
 
 }

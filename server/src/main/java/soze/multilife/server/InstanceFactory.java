@@ -10,17 +10,29 @@ import java.util.concurrent.Executors;
 /**
  * An object responsible for creating, configuring and starting new {@link Instance} objects.
  */
-class InstanceFactory {
+public class InstanceFactory {
 
   private final Executor executor = Executors.newCachedThreadPool();
   private final Map<Long, Instance> instances;
-  private final int maxPlayers = 4;
-  private final long defaultTimeToLive = 1000 * 60 * 5;
-  private final SimulationFactory simulationFactory = new SimulationFactory();
+  private final int maxPlayers;
+  private final long instanceDuration;
+  private final long iterationInterval;
+  private final long timeInactiveBeforeRemoval;
+  private final SimulationFactory simulationFactory;
   private long currentId = 0;
 
-  InstanceFactory(Map<Long, Instance> instances) {
-	this.instances = instances;
+  public InstanceFactory(Map<Long, Instance> instances,
+						 int maxPlayers,
+						 long instanceDuration,
+						 long iterationInterval,
+						 long timeInactiveBeforeRemoval,
+						 SimulationFactory simulationFactory) {
+    this.instances = instances;
+    this.maxPlayers = maxPlayers;
+    this.instanceDuration = instanceDuration;
+	this.iterationInterval = iterationInterval;
+	this.timeInactiveBeforeRemoval = timeInactiveBeforeRemoval;
+	this.simulationFactory = simulationFactory;
   }
 
   /**
@@ -43,8 +55,8 @@ class InstanceFactory {
 	// not a single instance was found, so let's create a new one.
 	Simulation simulation = simulationFactory.getSimulation();
 	simulation.init(); //TODO decide if this should be here
-	Instance instance = new Instance(++currentId, simulation, maxPlayers, defaultTimeToLive);
-	executor.execute(new InstanceRunner(instance));
+	Instance instance = new Instance(++currentId, simulation, maxPlayers, instanceDuration);
+	executor.execute(new InstanceRunner(instance, iterationInterval, timeInactiveBeforeRemoval));
 	return instance;
   }
 

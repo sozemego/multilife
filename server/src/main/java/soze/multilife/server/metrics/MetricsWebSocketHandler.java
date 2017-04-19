@@ -23,7 +23,7 @@ public class MetricsWebSocketHandler implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(MetricsWebSocketHandler.class);
 
-  private static final long UPDATE_RATE = 1000 * 6;
+  private final long metricsPushUpdateRate;
 
   private final MetricsService metricsService;
   private final ConnectionFactory connectionFactory;
@@ -32,7 +32,8 @@ public class MetricsWebSocketHandler implements Runnable {
   private final Map<Session, Long> sessionIdMap = new ConcurrentHashMap<>();
   private final Map<Long, Connection> connections = new ConcurrentHashMap<>();
 
-  public MetricsWebSocketHandler(MetricsService metricsService, ConnectionFactory connectionFactory) {
+  public MetricsWebSocketHandler(long metricsPushUpdateRate, MetricsService metricsService, ConnectionFactory connectionFactory) {
+	this.metricsPushUpdateRate = metricsPushUpdateRate;
 	this.metricsService = metricsService;
 	this.connectionFactory = connectionFactory;
   }
@@ -74,7 +75,7 @@ public class MetricsWebSocketHandler implements Runnable {
 	  }
 
       try {
-        Thread.sleep(UPDATE_RATE);
+        Thread.sleep(metricsPushUpdateRate);
 	  } catch (InterruptedException e) {
         LOG.error("Thread interrupted [{}] ", e);
 	  }

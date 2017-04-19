@@ -4,13 +4,18 @@ import soze.multilife.events.EventBusHandler;
 import soze.multilife.events.EventHandler;
 import soze.multilife.helpers.UncaughtExceptionLogger;
 import soze.multilife.server.GameSocketHandler;
+import soze.multilife.server.Instance;
+import soze.multilife.server.InstanceFactory;
 import soze.multilife.server.Lobby;
 import soze.multilife.server.Server.ServerBuilder;
 import soze.multilife.server.connection.ConnectionFactory;
 import soze.multilife.server.metrics.MetricsHttpHandler;
 import soze.multilife.server.metrics.MetricsService;
 import soze.multilife.server.metrics.MetricsWebSocketHandler;
+import soze.multilife.simulation.SimulationFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -22,7 +27,10 @@ public class MultiLife {
 
   public static void main(String[] args) throws InterruptedException, ExecutionException {
 
-	MultiLife ml = new MultiLife();
+    Configuration config = new Configuration();
+    config.load();
+
+	MultiLife ml = new MultiLife(config);
 	ml.start();
 
   }
@@ -34,15 +42,36 @@ public class MultiLife {
   private final EventHandler eventHandler;
   private final MetricsService metricsService;
 
-  private MultiLife() {
+  private MultiLife(Configuration config) {
+
 	Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger());
 	this.eventHandler = new EventBusHandler();
+
+	SimulationFactory simulationFactory = new SimulationFactory(
+	  config.getInt("gameDefaultWidth"),
+	  config.getInt("gameDefaultHeight")
+	);
+
+	Map<Long, Instance> instances = new HashMap<>();
+	InstanceFactory instanceFactory = new InstanceFactory(
+	  instances,
+	  config.getInt("maxPlayersPerInstance"),
+	  config.getLong("gameDuration"),
+	  config.getLong("gameIterationInterval"),
+	  config.getLong("instanceInactiveTimeBeforeRemoval"),
+	  simulationFactory
+	);
+	this.lobby = new Lobby(eventHandler, instanceFactory, instances);
+
 	this.connectionFactory = new ConnectionFactory(eventHandler);
-	this.lobby = new Lobby(eventHandler);
-	this.metricsService = new MetricsService();
+
+	this.metricsService = new MetricsService(config.getLong("calculateMetricsInterval"));
 	this.eventHandler.register(metricsService);
-	metricsHttpHandler = new MetricsHttpHandler(metricsService);
-	this.metricsWebSocketHandler = new MetricsWebSocketHandler(metricsService, connectionFactory);
+	metricsHttpHandler = new MetricsHttpHandler();
+	this.metricsWebSocketHandler = new MetricsWebSocketHandler(
+	  config.getLong("metricsPushUpdateRate"),
+	  metricsService, connectionFactory
+	);
 
 	Executor executor = Executors.newCachedThreadPool();
 	executor.execute(lobby);

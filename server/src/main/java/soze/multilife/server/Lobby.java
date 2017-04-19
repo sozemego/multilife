@@ -29,15 +29,16 @@ public class Lobby implements Runnable {
 
   private final Map<Long, Connection> connections = new HashMap<>();
   private final Map<Long, Player> players = new HashMap<>();
-  private final Map<Long, Instance> instances = new HashMap<>();
+  private final Map<Long, Instance> instances;
   private final Map<Long, Long> playerToInstance = new HashMap<>();
   private final InstanceFactory instanceFactory;
 
   private final EventHandler eventHandler;
 
-  public Lobby(EventHandler eventHandler) {
+  public Lobby(EventHandler eventHandler, InstanceFactory instanceFactory, Map<Long, Instance> instances) {
 	this.eventHandler = eventHandler;
-	this.instanceFactory = new InstanceFactory(instances);
+	this.instanceFactory = instanceFactory;
+	this.instances = instances;
   }
 
   @Override
