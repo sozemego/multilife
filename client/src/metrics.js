@@ -59,6 +59,7 @@ export default class Metrics {
 	this.averageBytesChart
 	  .append("g")
 	  .attr("class", "x axis")
+	  .attr("transform", "translate(0, " + 399 + ")")
 	  .call(xAxis);
   };
 

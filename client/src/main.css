@@ -93,3 +93,10 @@ html, body {
     margin: 0;
     overflow: hidden;
 }
+
+/** For hrs in flex boxes*/
+hr {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%
+}
