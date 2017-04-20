@@ -82,8 +82,20 @@ export default class Metrics {
 
 	bytes.exit().remove();
 
-    bytes.enter().append("span").text(data => "Total bytes sent: " + data);
+    bytes.enter().append("span").text(data => {
+      return "Total bytes sent: "
+		+ data + " (" + this._getTruncatedKb(data)
+		+ "kB, " + this._getTruncatedMb(data) + "MB)";
+	});
 
+  };
+
+  _getTruncatedKb = (bytes) => {
+    return ("" + (bytes / 1024)).substr(0, 4);
+  };
+
+  _getTruncatedMb = (bytes) => {
+	return ("" + ((bytes / 1024) / 1024)).substr(0, 4);
   };
 
   _displayAverageKbChart = (averageBytes) => {
