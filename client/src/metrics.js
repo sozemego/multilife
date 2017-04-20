@@ -99,7 +99,7 @@ export default class Metrics {
   };
 
   _displayAverageKbChart = (averageBytes) => {
-    this.averageBytes.push({kb: (averageBytes / 1000), time: new Date()});
+	this._addAverageBytesToDataSet(averageBytes);
 
     let max = d3.max(this.averageBytes.map(d => d.kb)) * 1.25;
     let minDate = d3.min(this.averageBytes.map(d => d.time));
@@ -141,17 +141,25 @@ export default class Metrics {
 
   };
 
-  _getTimeDomainMin() {
-    let date = new Date();
-    date.setMinutes(date.getMinutes() - 5);
-    return date;
-  }
+  _addAverageBytesToDataSet = (averageBytes) => {
+	this.averageBytes.push({kb: (averageBytes / 1000), time: new Date()});
+	let timeDomainMin = this._getTimeDomainMin();
+	this.averageBytes = this.averageBytes.filter(item => {
+	  return item.time > timeDomainMin;
+	});
+  };
 
-  _getTimeDomainMax() {
+  _getTimeDomainMin = () => {
+    let date = new Date();
+    date.setMinutes(date.getMinutes() - 4);
+    return date;
+  };
+
+  _getTimeDomainMax = () => {
 	let date = new Date();
 	date.setMinutes(date.getMinutes() + 1);
 	return date;
-  }
+  };
 
 }
 
