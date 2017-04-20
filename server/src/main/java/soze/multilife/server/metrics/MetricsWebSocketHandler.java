@@ -92,7 +92,6 @@ public class MetricsWebSocketHandler implements Runnable {
 
 	return new MetricsMessage(
 	  totalBytesSent,
-	  (long) (totalBytesSent / 1e6),
 	  averageBytesSent,
 	  messagesSent,
 	  typeCountMap,
