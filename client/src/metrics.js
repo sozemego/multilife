@@ -21,17 +21,22 @@ export default class Metrics {
   }
 
   _initCharts = () => {
-    this.averageBytesChart = d3.select("#average-message-size")
+	this._initAverageBytesChart();
+	this._initMessageTypeCountsChart();
+  };
+
+  _initAverageBytesChart = () => {
+	this.averageBytesChart = d3.select("#average-message-size")
 	  .append("svg")
 	  .attr("width", 630)
 	  .attr("height", 420)
 	  .append("g")
 	  .attr("transform", "translate(30,20)");
 
-    let x = d3.scaleLinear().domain([0, 600]).range([0, 600]);
+	let x = d3.scaleLinear().domain([0, 600]).range([0, 600]);
 	let y = d3.scaleLinear().domain([0, 50000]).range([0, 400]);
 
-    this.averageBytesChart.selectAll("line.x")
+	this.averageBytesChart.selectAll("line.x")
 	  .data(x.ticks(5))
 	  .enter().append("line")
 	  .attr("x1", x)
@@ -63,6 +68,19 @@ export default class Metrics {
 	  .call(xAxis);
   };
 
+  _initMessageTypeCountsChart = () => {
+	let width = 600, height = 600;
+	this.messageTypeCountsChart = d3.select("#message-type-count")
+	  .append("svg")
+	  .attr("width", width)
+	  .attr("height", height)
+	  .append("g")
+	  .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+	this.pie = d3.pie().sort(null).value(data => data.count);
+
+  };
+
   _handleMessage = (msg) => {
     if(msg.type === "METRICS") {
 		this._handleMetrics(msg);
@@ -72,6 +90,7 @@ export default class Metrics {
   _handleMetrics = (msg) => {
     this._displaySent(msg.totalBytesSent, msg.totalMessagesSent);
     this._displayAverageKbChart(msg.averageBytesPerMessage);
+    this._displayMessageTypeCounts(msg.typeCount);
   };
 
   _displaySent = (bytesSent, messagesSent) => {
@@ -160,6 +179,50 @@ export default class Metrics {
 	let date = new Date();
 	date.setMinutes(date.getMinutes() + 1);
 	return date;
+  };
+
+  _displayMessageTypeCounts = (typeCount) => {
+	this.radius = Math.min(600, 600) / 2;
+	let pieColors = d3.scaleOrdinal(["#e57373", "#F06292", "#BA68C8", "#9575CD", "#7986CB", "#64B5F6", "#FFD54F"]);
+
+	let path = d3.arc().outerRadius(this.radius - 150).innerRadius(0);
+	let label = d3.arc().outerRadius(200).innerRadius(175);
+
+	let arc = this.messageTypeCountsChart.selectAll(".arc")
+	  .data(this.pie(this._transformTypeCountToArray(typeCount)), d => {
+	    return Math.random();
+	  });
+
+	arc.exit().remove();
+
+	let g = arc.enter()
+	  .append("g")
+	  .attr("class", "arc");
+
+	g.append("path")
+	  .attr("d", path)
+	  .attr("fill", d => {
+	    return pieColors(d.data.type);
+	  });
+
+	g.append("text")
+	  .attr("transform", d => {
+	    return "translate(" + label.centroid(d) + ")";
+	  })
+	  .attr("dy", "0.35em")
+	  .attr("font-size", "12")
+	  .text(d => d.data.type + " (" + d.data.count + ")");
+
+  };
+
+  _transformTypeCountToArray = (typeCount) => {
+    let arr = [];
+    for(let key in typeCount) {
+      if(typeCount.hasOwnProperty(key)) {
+		arr.push({type: key, count: typeCount[key]})
+	  }
+	}
+	return arr;
   };
 
 }
