@@ -70,11 +70,11 @@ export default class Metrics {
   };
 
   _handleMetrics = (msg) => {
-    this._displayBytesSent(msg.totalBytesSent);
+    this._displaySent(msg.totalBytesSent, msg.totalMessagesSent);
     this._displayAverageKbChart(msg.averageBytesPerMessage);
   };
 
-  _displayBytesSent = (bytesSent) => {
+  _displaySent = (bytesSent, messagesSent) => {
 
     let bytes = d3.select("#total-bytes-sent")
 	  .selectAll("span")
@@ -85,7 +85,8 @@ export default class Metrics {
     bytes.enter().append("span").text(data => {
       return "Total bytes sent: "
 		+ data + " (" + this._getTruncatedKb(data)
-		+ "kB, " + this._getTruncatedMb(data) + "MB)";
+		+ "kB, " + this._getTruncatedMb(data) + "MB). "
+		+ "Total messages: " + messagesSent;
 	});
 
   };
