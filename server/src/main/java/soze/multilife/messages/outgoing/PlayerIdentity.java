@@ -5,10 +5,10 @@ package soze.multilife.messages.outgoing;
  */
 public class PlayerIdentity extends OutgoingMessage {
 
-  public long playerId;
+	public long playerId;
 
-  public PlayerIdentity(long playerId) {
-	setType(OutgoingType.PLAYER_IDENTITY);
-	this.playerId = playerId;
-  }
+	public PlayerIdentity(long playerId) {
+		setType(OutgoingType.PLAYER_IDENTITY);
+		this.playerId = playerId;
+	}
 }

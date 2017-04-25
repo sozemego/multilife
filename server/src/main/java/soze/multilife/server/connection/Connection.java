@@ -7,20 +7,20 @@ import soze.multilife.messages.outgoing.OutgoingMessage;
  */
 public interface Connection {
 
-  /**
-   * Returns id of this connection. Ids have to be unique.
-   *
-   * @return
-   */
-  public long getId();
+	/**
+	 * Returns id of this connection. Ids have to be unique.
+	 *
+	 * @return
+	 */
+	public long getId();
 
-  /**
-   * Sends a message to the client connected to this connection.
-   * Implementing classes should serialize the data in an appropriate way
-   * (to be compatible with front-end).
-   *
-   * @param message
-   */
-  public void send(OutgoingMessage message);
+	/**
+	 * Sends a message to the client connected to this connection.
+	 * Implementing classes should serialize the data in an appropriate way
+	 * (to be compatible with front-end).
+	 *
+	 * @param message
+	 */
+	public void send(OutgoingMessage message);
 
 }

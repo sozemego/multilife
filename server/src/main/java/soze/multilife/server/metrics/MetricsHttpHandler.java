@@ -16,37 +16,37 @@ import java.util.List;
  */
 public class MetricsHttpHandler implements Route {
 
-  private static final Logger LOG = LoggerFactory.getLogger(MetricsHttpHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MetricsHttpHandler.class);
 
-  private String html;
+	private String html;
 
-  public MetricsHttpHandler() {
+	public MetricsHttpHandler() {
 
-  }
-
-  @Override
-  public Object handle(Request request, Response response) throws Exception {
-	response.header("Content-type", "text-html");
-	return createResponse();
-  }
-
-  private String createResponse() {
-    //if(html == null) {
-      loadHtml();
-	//}
-	return html;
-  }
-
-  private void loadHtml() {
-    try {
-      //TODO MAKE THIS PATH DEPENDENT ON SOME ENVIRONMENT VARIABLE
-	  //TODO no, make it load from resources/public always
-	  List<String> lines = Files.readAllLines(Paths.get("server/src/main/resources/public/metrics.html"));
-	  html = lines.stream().reduce("", (prev, curr) -> prev += curr + "\n");
-	} catch (IOException e) {
-      LOG.error("Could not load metrics.html file. [{}]", e);
 	}
-  }
+
+	@Override
+	public Object handle(Request request, Response response) throws Exception {
+		response.header("Content-type", "text-html");
+		return createResponse();
+	}
+
+	private String createResponse() {
+		//if(html == null) {
+		loadHtml();
+		//}
+		return html;
+	}
+
+	private void loadHtml() {
+		try {
+			//TODO MAKE THIS PATH DEPENDENT ON SOME ENVIRONMENT VARIABLE
+			//TODO no, make it load from resources/public always
+			List<String> lines = Files.readAllLines(Paths.get("server/src/main/resources/public/metrics.html"));
+			html = lines.stream().reduce("", (prev, curr) -> prev += curr + "\n");
+		} catch (IOException e) {
+			LOG.error("Could not load metrics.html file. [{}]", e);
+		}
+	}
 
 
 }

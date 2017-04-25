@@ -16,114 +16,114 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class MetricsService implements Runnable {
 
-  private final long calculateMetricsInterval;
+	private final long calculateMetricsInterval;
 
-  private final Queue<Object> events = new ConcurrentLinkedQueue<>();
+	private final Queue<Object> events = new ConcurrentLinkedQueue<>();
 
-  private long totalBytesSent = 0;
-  private double averageBytesSent = 0d;
-  private long totalMessagesSent = 0;
+	private long totalBytesSent = 0;
+	private double averageBytesSent = 0d;
+	private long totalMessagesSent = 0;
 
-  private final Map<String, Long> typeCountMap = new ConcurrentHashMap<>();
-  private final Map<Long, Long> playerMap = new ConcurrentHashMap<>();
+	private final Map<String, Long> typeCountMap = new ConcurrentHashMap<>();
+	private final Map<Long, Long> playerMap = new ConcurrentHashMap<>();
 
-  public MetricsService(long calculateMetricsInterval) {
-	this.calculateMetricsInterval = calculateMetricsInterval;
-  }
-
-  @Override
-  public void run() {
-	while (true) {
-
-	  Object event;
-	  while ((event = events.poll()) != null) {
-		if (event instanceof PlayerLoggedEvent) {
-		  process((PlayerLoggedEvent) event);
-		}
-		if (event instanceof PlayerDisconnectedEvent) {
-		  process((PlayerDisconnectedEvent) event);
-		}
-		if(event instanceof SerializedMetricEvent) {
-		  process((SerializedMetricEvent) event);
-		}
-		if(event instanceof InstanceMetricEvent) {
-		  process((InstanceMetricEvent) event);
-		}
-	  }
-
-	  try {
-	    Thread.sleep(calculateMetricsInterval);
-	  } catch (InterruptedException e) {
-	    e.printStackTrace();
-	  }
+	public MetricsService(long calculateMetricsInterval) {
+		this.calculateMetricsInterval = calculateMetricsInterval;
 	}
-  }
 
-  private void process(PlayerLoggedEvent playerEvent) {
-	//synchronized (playerMap) {
-	  long playerId = playerEvent.getPlayerId();
-	  long instanceId = playerEvent.getInstanceId();
-	  playerMap.put(playerId, instanceId);
-	//}
-  }
+	@Override
+	public void run() {
+		while (true) {
 
-  private void process(PlayerDisconnectedEvent playerEvent) {
-	//synchronized (playerMap) {
-	  playerMap.remove(playerEvent.getPlayerId());
-	//}
-  }
+			Object event;
+			while ((event = events.poll()) != null) {
+				if (event instanceof PlayerLoggedEvent) {
+					process((PlayerLoggedEvent) event);
+				}
+				if (event instanceof PlayerDisconnectedEvent) {
+					process((PlayerDisconnectedEvent) event);
+				}
+				if (event instanceof SerializedMetricEvent) {
+					process((SerializedMetricEvent) event);
+				}
+				if (event instanceof InstanceMetricEvent) {
+					process((InstanceMetricEvent) event);
+				}
+			}
 
-  private void process(SerializedMetricEvent event) {
-	totalBytesSent += event.getBytesSent();
-	totalMessagesSent++;
-	averageBytesSent = totalBytesSent / totalMessagesSent;
-  }
+			try {
+				Thread.sleep(calculateMetricsInterval);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
-  private void process(InstanceMetricEvent event) {
-	String type = event.getType();
-	//synchronized (typeCountMap) {
-	  Long count = typeCountMap.get(type);
-	  typeCountMap.put(type, count == null ? 1 : ++count);
-	//}
-  }
+	private void process(PlayerLoggedEvent playerEvent) {
+		//synchronized (playerMap) {
+		long playerId = playerEvent.getPlayerId();
+		long instanceId = playerEvent.getInstanceId();
+		playerMap.put(playerId, instanceId);
+		//}
+	}
 
-  @Subscribe
-  public void handleInstanceMetricEvent(InstanceMetricEvent event) {
-	events.add(event);
-  }
+	private void process(PlayerDisconnectedEvent playerEvent) {
+		//synchronized (playerMap) {
+		playerMap.remove(playerEvent.getPlayerId());
+		//}
+	}
 
-  @Subscribe
-  public void handleSerializedMetricEvent(SerializedMetricEvent event) {
-	events.add(event);
-  }
+	private void process(SerializedMetricEvent event) {
+		totalBytesSent += event.getBytesSent();
+		totalMessagesSent++;
+		averageBytesSent = totalBytesSent / totalMessagesSent;
+	}
 
-  @Subscribe
-  public void handlePlayerLoggedEvent(PlayerLoggedEvent event) {
-	events.add(event);
-  }
+	private void process(InstanceMetricEvent event) {
+		String type = event.getType();
+		//synchronized (typeCountMap) {
+		Long count = typeCountMap.get(type);
+		typeCountMap.put(type, count == null ? 1 : ++count);
+		//}
+	}
 
-  @Subscribe
-  public void handlePlayerDisconnectedEvent(PlayerDisconnectedEvent event) {
-	events.add(event);
-  }
+	@Subscribe
+	public void handleInstanceMetricEvent(InstanceMetricEvent event) {
+		events.add(event);
+	}
 
-  public long getTotalBytesSent() {
-	return totalBytesSent;
-  }
+	@Subscribe
+	public void handleSerializedMetricEvent(SerializedMetricEvent event) {
+		events.add(event);
+	}
 
-  public double getAverageBytesSent() {
-	return averageBytesSent;
-  }
+	@Subscribe
+	public void handlePlayerLoggedEvent(PlayerLoggedEvent event) {
+		events.add(event);
+	}
 
-  public long getTotalMessagesSent() {
-	return totalMessagesSent;
-  }
+	@Subscribe
+	public void handlePlayerDisconnectedEvent(PlayerDisconnectedEvent event) {
+		events.add(event);
+	}
 
-  public Map<String, Long> getTypeCountMap() {
-	return typeCountMap;
-  }
+	public long getTotalBytesSent() {
+		return totalBytesSent;
+	}
 
-  public Map<Long, Long> getPlayerMap() {
-	return playerMap;
-  }
+	public double getAverageBytesSent() {
+		return averageBytesSent;
+	}
+
+	public long getTotalMessagesSent() {
+		return totalMessagesSent;
+	}
+
+	public Map<String, Long> getTypeCountMap() {
+		return typeCountMap;
+	}
+
+	public Map<Long, Long> getPlayerMap() {
+		return playerMap;
+	}
 }

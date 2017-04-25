@@ -23,42 +23,42 @@ import java.util.concurrent.atomic.AtomicLong;
 @WebSocket
 public class GameSocketHandler {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GameSocketHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GameSocketHandler.class);
 
-  private final Lobby lobby;
-  private final ConnectionFactory connectionFactory;
-  private final AtomicLong id = new AtomicLong(0L);
-  private final Map<Session, Long> sessionIdMap = new ConcurrentHashMap<>();
-  private final ObjectMapper mapper = new ObjectMapper();
+	private final Lobby lobby;
+	private final ConnectionFactory connectionFactory;
+	private final AtomicLong id = new AtomicLong(0L);
+	private final Map<Session, Long> sessionIdMap = new ConcurrentHashMap<>();
+	private final ObjectMapper mapper = new ObjectMapper();
 
-  public GameSocketHandler(Lobby lobby, ConnectionFactory connectionFactory) {
-	this.lobby = lobby;
-	this.connectionFactory = connectionFactory;
-  }
+	public GameSocketHandler(Lobby lobby, ConnectionFactory connectionFactory) {
+		this.lobby = lobby;
+		this.connectionFactory = connectionFactory;
+	}
 
-  @OnWebSocketConnect
-  public void onOpen(Session session) throws Exception {
-    long nextId = id.incrementAndGet();
-	LOG.info("User connected. ConnectionID [{}].", nextId);
-	sessionIdMap.put(session, nextId);
-	lobby.onConnect(getConnection(nextId, session));
-  }
+	@OnWebSocketConnect
+	public void onOpen(Session session) throws Exception {
+		long nextId = id.incrementAndGet();
+		LOG.info("User connected. ConnectionID [{}].", nextId);
+		sessionIdMap.put(session, nextId);
+		lobby.onConnect(getConnection(nextId, session));
+	}
 
-  @OnWebSocketClose
-  public void onClose(Session session, int statusCode, String reason) throws Exception {
-    long userId = sessionIdMap.remove(session);
-	LOG.info("User disconnected. ConnectionID [{}]. Status code [{}]. Reason [{}]", userId, statusCode, reason);
-	lobby.onDisconnect(getConnection(userId, session));
-  }
+	@OnWebSocketClose
+	public void onClose(Session session, int statusCode, String reason) throws Exception {
+		long userId = sessionIdMap.remove(session);
+		LOG.info("User disconnected. ConnectionID [{}]. Status code [{}]. Reason [{}]", userId, statusCode, reason);
+		lobby.onDisconnect(getConnection(userId, session));
+	}
 
-  @OnWebSocketMessage
-  public void onMessage(Session session, String msg) throws Exception {
-	IncomingMessage inc = mapper.readValue(msg, IncomingMessage.class);
-	lobby.onMessage(inc, sessionIdMap.get(session));
-  }
+	@OnWebSocketMessage
+	public void onMessage(Session session, String msg) throws Exception {
+		IncomingMessage inc = mapper.readValue(msg, IncomingMessage.class);
+		lobby.onMessage(inc, sessionIdMap.get(session));
+	}
 
-  private Connection getConnection(long id, Session session) {
-	return connectionFactory.getConnection(id, session);
-  }
+	private Connection getConnection(long id, Session session) {
+		return connectionFactory.getConnection(id, session);
+	}
 
 }

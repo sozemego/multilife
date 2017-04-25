@@ -5,10 +5,10 @@ package soze.multilife.messages.outgoing;
  */
 public class TickData extends OutgoingMessage {
 
-  public long simulationSteps;
+	public long simulationSteps;
 
-  public TickData(long simulationSteps) {
-	setType(OutgoingType.TICK_DATA);
-	this.simulationSteps = simulationSteps;
-  }
+	public TickData(long simulationSteps) {
+		setType(OutgoingType.TICK_DATA);
+		this.simulationSteps = simulationSteps;
+	}
 }

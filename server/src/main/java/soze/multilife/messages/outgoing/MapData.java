@@ -5,13 +5,13 @@ package soze.multilife.messages.outgoing;
  */
 public class MapData extends OutgoingMessage {
 
-  public int width;
-  public int height;
+	public int width;
+	public int height;
 
-  public MapData(int width, int height) {
-	this.setType(OutgoingType.MAP_DATA);
-	this.width = width;
-	this.height = height;
-  }
+	public MapData(int width, int height) {
+		this.setType(OutgoingType.MAP_DATA);
+		this.width = width;
+		this.height = height;
+	}
 
 }

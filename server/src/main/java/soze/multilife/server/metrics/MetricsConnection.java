@@ -16,72 +16,72 @@ import soze.multilife.server.metrics.events.SerializedMetricEvent;
  */
 public class MetricsConnection extends BaseConnection {
 
-  private final EventHandler eventHandler;
-  private final ObjectMapper objectMapper = new ObjectMapper();
+	private final EventHandler eventHandler;
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
-  public MetricsConnection(long id, Session session, EventHandler eventHandler) {
-	super(id, session);
-	this.eventHandler = eventHandler;
-  }
-
-  @Override
-  public void send(OutgoingMessage message) {
-	postEvent(message);
-	String serializedMessage = serialize(message);
-	postEvent(serializedMessage);
-	super.send(message);
-  }
-
-  /**
-   * Assemblers and posts event based on this message.
-   *
-   * @param msg outgoing message
-   */
-  private void postEvent(OutgoingMessage msg) {
-	InstanceMetricEvent event = createEvent(msg);
-	eventHandler.post(event);
-  }
-
-  /**
-   * Creates {@link InstanceMetricEvent}.
-   *
-   * @param msg outgoing message
-   * @return event constructed from the data
-   */
-  private InstanceMetricEvent createEvent(OutgoingMessage msg) {
-	long timeStamp = System.nanoTime();
-	return new InstanceMetricEvent(timeStamp, msg.getType().toString(), getId());
-  }
-
-  /**
-   * Assembles and posts an event based on this data.
-   *
-   * @param message
-   */
-  private void postEvent(String message) {
-	SerializedMetricEvent event = createEvent(message);
-	eventHandler.post(event);
-  }
-
-  /**
-   * Creates an event based on this message.
-   *
-   * @param message
-   * @return
-   */
-  private SerializedMetricEvent createEvent(String message) {
-	long timeStamp = System.nanoTime();
-	return new SerializedMetricEvent(timeStamp, getId(), message.length() / 2);
-  }
-
-  private String serialize(OutgoingMessage message) {
-	try {
-	  return objectMapper.writeValueAsString(message);
-	} catch (JsonProcessingException e) {
-	  e.printStackTrace();
-	  return "";
+	public MetricsConnection(long id, Session session, EventHandler eventHandler) {
+		super(id, session);
+		this.eventHandler = eventHandler;
 	}
-  }
+
+	@Override
+	public void send(OutgoingMessage message) {
+		postEvent(message);
+		String serializedMessage = serialize(message);
+		postEvent(serializedMessage);
+		super.send(message);
+	}
+
+	/**
+	 * Assemblers and posts event based on this message.
+	 *
+	 * @param msg outgoing message
+	 */
+	private void postEvent(OutgoingMessage msg) {
+		InstanceMetricEvent event = createEvent(msg);
+		eventHandler.post(event);
+	}
+
+	/**
+	 * Creates {@link InstanceMetricEvent}.
+	 *
+	 * @param msg outgoing message
+	 * @return event constructed from the data
+	 */
+	private InstanceMetricEvent createEvent(OutgoingMessage msg) {
+		long timeStamp = System.nanoTime();
+		return new InstanceMetricEvent(timeStamp, msg.getType().toString(), getId());
+	}
+
+	/**
+	 * Assembles and posts an event based on this data.
+	 *
+	 * @param message
+	 */
+	private void postEvent(String message) {
+		SerializedMetricEvent event = createEvent(message);
+		eventHandler.post(event);
+	}
+
+	/**
+	 * Creates an event based on this message.
+	 *
+	 * @param message
+	 * @return
+	 */
+	private SerializedMetricEvent createEvent(String message) {
+		long timeStamp = System.nanoTime();
+		return new SerializedMetricEvent(timeStamp, getId(), message.length() / 2);
+	}
+
+	private String serialize(OutgoingMessage message) {
+		try {
+			return objectMapper.writeValueAsString(message);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return "";
+		}
+	}
 
 
 }

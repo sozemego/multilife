@@ -21,86 +21,86 @@ import java.util.concurrent.atomic.AtomicLong;
 @WebSocket
 public class MetricsWebSocketHandler implements Runnable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(MetricsWebSocketHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MetricsWebSocketHandler.class);
 
-  private final long metricsPushUpdateRate;
+	private final long metricsPushUpdateRate;
 
-  private final MetricsService metricsService;
-  private final ConnectionFactory connectionFactory;
+	private final MetricsService metricsService;
+	private final ConnectionFactory connectionFactory;
 
-  private final AtomicLong nextId = new AtomicLong();
-  private final Map<Session, Long> sessionIdMap = new ConcurrentHashMap<>();
-  private final Map<Long, Connection> connections = new ConcurrentHashMap<>();
+	private final AtomicLong nextId = new AtomicLong();
+	private final Map<Session, Long> sessionIdMap = new ConcurrentHashMap<>();
+	private final Map<Long, Connection> connections = new ConcurrentHashMap<>();
 
-  public MetricsWebSocketHandler(long metricsPushUpdateRate, MetricsService metricsService, ConnectionFactory connectionFactory) {
-	this.metricsPushUpdateRate = metricsPushUpdateRate;
-	this.metricsService = metricsService;
-	this.connectionFactory = connectionFactory;
-  }
-
-  @OnWebSocketConnect
-  public void onOpen(Session session) throws Exception {
-    Connection conn = getConnection(session);
-	sessionIdMap.put(session, conn.getId());
-	synchronized (connections) {
-	  connections.put(conn.getId(), conn);
+	public MetricsWebSocketHandler(long metricsPushUpdateRate, MetricsService metricsService, ConnectionFactory connectionFactory) {
+		this.metricsPushUpdateRate = metricsPushUpdateRate;
+		this.metricsService = metricsService;
+		this.connectionFactory = connectionFactory;
 	}
-  }
 
-  @OnWebSocketClose
-  public void onClose(Session session, int statusCode, String reason) throws Exception {
-    long id = sessionIdMap.remove(session);
-	synchronized (connections) {
-	  connections.remove(id);
-	}
-  }
-
-  @OnWebSocketMessage
-  public void onMessage(Session session, String msg) throws Exception {
-
-  }
-
-  public void run() {
-    while(true) {
-
-      synchronized (connections) {
-
-        if(connections.size() > 0) {
-
-		  MetricsMessage message = createMetricsMessage();
-		  for (Connection connection : connections.values()) {
-			connection.send(message);
-		  }
+	@OnWebSocketConnect
+	public void onOpen(Session session) throws Exception {
+		Connection conn = getConnection(session);
+		sessionIdMap.put(session, conn.getId());
+		synchronized (connections) {
+			connections.put(conn.getId(), conn);
 		}
-	  }
+	}
 
-      try {
-        Thread.sleep(metricsPushUpdateRate);
-	  } catch (InterruptedException e) {
-        LOG.error("Thread interrupted [{}] ", e);
-	  }
+	@OnWebSocketClose
+	public void onClose(Session session, int statusCode, String reason) throws Exception {
+		long id = sessionIdMap.remove(session);
+		synchronized (connections) {
+			connections.remove(id);
+		}
+	}
+
+	@OnWebSocketMessage
+	public void onMessage(Session session, String msg) throws Exception {
 
 	}
-  }
 
-  private MetricsMessage createMetricsMessage() {
-	long totalBytesSent = metricsService.getTotalBytesSent();
-	long messagesSent = metricsService.getTotalMessagesSent();
-	double averageBytesSent = metricsService.getAverageBytesSent();
-	Map<String, Long> typeCountMap = metricsService.getTypeCountMap();
-	Map<Long, Long> playerMap = metricsService.getPlayerMap();
+	public void run() {
+		while (true) {
 
-	return new MetricsMessage(
-	  totalBytesSent,
-	  averageBytesSent,
-	  messagesSent,
-	  typeCountMap,
-	  playerMap
-	);
-  }
+			synchronized (connections) {
 
-  private Connection getConnection(Session session) {
-    return connectionFactory.getConnection(nextId.incrementAndGet(), session);
-  }
+				if (connections.size() > 0) {
+
+					MetricsMessage message = createMetricsMessage();
+					for (Connection connection : connections.values()) {
+						connection.send(message);
+					}
+				}
+			}
+
+			try {
+				Thread.sleep(metricsPushUpdateRate);
+			} catch (InterruptedException e) {
+				LOG.error("Thread interrupted [{}] ", e);
+			}
+
+		}
+	}
+
+	private MetricsMessage createMetricsMessage() {
+		long totalBytesSent = metricsService.getTotalBytesSent();
+		long messagesSent = metricsService.getTotalMessagesSent();
+		double averageBytesSent = metricsService.getAverageBytesSent();
+		Map<String, Long> typeCountMap = metricsService.getTypeCountMap();
+		Map<Long, Long> playerMap = metricsService.getPlayerMap();
+
+		return new MetricsMessage(
+			totalBytesSent,
+			averageBytesSent,
+			messagesSent,
+			typeCountMap,
+			playerMap
+		);
+	}
+
+	private Connection getConnection(Session session) {
+		return connectionFactory.getConnection(nextId.incrementAndGet(), session);
+	}
 
 }

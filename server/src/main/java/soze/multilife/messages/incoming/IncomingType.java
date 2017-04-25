@@ -5,6 +5,6 @@ package soze.multilife.messages.incoming;
  */
 public enum IncomingType {
 
-  LOGIN, CLICK, PING;
+	LOGIN, CLICK, PING;
 
 }

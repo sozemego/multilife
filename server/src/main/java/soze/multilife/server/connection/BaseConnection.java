@@ -15,38 +15,38 @@ import java.io.IOException;
  */
 public class BaseConnection implements Connection {
 
-  private static final Logger LOG = LoggerFactory.getLogger(BaseConnection.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BaseConnection.class);
 
-  private final long id;
-  private final Session session;
-  private final ObjectMapper mapper = new ObjectMapper();
+	private final long id;
+	private final Session session;
+	private final ObjectMapper mapper = new ObjectMapper();
 
-  public BaseConnection(long id, Session session) {
-	this.id = id;
-	this.session = session;
-  }
-
-  @Override
-  public long getId() {
-	return id;
-  }
-
-  @Override
-  public void send(OutgoingMessage message) {
-    try {
-	  this.session.getRemote().sendString(serialize(message));
-	} catch (IOException e) {
-		LOG.warn("Base connection could not send string.", e);
+	public BaseConnection(long id, Session session) {
+		this.id = id;
+		this.session = session;
 	}
-  }
 
-  private String serialize(OutgoingMessage message) {
-	try {
-	  return mapper.writeValueAsString(message);
-	} catch (JsonProcessingException e) {
-	  e.printStackTrace();
-	  return "";
+	@Override
+	public long getId() {
+		return id;
 	}
-  }
+
+	@Override
+	public void send(OutgoingMessage message) {
+		try {
+			this.session.getRemote().sendString(serialize(message));
+		} catch (IOException e) {
+			LOG.warn("Base connection could not send string.", e);
+		}
+	}
+
+	private String serialize(OutgoingMessage message) {
+		try {
+			return mapper.writeValueAsString(message);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return "";
+		}
+	}
 
 }

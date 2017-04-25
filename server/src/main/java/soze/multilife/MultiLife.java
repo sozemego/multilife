@@ -25,67 +25,67 @@ import java.util.concurrent.Executors;
  */
 public class MultiLife {
 
-  public static void main(String[] args) throws InterruptedException, ExecutionException {
+	public static void main(String[] args) throws InterruptedException, ExecutionException {
 
-    Configuration config = new Configuration();
-    config.load();
+		Configuration config = new Configuration();
+		config.load();
 
-	MultiLife ml = new MultiLife(config);
-	ml.start();
+		MultiLife ml = new MultiLife(config);
+		ml.start();
 
-  }
+	}
 
-  private final ConnectionFactory connectionFactory;
-  private final Lobby lobby;
-  private final MetricsWebSocketHandler metricsWebSocketHandler;
-  private final MetricsHttpHandler metricsHttpHandler;
-  private final EventHandler eventHandler;
-  private final MetricsService metricsService;
+	private final ConnectionFactory connectionFactory;
+	private final Lobby lobby;
+	private final MetricsWebSocketHandler metricsWebSocketHandler;
+	private final MetricsHttpHandler metricsHttpHandler;
+	private final EventHandler eventHandler;
+	private final MetricsService metricsService;
 
-  private MultiLife(Configuration config) {
+	private MultiLife(Configuration config) {
 
-	Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger());
-	this.eventHandler = new EventBusHandler();
+		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger());
+		this.eventHandler = new EventBusHandler();
 
-	SimulationFactory simulationFactory = new SimulationFactory(
-	  config.getInt("gameDefaultWidth"),
-	  config.getInt("gameDefaultHeight")
-	);
+		SimulationFactory simulationFactory = new SimulationFactory(
+			config.getInt("gameDefaultWidth"),
+			config.getInt("gameDefaultHeight")
+		);
 
-	Map<Long, Instance> instances = new HashMap<>();
-	InstanceFactory instanceFactory = new InstanceFactory(
-	  instances,
-	  config.getInt("maxPlayersPerInstance"),
-	  config.getLong("gameDuration"),
-	  config.getLong("gameIterationInterval"),
-	  config.getLong("instanceInactiveTimeBeforeRemoval"),
-	  simulationFactory
-	);
-	this.lobby = new Lobby(eventHandler, instanceFactory, instances);
+		Map<Long, Instance> instances = new HashMap<>();
+		InstanceFactory instanceFactory = new InstanceFactory(
+			instances,
+			config.getInt("maxPlayersPerInstance"),
+			config.getLong("gameDuration"),
+			config.getLong("gameIterationInterval"),
+			config.getLong("instanceInactiveTimeBeforeRemoval"),
+			simulationFactory
+		);
+		this.lobby = new Lobby(eventHandler, instanceFactory, instances);
 
-	this.connectionFactory = new ConnectionFactory(eventHandler);
+		this.connectionFactory = new ConnectionFactory(eventHandler);
 
-	this.metricsService = new MetricsService(config.getLong("calculateMetricsInterval"));
-	this.eventHandler.register(metricsService);
-	metricsHttpHandler = new MetricsHttpHandler();
-	this.metricsWebSocketHandler = new MetricsWebSocketHandler(
-	  config.getLong("metricsPushUpdateRate"),
-	  metricsService, connectionFactory
-	);
+		this.metricsService = new MetricsService(config.getLong("calculateMetricsInterval"));
+		this.eventHandler.register(metricsService);
+		metricsHttpHandler = new MetricsHttpHandler();
+		this.metricsWebSocketHandler = new MetricsWebSocketHandler(
+			config.getLong("metricsPushUpdateRate"),
+			metricsService, connectionFactory
+		);
 
-	Executor executor = Executors.newCachedThreadPool();
-	executor.execute(lobby);
-	executor.execute(metricsService);
-	executor.execute(metricsWebSocketHandler);
-  }
+		Executor executor = Executors.newCachedThreadPool();
+		executor.execute(lobby);
+		executor.execute(metricsService);
+		executor.execute(metricsWebSocketHandler);
+	}
 
-  private void start() throws InterruptedException, ExecutionException {
-	new ServerBuilder(8080)
-	  .withWebSocketHandler("/game", new GameSocketHandler(lobby, connectionFactory))
-	  .withWebSocketHandler("/metrics-live", metricsWebSocketHandler)
-	  .withHttpHandler("/metrics", metricsHttpHandler)
-	  .withStaticFileHandler("/public")
-	  .build();
-  }
+	private void start() throws InterruptedException, ExecutionException {
+		new ServerBuilder(8080)
+			.withWebSocketHandler("/game", new GameSocketHandler(lobby, connectionFactory))
+			.withWebSocketHandler("/metrics-live", metricsWebSocketHandler)
+			.withHttpHandler("/metrics", metricsHttpHandler)
+			.withStaticFileHandler("/public")
+			.build();
+	}
 
 }
