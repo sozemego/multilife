@@ -6,6 +6,7 @@ import soze.multilife.simulation.SimulationFactory;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 /**
  * An object responsible for creating, configuring and starting new {@link Instance} objects.
@@ -14,18 +15,18 @@ public class InstanceFactory {
 
 	private final Executor executor = Executors.newCachedThreadPool();
 	private final Map<Long, Instance> instances;
-	private final int maxPlayers;
-	private final long instanceDuration;
-	private final long iterationInterval;
-	private final long timeInactiveBeforeRemoval;
+	private final Supplier<Integer> maxPlayers;
+	private final Supplier<Long> instanceDuration;
+	private final Supplier<Long> iterationInterval;
+	private final Supplier<Long> timeInactiveBeforeRemoval;
 	private final SimulationFactory simulationFactory;
 	private long currentId = 0;
 
 	public InstanceFactory(Map<Long, Instance> instances,
-						   int maxPlayers,
-						   long instanceDuration,
-						   long iterationInterval,
-						   long timeInactiveBeforeRemoval,
+						   Supplier<Integer> maxPlayers,
+						   Supplier<Long> instanceDuration,
+						   Supplier<Long> iterationInterval,
+						   Supplier<Long> timeInactiveBeforeRemoval,
 						   SimulationFactory simulationFactory) {
 		this.instances = instances;
 		this.maxPlayers = maxPlayers;
@@ -55,8 +56,8 @@ public class InstanceFactory {
 		// not a single instance was found, so let's create a new one.
 		Simulation simulation = simulationFactory.getSimulation();
 		simulation.init(); //TODO decide if this should be here
-		Instance instance = new Instance(++currentId, simulation, maxPlayers, instanceDuration);
-		executor.execute(new InstanceRunner(instance, iterationInterval, timeInactiveBeforeRemoval));
+		Instance instance = new Instance(++currentId, simulation, maxPlayers.get(), instanceDuration.get());
+		executor.execute(new InstanceRunner(instance, iterationInterval.get(), timeInactiveBeforeRemoval.get()));
 		return instance;
 	}
 

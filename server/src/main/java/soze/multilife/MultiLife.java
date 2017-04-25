@@ -48,28 +48,28 @@ public class MultiLife {
 		this.eventHandler = new EventBusHandler();
 
 		SimulationFactory simulationFactory = new SimulationFactory(
-			config.getInt("gameDefaultWidth"),
-			config.getInt("gameDefaultHeight")
+			config.getIntSupplier("gameDefaultWidth"),
+			config.getIntSupplier("gameDefaultHeight")
 		);
 
 		Map<Long, Instance> instances = new HashMap<>();
 		InstanceFactory instanceFactory = new InstanceFactory(
 			instances,
-			config.getInt("maxPlayersPerInstance"),
-			config.getLong("gameDuration"),
-			config.getLong("gameIterationInterval"),
-			config.getLong("instanceInactiveTimeBeforeRemoval"),
+			config.getIntSupplier("maxPlayersPerInstance"),
+			config.getLongSupplier("gameDuration"),
+			config.getLongSupplier("gameIterationInterval"),
+			config.getLongSupplier("instanceInactiveTimeBeforeRemoval"),
 			simulationFactory
 		);
 		this.lobby = new Lobby(eventHandler, instanceFactory, instances);
 
 		this.connectionFactory = new ConnectionFactory(eventHandler);
 
-		this.metricsService = new MetricsService(config.getLong("calculateMetricsInterval"));
+		this.metricsService = new MetricsService(config.getLongSupplier("calculateMetricsInterval"));
 		this.eventHandler.register(metricsService);
 		metricsHttpHandler = new MetricsHttpHandler();
 		this.metricsWebSocketHandler = new MetricsWebSocketHandler(
-			config.getLong("metricsPushUpdateRate"),
+			config.getLongSupplier("metricsPushUpdateRate"),
 			metricsService, connectionFactory
 		);
 

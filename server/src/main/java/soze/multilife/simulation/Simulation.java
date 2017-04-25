@@ -352,7 +352,7 @@ public class Simulation {
 	 */
 	private void synchronize() {
 		if (simulationSteps % 10 == 0) {
-			sendToPlayers(getAllCellData());
+			//sendToPlayers(getAllCellData());
 		}
 	}
 

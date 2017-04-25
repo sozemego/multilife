@@ -14,6 +14,7 @@ import soze.multilife.server.connection.ConnectionFactory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 /**
  * A metrics endpoint handler for live data.
@@ -23,7 +24,7 @@ public class MetricsWebSocketHandler implements Runnable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MetricsWebSocketHandler.class);
 
-	private final long metricsPushUpdateRate;
+	private final Supplier<Long> metricsPushUpdateRate;
 
 	private final MetricsService metricsService;
 	private final ConnectionFactory connectionFactory;
@@ -32,7 +33,7 @@ public class MetricsWebSocketHandler implements Runnable {
 	private final Map<Session, Long> sessionIdMap = new ConcurrentHashMap<>();
 	private final Map<Long, Connection> connections = new ConcurrentHashMap<>();
 
-	public MetricsWebSocketHandler(long metricsPushUpdateRate, MetricsService metricsService, ConnectionFactory connectionFactory) {
+	public MetricsWebSocketHandler(Supplier<Long> metricsPushUpdateRate, MetricsService metricsService, ConnectionFactory connectionFactory) {
 		this.metricsPushUpdateRate = metricsPushUpdateRate;
 		this.metricsService = metricsService;
 		this.connectionFactory = connectionFactory;
@@ -75,7 +76,7 @@ public class MetricsWebSocketHandler implements Runnable {
 			}
 
 			try {
-				Thread.sleep(metricsPushUpdateRate);
+				Thread.sleep(metricsPushUpdateRate.get());
 			} catch (InterruptedException e) {
 				LOG.error("Thread interrupted [{}] ", e);
 			}

@@ -10,13 +10,14 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Supplier;
 
 /**
  * A service for storing, calculating and reporting various metrics.
  */
 public class MetricsService implements Runnable {
 
-	private final long calculateMetricsInterval;
+	private final Supplier<Long> calculateMetricsInterval;
 
 	private final Queue<Object> events = new ConcurrentLinkedQueue<>();
 
@@ -27,7 +28,7 @@ public class MetricsService implements Runnable {
 	private final Map<String, Long> typeCountMap = new ConcurrentHashMap<>();
 	private final Map<Long, Long> playerMap = new ConcurrentHashMap<>();
 
-	public MetricsService(long calculateMetricsInterval) {
+	public MetricsService(Supplier<Long> calculateMetricsInterval) {
 		this.calculateMetricsInterval = calculateMetricsInterval;
 	}
 
@@ -52,7 +53,7 @@ public class MetricsService implements Runnable {
 			}
 
 			try {
-				Thread.sleep(calculateMetricsInterval);
+				Thread.sleep(calculateMetricsInterval.get());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
