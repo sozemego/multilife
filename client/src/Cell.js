@@ -22,7 +22,7 @@ export default class Cell {
 
 	setAlive(alive) {
 		this.alive = alive;
-		if(alive) {
+		if (alive) {
 			this.targetSizePercentage = 1;
 		} else {
 			this.targetSizePercentage = 0;
@@ -49,7 +49,7 @@ export default class Cell {
 	update() {
 		let p = this.currentPercentageSize;
 		let t = this.targetSizePercentage;
-		if(p < t) {
+		if (p < t) {
 			this.currentPercentageSize += 0.250;
 		} else if (p > t) {
 			this.currentPercentageSize -= 0.250;
@@ -59,13 +59,13 @@ export default class Cell {
 	}
 
 	render(viewport) {
-	  	if(this.currentPercentageSize > 0) {
-		    if((this.x * this.size) < viewport.x || (this.x * this.size) > viewport.x + viewport.width) {
-		        return;
-		    }
-		    if((this.y * this.size) < viewport.y || (this.y * this.size) > viewport.y + viewport.height) {
-		        return;
-		    }
+		if (this.currentPercentageSize > 0) {
+			if ((this.x * this.size) < viewport.x || (this.x * this.size) > viewport.x + viewport.width) {
+				return;
+			}
+			if ((this.y * this.size) < viewport.y || (this.y * this.size) > viewport.y + viewport.height) {
+				return;
+			}
 			this.actuallyRender();
 		}
 	}
