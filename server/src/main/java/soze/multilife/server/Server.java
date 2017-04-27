@@ -23,7 +23,8 @@ public class Server {
 		int port,
 		List<PathHandlerPair<Route>> pathHandlerPairs,
 		List<PathHandlerPair<Object>> pathWebSocketHandlerPairs,
-		List<String> staticFileHandlerPaths
+		List<String> staticFileHandlerPaths,
+		List<String> externalStaticFileHandlerPaths
 	) {
 
 		port(port);
@@ -32,6 +33,9 @@ public class Server {
 		}
 		for (String path : staticFileHandlerPaths) {
 			staticFileLocation(path);
+		}
+		for(String path: externalStaticFileHandlerPaths) {
+			staticFiles.externalLocation(path);
 		}
 		for (PathHandlerPair<Route> pair : pathHandlerPairs) {
 			get(pair.getPath(), pair.getHandler());
@@ -48,6 +52,7 @@ public class Server {
 		private final List<PathHandlerPair<Route>> pathHandlerPairs = new ArrayList<>();
 		private final List<PathHandlerPair<Object>> pathWebSocketHandlerPairs = new ArrayList<>();
 		private final List<String> staticFileHandlerPaths = new ArrayList<>();
+		private final List<String> externalStaticFileHandlerPaths = new ArrayList<>();
 
 		public ServerBuilder(int port) {
 			if (port < 0 || port > 65535) {
@@ -71,8 +76,13 @@ public class Server {
 			return this;
 		}
 
+		public ServerBuilder withExternalStaticFileHandler(String path) {
+			externalStaticFileHandlerPaths.add(Objects.requireNonNull(path));
+			return this;
+		}
+
 		public Server build() {
-			return new Server(port, pathHandlerPairs, pathWebSocketHandlerPairs, staticFileHandlerPaths);
+			return new Server(port, pathHandlerPairs, pathWebSocketHandlerPairs, staticFileHandlerPaths, externalStaticFileHandlerPaths);
 		}
 
 	}

@@ -84,7 +84,7 @@ public class MultiLife {
 			.withWebSocketHandler("/game", new GameSocketHandler(lobby, connectionFactory))
 			.withWebSocketHandler("/metrics-live", metricsWebSocketHandler)
 			.withHttpHandler("/metrics", metricsHttpHandler)
-			.withStaticFileHandler("/public")
+			.withExternalStaticFileHandler("f:/multilife/server/src/main/resources/public")
 			.build();
 	}
 
