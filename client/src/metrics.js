@@ -69,16 +69,7 @@ export default class Metrics {
 	};
 
 	_initMessageTypeCountsChart = () => {
-		let width = 600, height = 600;
-		this.messageTypeCountsChart = d3.select("#message-type-count")
-			.append("svg")
-			.attr("width", width)
-			.attr("height", height)
-			.append("g")
-			.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-		this.pie = d3.pie().sort(null).value(data => data.count);
-
+		//this._typeCountChart = d3.select("#message-type-count").selectAll("div");
 	};
 
 	_handleMessage = (msg) => {
@@ -182,36 +173,38 @@ export default class Metrics {
 	};
 
 	_displayMessageTypeCounts = (typeCount) => {
-		this.radius = Math.min(600, 600) / 2;
-		let pieColors = d3.scaleOrdinal(["#e57373", "#F06292", "#BA68C8", "#9575CD", "#7986CB", "#64B5F6", "#FFD54F"]);
+		let data = this._transformTypeCountToArray(typeCount);
 
-		let path = d3.arc().outerRadius(this.radius - 150).innerRadius(0);
-		let label = d3.arc().outerRadius(200).innerRadius(175);
+		let max = this._findMax(data.map(d => d.count));
+		let length = d3.scaleLinear().domain([0, max]).range([0, 450]);
 
-		let arc = this.messageTypeCountsChart.selectAll(".arc")
-			.data(this.pie(this._transformTypeCountToArray(typeCount)), d => {
-				return Math.random();
-			});
+		let colors = d3.scaleOrdinal(this._genRandomColors(10));
 
-		arc.exit().remove();
+		let chart = d3.select("#message-type-count")
+			.selectAll("div")
+			.data(data, d => d.type);
 
-		let g = arc.enter()
-			.append("g")
-			.attr("class", "arc");
-
-		g.append("path")
-			.attr("d", path)
-			.attr("fill", d => {
-				return pieColors(d.data.type);
-			});
-
-		g.append("text")
-			.attr("transform", d => {
-				return "translate(" + label.centroid(d) + ")";
+		chart
+			.style("margin", "2px")
+			.style("font-size", "1em")
+			.style("height", "48px")
+			.style("line-height", "48px")
+			.style("border-style", "dashed")
+			.text(d => {
+				return d.type + "(" +  d.count + ")";
 			})
-			.attr("dy", "0.35em")
-			.attr("font-size", "12")
-			.text(d => d.data.type + " (" + d.data.count + ")");
+			.transition().duration(750)
+			.style("width", d => length(d.count) + "px");
+
+		chart.enter()
+			.append("div")
+			.style("background-color", d => colors(d.type))
+			.style("width", 25)
+			.transition()
+			.duration(750)
+			.style("width", d => length(d.count) + "px");
+
+		chart.exit().remove();
 
 	};
 
@@ -223,6 +216,22 @@ export default class Metrics {
 			}
 		}
 		return arr;
+	};
+
+	_findMax = (arr) => {
+		let max = 0;
+		arr.forEach(i => {
+			if(i > max) max = i;
+		});
+		return max;
+	};
+
+	_genRandomColors = (amount) => {
+		let colors = [];
+		for(let i = 0; i < amount; i++) {
+			colors.push('#'+Math.floor(Math.random()*16777215).toString(16));
+		}
+		return colors;
 	};
 
 }
