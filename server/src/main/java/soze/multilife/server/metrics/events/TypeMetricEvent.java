@@ -5,20 +5,20 @@ package soze.multilife.server.metrics.events;
  *
  * @see soze.multilife.messages.outgoing.OutgoingMessage
  */
-public class InstanceMetricEvent {
+public class TypeMetricEvent {
 
-	private final long timeStamp;
+	private final long timestamp;
 	private final String type;
 	private final long connectionId;
 
-	public InstanceMetricEvent(long timeStamp, String type, long connectionId) {
-		this.timeStamp = timeStamp;
+	public TypeMetricEvent(long timestamp, String type, long connectionId) {
+		this.timestamp = timestamp;
 		this.type = type;
 		this.connectionId = connectionId;
 	}
 
-	public long getTimeStamp() {
-		return timeStamp;
+	public long getTimestamp() {
+		return timestamp;
 	}
 
 	public String getType() {

@@ -7,7 +7,7 @@ import soze.multilife.events.EventHandler;
 import soze.multilife.messages.outgoing.OutgoingMessage;
 import soze.multilife.server.connection.BaseConnection;
 import soze.multilife.server.connection.Connection;
-import soze.multilife.server.metrics.events.InstanceMetricEvent;
+import soze.multilife.server.metrics.events.TypeMetricEvent;
 import soze.multilife.server.metrics.events.SerializedMetricEvent;
 
 /**
@@ -38,19 +38,19 @@ public class MetricsConnection extends BaseConnection {
 	 * @param msg outgoing message
 	 */
 	private void postEvent(OutgoingMessage msg) {
-		InstanceMetricEvent event = createEvent(msg);
+		TypeMetricEvent event = createEvent(msg);
 		eventHandler.post(event);
 	}
 
 	/**
-	 * Creates {@link InstanceMetricEvent}.
+	 * Creates {@link TypeMetricEvent}.
 	 *
 	 * @param msg outgoing message
 	 * @return event constructed from the data
 	 */
-	private InstanceMetricEvent createEvent(OutgoingMessage msg) {
+	private TypeMetricEvent createEvent(OutgoingMessage msg) {
 		long timeStamp = System.nanoTime();
-		return new InstanceMetricEvent(timeStamp, msg.getType().toString(), getId());
+		return new TypeMetricEvent(timeStamp, msg.getType().toString(), getId());
 	}
 
 	/**

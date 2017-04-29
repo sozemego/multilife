@@ -1,7 +1,7 @@
 package soze.multilife.server.metrics;
 
 import com.google.common.eventbus.Subscribe;
-import soze.multilife.server.metrics.events.InstanceMetricEvent;
+import soze.multilife.server.metrics.events.TypeMetricEvent;
 import soze.multilife.server.metrics.events.PlayerDisconnectedEvent;
 import soze.multilife.server.metrics.events.PlayerLoggedEvent;
 import soze.multilife.server.metrics.events.SerializedMetricEvent;
@@ -47,8 +47,8 @@ public class MetricsService implements Runnable {
 				if (event instanceof SerializedMetricEvent) {
 					process((SerializedMetricEvent) event);
 				}
-				if (event instanceof InstanceMetricEvent) {
-					process((InstanceMetricEvent) event);
+				if (event instanceof TypeMetricEvent) {
+					process((TypeMetricEvent) event);
 				}
 			}
 
@@ -80,7 +80,7 @@ public class MetricsService implements Runnable {
 		averageBytesSent = totalBytesSent / totalMessagesSent;
 	}
 
-	private void process(InstanceMetricEvent event) {
+	private void process(TypeMetricEvent event) {
 		String type = event.getType();
 		//synchronized (typeCountMap) {
 		Long count = typeCountMap.get(type);
@@ -89,7 +89,7 @@ public class MetricsService implements Runnable {
 	}
 
 	@Subscribe
-	public void handleInstanceMetricEvent(InstanceMetricEvent event) {
+	public void handleInstanceMetricEvent(TypeMetricEvent event) {
 		events.add(event);
 	}
 
