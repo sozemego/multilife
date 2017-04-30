@@ -32,9 +32,9 @@ public class MetricsService implements Runnable {
 	private double averageBytesSent = 0d;
 	private long totalMessagesSent = 0;
 
-	private long lastKilobytePerSecondCalculationTime = System.currentTimeMillis();
+	private long lastKbsCalculationTime = System.currentTimeMillis();
 	private double totalBytesDuringLastCheck = 0;
-	private double currentKilobytesPerSecond = 0d;
+	private double averageKbs = 0d;
 	private long lastSaveTime = 0L;
 	private Supplier<Long> intervalBetweenSaves;
 	private int maxPlayersBeforeSave = 0;
@@ -103,11 +103,11 @@ public class MetricsService implements Runnable {
 	}
 
 	private void calculateKilobytesPerSecond() {
-		long timePassedMs = System.currentTimeMillis() - lastKilobytePerSecondCalculationTime;
+		long timePassedMs = System.currentTimeMillis() - lastKbsCalculationTime;
 		double kilobytesSentSinceLastCheck = (totalBytesSent - totalBytesDuringLastCheck) / 1024;
-		currentKilobytesPerSecond = kilobytesSentSinceLastCheck / (timePassedMs / 1000);
+		averageKbs = kilobytesSentSinceLastCheck / (timePassedMs / 1000);
 		totalBytesDuringLastCheck = totalBytesSent;
-		LOG.trace("Currently sending [{}] kb/s", currentKilobytesPerSecond);
+		LOG.trace("Currently sending [{}] kb/s", averageKbs);
 	}
 
 	private void countMaxPlayers() {
@@ -119,7 +119,7 @@ public class MetricsService implements Runnable {
 	}
 
 	private void saveKbs() {
-		repository.saveKilobytesPerSecond(currentKilobytesPerSecond, Instant.now().toEpochMilli());
+		repository.saveKilobytesPerSecond(averageKbs, Instant.now().toEpochMilli());
 	}
 
 	private void saveMaxPlayers() {
@@ -154,6 +154,10 @@ public class MetricsService implements Runnable {
 	@Subscribe
 	public void handlePlayerDisconnectedEvent(PlayerDisconnectedEvent event) {
 		events.add(event);
+	}
+
+	public double getAverageKbs() {
+		return averageKbs;
 	}
 
 	public long getTotalBytesSent() {

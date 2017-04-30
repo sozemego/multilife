@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class MetricsMessage extends OutgoingMessage {
 
+	private final double averageKbs;
 	private final long totalBytesSent;
 	private final double averageBytesPerMessage;
 	private final long totalMessagesSent;
@@ -12,6 +13,7 @@ public class MetricsMessage extends OutgoingMessage {
 	private final Map<Long, Long> instancePlayerMap;
 
 	public MetricsMessage(
+		double averageKbs,
 		long totalBytesSent,
 		double averageBytesPerMessage,
 		long totalMessagesSent,
@@ -19,11 +21,16 @@ public class MetricsMessage extends OutgoingMessage {
 		Map<Long, Long> instancePlayerMap
 	) {
 		setType(OutgoingType.METRICS);
+		this.averageKbs = averageKbs;
 		this.totalBytesSent = totalBytesSent;
 		this.averageBytesPerMessage = averageBytesPerMessage;
 		this.totalMessagesSent = totalMessagesSent;
 		this.typeCount = typeCount;
 		this.instancePlayerMap = instancePlayerMap;
+	}
+
+	public double getAverageKbs() {
+		return averageKbs;
 	}
 
 	public long getTotalBytesSent() {

@@ -85,6 +85,7 @@ public class MetricsWebSocketHandler implements Runnable {
 	}
 
 	private MetricsMessage createMetricsMessage() {
+		double averageKbs = metricsService.getAverageKbs();
 		long totalBytesSent = metricsService.getTotalBytesSent();
 		long messagesSent = metricsService.getTotalMessagesSent();
 		double averageBytesSent = metricsService.getAverageBytesSent();
@@ -92,6 +93,7 @@ public class MetricsWebSocketHandler implements Runnable {
 		Map<Long, Long> playerMap = metricsService.getPlayerMap();
 
 		return new MetricsMessage(
+			averageKbs,
 			totalBytesSent,
 			averageBytesSent,
 			messagesSent,
