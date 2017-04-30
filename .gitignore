@@ -25,3 +25,5 @@ node_modules/
 **/public/
 
 app.cfg
+
+db
