@@ -1,5 +1,9 @@
 import * as d3 from "d3";
 
+/**
+ * Handles the display of total messages sent, but also
+ * total bytes/kb/mb sent.
+ */
 export default class TotalMessagesMetric {
 
 	constructor(socket) {
