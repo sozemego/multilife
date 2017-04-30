@@ -26,9 +26,21 @@ const styles = {
 	totalBytesSent: {
 		width: "100%",
 		textAlign: "center"
+	},
+	averageKbsContainer: {
+		textAlign: "center"
+	},
+	typeCountContainer: {
+
+	},
+	typeCountTitle: {
+		textAlign: "center"
 	}
 };
 
+/**
+ * Part of the application responsible for displaying various metrics.
+ */
 export default class Metrics extends React.Component {
 
 	constructor(props) {
@@ -50,13 +62,12 @@ export default class Metrics extends React.Component {
 					<div style={styles.content}>
 						<div id="total-bytes-sent" style={styles.totalBytesSent}/>
 						<Divider />
-						<div style={selectedView !== 0 ? {display:"none"} : {}}>
-							<p>Average outgoing kb/s</p>
+						<div id="average-kbs-container" style={selectedView !== 0 ? {display:"none"} : styles.averageKbsContainer}>
 							<div id="average-kbs">
 
 							</div>
 						</div>
-						<div id="message-type-count-container"  style={selectedView !== 1 ? {display:"none"} : {}}>
+						<div style={selectedView !== 1 ? {display:"none"} : styles.typeCountTitle}>
 							<p>Message type count</p>
 							<div id="message-type-count">
 

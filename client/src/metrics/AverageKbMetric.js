@@ -9,20 +9,20 @@ export default class AverageKbMetric {
 	}
 
 	_init = () => {
-		this.kbsChartWidth = 800;
+		this.kbsChartWidth = 850;
 		this.kbsChartHeight = 420;
 		this.averageKbsChart = d3.select("#average-kbs")
 			.append("svg")
 			.attr("width", this.kbsChartWidth)
 			.attr("height", this.kbsChartHeight)
 			.append("g")
-			.attr("transform", "translate(" + 100 + "," + 20 + ")");
+			.attr("transform", "translate(" + 50 + "," + 20 + ")");
 
 		let x = d3.scaleLinear().domain([0, this.kbsChartWidth]).range([0, this.kbsChartWidth]);
 		let y = d3.scaleLinear().domain([0, this.kbsChartHeight]).range([0, this.kbsChartHeight]);
 
 		this.averageKbsChart.selectAll("line.x")
-			.data(x.ticks(7))
+			.data(x.ticks(8))
 			.enter().append("line")
 			.attr("x1", x)
 			.attr("x2", x)
@@ -89,6 +89,16 @@ export default class AverageKbMetric {
 		let xAxis = d3.axisTop().scale(x).ticks(4);
 		this.averageKbsChart.selectAll("g.x.axis")
 			.call(xAxis);
+
+		let avgKbsTitle = d3.select("#average-kbs-container")
+			.selectAll("p")
+			.data([averageKbs], data => data);
+
+		avgKbsTitle.exit().remove();
+
+		avgKbsTitle.enter().append("p").text(data => {
+			return "Average outgoing " + data + " kb/s.";
+		});
 
 	};
 

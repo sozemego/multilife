@@ -8,7 +8,7 @@ export default class TypeCountMetric {
 		let data = this._transformTypeCountToArray(typeCount);
 
 		let max = this._findMax(data.map(d => d.count));
-		let length = d3.scaleLinear().domain([0, max]).range([0, 450]);
+		let length = d3.scaleLinear().domain([0, max]).range([0, this._getMaxWidth()]);
 
 		let colors = d3.scaleOrdinal(this._genRandomColors(10));
 
@@ -65,5 +65,9 @@ export default class TypeCountMetric {
 		}
 		return colors;
 	};
+
+	_getMaxWidth = () => {
+		return document.getElementById("message-type-count").offsetWidth * 0.9;
+	}
 
 }
