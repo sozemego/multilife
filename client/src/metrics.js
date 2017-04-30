@@ -26,30 +26,32 @@ export default class Metrics {
 	};
 
 	_initAverageKbsChart = () => {
+		this.kbsChartWidth = 800;
+		this.kbsChartHeight = 420;
 		this.averageKbsChart = d3.select("#average-kbs")
 			.append("svg")
-			.attr("width", 640)
-			.attr("height", 420)
+			.attr("width", this.kbsChartWidth)
+			.attr("height", this.kbsChartHeight)
 			.append("g")
-			.attr("transform", "translate(30,20)");
+			.attr("transform", "translate(" + 100 + "," + 20 + ")");
 
-		let x = d3.scaleLinear().domain([0, 600]).range([0, 600]);
-		let y = d3.scaleLinear().domain([0, 50000]).range([0, 400]);
+		let x = d3.scaleLinear().domain([0, this.kbsChartWidth]).range([0, this.kbsChartWidth]);
+		let y = d3.scaleLinear().domain([0, this.kbsChartHeight]).range([0, this.kbsChartHeight]);
 
 		this.averageKbsChart.selectAll("line.x")
-			.data(x.ticks(5))
+			.data(x.ticks(7))
 			.enter().append("line")
 			.attr("x1", x)
 			.attr("x2", x)
 			.attr("y1", 0)
-			.attr("y2", 400)
+			.attr("y2", this.kbsChartHeight)
 			.style("stroke", "#ccc");
 
 		this.averageKbsChart.selectAll("line.y")
-			.data(y.ticks(5))
+			.data(y.ticks(6))
 			.enter().append("line")
 			.attr("x1", 0)
-			.attr("x2", 600)
+			.attr("x2", this.kbsChartWidth)
 			.attr("y1", y)
 			.attr("y2", y)
 			.style("stroke", "#ccc");
@@ -116,8 +118,8 @@ export default class Metrics {
 		let timeDomainMin = this._getTimeDomainMin();
 		let timeDomainMax = this._getTimeDomainMax();
 
-		let x = d3.scaleTime().domain([timeDomainMin, timeDomainMax]).range([0, 600]);
-		let y = d3.scaleLinear().domain([0, max]).range([400, 0]);
+		let x = d3.scaleTime().domain([timeDomainMin, timeDomainMax]).range([0, this.kbsChartWidth]);
+		let y = d3.scaleLinear().domain([0, max]).range([this.kbsChartHeight, 0]);
 
 		let line = d3.line()
 			.x(d => x(d.time))
