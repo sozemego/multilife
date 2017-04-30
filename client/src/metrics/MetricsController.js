@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-export default class Metrics {
+export default class MetricsController {
 
 	constructor() {
 		this.averageKbs = [];
@@ -8,7 +8,6 @@ export default class Metrics {
 	}
 
 	_init() {
-
 		this.webSocket = new WebSocket("ws://localhost:8080/metrics-live");
 
 		this.webSocket.onopen = () => {

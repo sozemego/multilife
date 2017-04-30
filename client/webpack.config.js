@@ -4,7 +4,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
 	entry: {
 		game: "./src/Game.js",
-		metrics: "./src/metrics.js"
+		metrics: "./src/metrics/Metrics.js"
 	},
 	output: {
 		filename: "[name].js",
@@ -27,7 +27,7 @@ module.exports = {
 	plugins: [
 		new CopyWebpackPlugin([
 			{from: "src/index.html"},
-			{from: "src/metrics.html"},
+			{from: "src/metrics/metrics.html"},
 			{from: "src/main.css"},
 			{from: "src/login_background.gif"}
 		])
