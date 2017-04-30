@@ -1,5 +1,8 @@
 package soze.multilife;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
 import soze.multilife.events.EventBusHandler;
 import soze.multilife.events.EventHandler;
 import soze.multilife.helpers.UncaughtExceptionLogger;
@@ -12,8 +15,11 @@ import soze.multilife.server.connection.ConnectionFactory;
 import soze.multilife.server.metrics.MetricsHttpHandler;
 import soze.multilife.server.metrics.MetricsService;
 import soze.multilife.server.metrics.MetricsWebSocketHandler;
+import soze.multilife.server.metrics.repository.MetricsRepository;
+import soze.multilife.server.metrics.repository.MongoMetricsRepository;
 import soze.multilife.simulation.SimulationFactory;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -41,11 +47,11 @@ public class MultiLife {
 	private final MetricsHttpHandler metricsHttpHandler;
 	private final EventHandler eventHandler;
 	private final MetricsService metricsService;
+	private final MongoClient mongoClient;
 
 	private MultiLife(Configuration config) {
 
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger());
-		this.eventHandler = new EventBusHandler();
 
 		SimulationFactory simulationFactory = new SimulationFactory(
 			config.getIntSupplier("gameDefaultWidth"),
@@ -61,11 +67,29 @@ public class MultiLife {
 			config.getLongSupplier("instanceInactiveTimeBeforeRemoval"),
 			simulationFactory
 		);
+		this.eventHandler = new EventBusHandler();
 		this.lobby = new Lobby(eventHandler, instanceFactory, instances);
 
 		this.connectionFactory = new ConnectionFactory(eventHandler);
 
-		this.metricsService = new MetricsService(config.getLongSupplier("calculateMetricsInterval"));
+		MongoCredential credential = MongoCredential.createCredential(
+			config.getStringSupplier("mongoUsername").get(),
+			config.getStringSupplier("mongoDatabase").get(),
+			config.getStringSupplier("mongoPassword").get().toCharArray()
+		);
+		this.mongoClient = new MongoClient(
+			new ServerAddress(
+				config.getStringSupplier("mongoHost").get(),
+				config.getIntSupplier("mongoPort").get()
+			),
+			Arrays.asList(credential));
+
+		MetricsRepository metricsRepository = new MongoMetricsRepository(mongoClient.getDatabase(config.getStringSupplier("mongoDatabase").get()));
+		this.metricsService = new MetricsService(
+			metricsRepository,
+			config.getLongSupplier("calculateMetricsInterval"),
+			config.getLongSupplier("metricsKbsIntervalBetweenSaves")
+		);
 		this.eventHandler.register(metricsService);
 		metricsHttpHandler = new MetricsHttpHandler();
 		this.metricsWebSocketHandler = new MetricsWebSocketHandler(

@@ -83,6 +83,10 @@ public class Configuration {
 	}
 
 	private void parseConfigLine(String line) throws IOException {
+		//ignore empty lines
+		if(line.trim().length() == 0) {
+			return;
+		}
 		String[] tokens = line.split("=");
 		if (tokens.length != 2) {
 			throw new IOException("Invalid properties, not split with '='");

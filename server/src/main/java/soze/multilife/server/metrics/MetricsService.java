@@ -7,7 +7,9 @@ import soze.multilife.server.metrics.events.PlayerDisconnectedEvent;
 import soze.multilife.server.metrics.events.PlayerLoggedEvent;
 import soze.multilife.server.metrics.events.SerializedMetricEvent;
 import soze.multilife.server.metrics.events.TypeMetricEvent;
+import soze.multilife.server.metrics.repository.MetricsRepository;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,6 +23,7 @@ public class MetricsService implements Runnable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MetricsService.class);
 
+	private final MetricsRepository repository;
 	private final Supplier<Long> calculateMetricsInterval;
 
 	private final Queue<Object> events = new ConcurrentLinkedQueue<>();
@@ -33,13 +36,16 @@ public class MetricsService implements Runnable {
 	private double totalBytesDuringLastCheck = 0;
 	private double currentKilobytesPerSecond = 0d;
 	private long lastSaveTime = 0L;
-	private long intervalBetweenSaves = 1000 * 60 * 60;
+	private Supplier<Long> intervalBetweenSaves;
+	private int maxPlayersBeforeSave = 0;
 
 	private final Map<String, Long> typeCountMap = new ConcurrentHashMap<>();
 	private final Map<Long, Long> playerMap = new ConcurrentHashMap<>();
 
-	public MetricsService(Supplier<Long> calculateMetricsInterval) {
+	public MetricsService(MetricsRepository repository, Supplier<Long> calculateMetricsInterval, Supplier<Long> intervalBetweenSaves) {
+		this.repository = repository;
 		this.calculateMetricsInterval = calculateMetricsInterval;
+		this.intervalBetweenSaves = intervalBetweenSaves;
 	}
 
 	@Override
@@ -62,13 +68,9 @@ public class MetricsService implements Runnable {
 				}
 			}
 
+			countMaxPlayers();
 			calculateKilobytesPerSecond();
-
-			long currentTime = System.currentTimeMillis();
-			if(currentTime > lastSaveTime + intervalBetweenSaves) {
-				LOG.info("Saving last hours data.");
-				lastSaveTime = currentTime;
-			}
+			save();
 
 			try {
 				Thread.sleep(calculateMetricsInterval.get());
@@ -79,17 +81,13 @@ public class MetricsService implements Runnable {
 	}
 
 	private void process(PlayerLoggedEvent playerEvent) {
-		//synchronized (playerMap) {
 		long playerId = playerEvent.getPlayerId();
 		long instanceId = playerEvent.getInstanceId();
 		playerMap.put(playerId, instanceId);
-		//}
 	}
 
 	private void process(PlayerDisconnectedEvent playerEvent) {
-		//synchronized (playerMap) {
 		playerMap.remove(playerEvent.getPlayerId());
-		//}
 	}
 
 	private void process(SerializedMetricEvent event) {
@@ -100,18 +98,42 @@ public class MetricsService implements Runnable {
 
 	private void process(TypeMetricEvent event) {
 		String type = event.getType();
-		//synchronized (typeCountMap) {
 		Long count = typeCountMap.get(type);
 		typeCountMap.put(type, count == null ? 1 : ++count);
-		//}
 	}
 
 	private void calculateKilobytesPerSecond() {
-		long timePassed = System.currentTimeMillis() - lastKilobytePerSecondCalculationTime;
+		long timePassedMs = System.currentTimeMillis() - lastKilobytePerSecondCalculationTime;
 		double kilobytesSentSinceLastCheck = (totalBytesSent - totalBytesDuringLastCheck) / 1024;
-		currentKilobytesPerSecond = kilobytesSentSinceLastCheck / (timePassed / 1000);
+		currentKilobytesPerSecond = kilobytesSentSinceLastCheck / (timePassedMs / 1000);
 		totalBytesDuringLastCheck = totalBytesSent;
-		LOG.info("Currently sending [{}] kb/s", currentKilobytesPerSecond);
+		LOG.trace("Currently sending [{}] kb/s", currentKilobytesPerSecond);
+	}
+
+	private void countMaxPlayers() {
+		int playerCount = playerMap.size();
+		if(playerCount > maxPlayersBeforeSave) {
+			maxPlayersBeforeSave = playerCount;
+		}
+		LOG.trace("Currently [{}] players.", playerCount);
+	}
+
+	private void saveKbs() {
+		repository.saveKilobytesPerSecond(currentKilobytesPerSecond, Instant.now().toEpochMilli());
+	}
+
+	private void saveMaxPlayers() {
+		repository.saveMaxPlayers(maxPlayersBeforeSave, Instant.now().toEpochMilli());
+		maxPlayersBeforeSave = 0;
+	}
+
+	private void save() {
+		long currentTime = System.currentTimeMillis();
+		if(currentTime > lastSaveTime + intervalBetweenSaves.get()) {
+			saveKbs();
+			saveMaxPlayers();
+			lastSaveTime = currentTime;
+		}
 	}
 
 	@Subscribe
