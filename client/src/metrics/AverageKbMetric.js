@@ -1,4 +1,3 @@
-import * as d3 from "d3";
 import LineChart from "./LineChart";
 import TextD3 from "./TextD3";
 

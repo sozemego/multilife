@@ -1,4 +1,4 @@
-import * as d3 from "d3";
+import TextD3 from "./TextD3";
 
 /**
  * Handles the display of total messages sent, but also
@@ -8,21 +8,18 @@ export default class TotalMessagesMetric {
 
 	constructor(socket) {
 		socket.addObserver(this._handleTotalMessages);
+		this._text = new TextD3(document.getElementById("total-bytes-sent"), this._textFunction);
 	}
 
 	_handleTotalMessages = ({totalBytesSent, totalMessagesSent} = msg) => {
-		let bytes = d3.select("#total-bytes-sent")
-			.selectAll("span")
-			.data([totalBytesSent], data => data);
+		this._text.update({bytes: totalBytesSent, totalMessagesSent: totalMessagesSent});
+	};
 
-		bytes.exit().remove();
-
-		bytes.enter().append("span").text(data => {
-			return "Total bytes sent: "
-				+ data + " (" + this._getTruncatedKb(data)
-				+ "kB, " + this._getTruncatedMb(data) + "MB). "
-				+ "Total messages: " + totalMessagesSent;
-		});
+	_textFunction = (data) => {
+		return "Total bytes sent: "
+			+ data.bytes + " (" + this._getTruncatedKb(data.bytes)
+			+ "kB, " + this._getTruncatedMb(data.bytes) + "MB). "
+			+ "Total messages: " + data.totalMessagesSent;
 	};
 
 	_getTruncatedKb = (bytes) => {

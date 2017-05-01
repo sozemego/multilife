@@ -9,13 +9,13 @@ export default class TextD3 {
 	}
 
 	update = (data) => {
-		let avgKbsTitle = d3.select(this._dom)
+		let text = d3.select(this._dom)
 			.selectAll("p")
-			.data([data], data => data);
+			.data([data], data => Math.random()); //almost always updates to new values
 
-		avgKbsTitle.exit().remove();
+		text.exit().remove();
 
-		avgKbsTitle.enter()
+		text.enter()
 			.append("p")
 			.text(this._textFunction);
 
