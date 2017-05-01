@@ -1,11 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import {Divider, MenuItem, MuiThemeProvider, Paper} from "material-ui";
+import {Divider, MenuItem, MuiThemeProvider, Paper, SvgIcon} from "material-ui";
 import MetricsSocket from "./MetricsSocket";
 import TotalMessagesMetric from "./TotalMessagesMetric";
 import injectTapEventPlugin from "react-tap-event-plugin";
 import AverageKbMetric from "./AverageKbMetric";
 import TypeCountMetric from "./TypeCountMetric";
+import LineIcon from "./line-chart.svg";
+import BarChart from "./bar-chart-7.svg";
 injectTapEventPlugin();
 
 const styles = {
@@ -17,6 +19,10 @@ const styles = {
 	},
 	sidebar: {
 		width: "15%"
+	},
+	sideBarIcon: {
+		width: "24px",
+		height: "24px"
 	},
 	content: {
 		width: "85%",
@@ -56,8 +62,14 @@ export default class Metrics extends React.Component {
 			<MuiThemeProvider>
 				<div style={styles.container}>
 					<Paper zDepth={2} style={styles.sidebar}>
-						<MenuItem onTouchTap={() => this.setState({selectedView: 0})}>Average kb/s</MenuItem>
-						<MenuItem onTouchTap={() => this.setState({selectedView: 1})}>Type chart</MenuItem>
+						<MenuItem onTouchTap={() => this.setState({selectedView: 0})}
+								  rightIcon={<img src={LineIcon}/>}>
+							Average kb/s
+						</MenuItem>
+						<MenuItem onTouchTap={() => this.setState({selectedView: 1})}
+								  rightIcon={<img src={BarChart}/>}>
+							Type chart
+						</MenuItem>
 					</Paper>
 					<div style={styles.content}>
 						<div id="total-bytes-sent" style={styles.totalBytesSent}/>

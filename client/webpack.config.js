@@ -21,6 +21,18 @@ module.exports = {
 						loader: "babel-loader"
 					}
 				]
+			},
+			{
+				test: /\.svg$/,
+				exclude: /node_modules/,
+				use: [
+					{
+						loader: "file-loader",
+						query: {
+							name: 'static/media/[name].[hash:8].[ext]'
+						}
+					}
+				]
 			}
 		]
 	},
