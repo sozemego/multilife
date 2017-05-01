@@ -19,13 +19,7 @@ export default class PlayerCountMetric {
 	};
 
 	_addPlayerCount = (instancePlayerMap) => {
-		let players = 0;
-		for(let key in instancePlayerMap) {
-			if(instancePlayerMap.hasOwnProperty(key)) {
-				players += parseInt(instancePlayerMap[key]);
-			}
-		}
-		this._playerCount.push({players: players, time: new Date()});
+		this._playerCount.push({players: Object.keys(instancePlayerMap).length, time: new Date()});
 	};
 
 	_textFunction = (data) => {
