@@ -1,3 +1,6 @@
+/**
+ * Part of the application responsible for displaying various metrics.
+ */
 import React from "react";
 import ReactDOM from "react-dom";
 import {Divider, MenuItem, MuiThemeProvider, Paper, SvgIcon} from "material-ui";
@@ -8,6 +11,7 @@ import AverageKbMetric from "./AverageKbMetric";
 import TypeCountMetric from "./TypeCountMetric";
 import LineIcon from "./line-chart.svg";
 import BarChart from "./bar-chart-7.svg";
+import PlayerCountMetric from "./PlayerCountMetric";
 injectTapEventPlugin();
 
 const styles = {
@@ -44,9 +48,6 @@ const styles = {
 	}
 };
 
-/**
- * Part of the application responsible for displaying various metrics.
- */
 export default class Metrics extends React.Component {
 
 	constructor(props) {
@@ -70,6 +71,10 @@ export default class Metrics extends React.Component {
 								  rightIcon={<img src={BarChart} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
 							Type chart
 						</MenuItem>
+						<MenuItem onTouchTap={() => this.setState({selectedView: 2})}
+								  rightIcon={<img src={LineIcon} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
+							Player count
+						</MenuItem>
 					</Paper>
 					<div style={styles.content}>
 						<div id="total-bytes-sent" style={styles.totalBytesSent}/>
@@ -82,6 +87,12 @@ export default class Metrics extends React.Component {
 						<div style={selectedView !== 1 ? {display:"none"} : styles.typeCountTitle}>
 							<p>Message type count</p>
 							<div id="message-type-count">
+
+							</div>
+						</div>
+						<div style={selectedView !== 2 ? {display:"none"} : styles.typeCountTitle}>
+							<p>Player count</p>
+							<div id="player-count">
 
 							</div>
 						</div>
@@ -99,4 +110,5 @@ let socket = new MetricsSocket();
 new TotalMessagesMetric(socket);
 new AverageKbMetric(socket);
 new TypeCountMetric(socket);
+new PlayerCountMetric(socket);
 

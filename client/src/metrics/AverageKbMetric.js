@@ -7,7 +7,7 @@ export default class AverageKbMetric {
 	constructor(socket) {
 		socket.addObserver(this._handleAverageKbs);
 		this._averageKbs = [];
-		this._chart = new LineChart(document.getElementById("average-kbs"));
+		this._chart = new LineChart(document.getElementById("average-kbs")).width(850).height(420).init();
 		this._text = new TextD3(document.getElementById("average-kbs"), this._textFunction);
 	}
 
@@ -15,8 +15,9 @@ export default class AverageKbMetric {
 		this._addAverageKbsToDataSet(averageKbs);
 		let timeDomainMin = this._getTimeDomainMin();
 		let timeDomainMax = this._getTimeDomainMax();
-		this._chart.update(this._averageKbs, timeDomainMin, timeDomainMax);
-		this._text.update(this._averageKbs[this._averageKbs.length - 1].kbs);
+		let transformedData = this._transformData();
+		this._chart.update(transformedData, timeDomainMin, timeDomainMax);
+		this._text.update(transformedData[transformedData.length - 1].count);
 	};
 
 	_addAverageKbsToDataSet = (averageKbs) => {
@@ -42,5 +43,11 @@ export default class AverageKbMetric {
 	_textFunction = (data) => {
 		return "Average outgoing " + data + " kb/s";
 	};
+
+	_transformData = () => {
+		return this._averageKbs.map(item => {
+			return {count: item.kbs, time: item.time};
+		})
+	}
 
 }

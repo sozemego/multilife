@@ -8,21 +8,28 @@ export default class LineChart {
 
 	constructor(domElement) {
 		this._domElement = domElement;
-		this._init();
 	}
 
-	_init = () => {
-		this.kbsChartWidth = 850;
-		this.kbsChartHeight = 420;
+	width = (width) => {
+		this._width = width;
+		return this;
+	};
+
+	height = (height) => {
+		this._height = height;
+		return this;
+	};
+
+	init = () => {
 		this.averageKbsChart = d3.select(this._domElement)
 			.append("svg")
-			.attr("width", this.kbsChartWidth)
-			.attr("height", this.kbsChartHeight)
+			.attr("width", this._width)
+			.attr("height", this._height)
 			.append("g")
 			.attr("transform", "translate(" + 50 + "," + 20 + ")");
 
-		let x = d3.scaleLinear().domain([0, this.kbsChartWidth]).range([0, this.kbsChartWidth]);
-		let y = d3.scaleLinear().domain([0, this.kbsChartHeight]).range([0, this.kbsChartHeight]);
+		let x = d3.scaleLinear().domain([0, this._width]).range([0, this._width]);
+		let y = d3.scaleLinear().domain([0, this._height]).range([0, this._height]);
 
 		this.averageKbsChart.selectAll("line.x")
 			.data(x.ticks(8))
@@ -30,14 +37,14 @@ export default class LineChart {
 			.attr("x1", x)
 			.attr("x2", x)
 			.attr("y1", 0)
-			.attr("y2", this.kbsChartHeight)
+			.attr("y2", this._height)
 			.style("stroke", "#ccc");
 
 		this.averageKbsChart.selectAll("line.y")
 			.data(y.ticks(6))
 			.enter().append("line")
 			.attr("x1", 0)
-			.attr("x2", this.kbsChartWidth)
+			.attr("x2", this._width)
 			.attr("y1", y)
 			.attr("y2", y)
 			.style("stroke", "#ccc");
@@ -54,20 +61,22 @@ export default class LineChart {
 			.attr("class", "x axis")
 			.attr("transform", "translate(0, " + 399 + ")")
 			.call(xAxis);
+
+		return this;
 	};
 
-	update = (averageKbs, timeDomainMin, timeDomainMax) => {
-		let yMax = d3.max(averageKbs.map(d => d.kbs)) * 1.25;
+	update = (data, timeDomainMin, timeDomainMax) => {
+		let yMax = d3.max(data.map(item => item.count)) * 1.25;
 
-		let x = d3.scaleTime().domain([timeDomainMin, timeDomainMax]).range([0, this.kbsChartWidth]);
-		let y = d3.scaleLinear().domain([0, yMax]).range([this.kbsChartHeight, 0]);
+		let x = d3.scaleTime().domain([timeDomainMin, timeDomainMax]).range([0, this._width]);
+		let y = d3.scaleLinear().domain([0, yMax]).range([this._height, 0]);
 
 		let line = d3.line()
 			.x(d => x(d.time))
-			.y(d => y(d.kbs));
+			.y(d => y(d.count));
 
 		let path = this.averageKbsChart.selectAll("path.content")
-			.data([averageKbs]);
+			.data([data]);
 
 		path.exit().remove();
 
@@ -78,7 +87,7 @@ export default class LineChart {
 			.style("stroke-width", "2px")
 			.style("fill", "transparent");
 
-		path.attr("d", line(averageKbs));
+		path.attr("d", line(data));
 
 		let yAxis = d3.axisLeft().scale(y);
 		this.averageKbsChart.selectAll("g.y.axis")
