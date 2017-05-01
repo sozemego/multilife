@@ -15,7 +15,7 @@ export default class PlayerCountMetric {
 		let timeDomainMax = this._getTimeDomainMax();
 		let transformedData = this._transformData();
 		this._chart.update(transformedData, timeDomainMin, timeDomainMax);
-		this._text.update(transformedData[transformedData.length - 1]);
+		this._text.update(transformedData[transformedData.length - 1].count);
 	};
 
 	_addPlayerCount = (instancePlayerMap) => {
