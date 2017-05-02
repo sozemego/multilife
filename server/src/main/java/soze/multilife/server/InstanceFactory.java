@@ -18,7 +18,6 @@ public class InstanceFactory {
 	private final Supplier<Integer> maxPlayers;
 	private final Supplier<Long> instanceDuration;
 	private final Supplier<Long> iterationInterval;
-	private final Supplier<Long> timeInactiveBeforeRemoval;
 	private final SimulationFactory simulationFactory;
 	private long currentId = 0;
 
@@ -26,13 +25,11 @@ public class InstanceFactory {
 						   Supplier<Integer> maxPlayers,
 						   Supplier<Long> instanceDuration,
 						   Supplier<Long> iterationInterval,
-						   Supplier<Long> timeInactiveBeforeRemoval,
 						   SimulationFactory simulationFactory) {
 		this.instances = instances;
 		this.maxPlayers = maxPlayers;
 		this.instanceDuration = instanceDuration;
 		this.iterationInterval = iterationInterval;
-		this.timeInactiveBeforeRemoval = timeInactiveBeforeRemoval;
 		this.simulationFactory = simulationFactory;
 	}
 
@@ -53,11 +50,12 @@ public class InstanceFactory {
 			}
 		}
 
+		//TODO simulation, max players and duration should be passed here
 		// not a single instance was found, so let's create a new one.
 		Simulation simulation = simulationFactory.getSimulation();
 		simulation.init(); //TODO decide if this should be here
 		Instance instance = new Instance(++currentId, simulation, maxPlayers.get(), instanceDuration.get());
-		executor.execute(new InstanceRunner(instance, iterationInterval.get(), timeInactiveBeforeRemoval.get()));
+		executor.execute(new InstanceRunner(instance, iterationInterval.get()));
 		return instance;
 	}
 

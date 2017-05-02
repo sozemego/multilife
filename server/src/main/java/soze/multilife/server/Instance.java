@@ -103,10 +103,6 @@ public class Instance {
 		return id;
 	}
 
-	public boolean isActive() {
-		return !players.isEmpty();
-	}
-
 	public int getNumberOfPlayers() {
 		return players.size();
 	}

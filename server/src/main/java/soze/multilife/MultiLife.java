@@ -64,7 +64,6 @@ public class MultiLife {
 			config.getIntSupplier("maxPlayersPerInstance"),
 			config.getLongSupplier("gameDuration"),
 			config.getLongSupplier("gameIterationInterval"),
-			config.getLongSupplier("instanceInactiveTimeBeforeRemoval"),
 			simulationFactory
 		);
 		this.eventHandler = new EventBusHandler();
