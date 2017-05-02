@@ -12,11 +12,11 @@ import soze.multilife.server.InstanceFactory;
 import soze.multilife.server.Lobby;
 import soze.multilife.server.Server.ServerBuilder;
 import soze.multilife.server.connection.ConnectionFactory;
-import soze.multilife.server.metrics.MetricsHttpHandler;
-import soze.multilife.server.metrics.MetricsService;
-import soze.multilife.server.metrics.MetricsWebSocketHandler;
-import soze.multilife.server.metrics.repository.MetricsRepository;
-import soze.multilife.server.metrics.repository.MongoMetricsRepository;
+import soze.multilife.metrics.MetricsHttpHandler;
+import soze.multilife.metrics.MetricsService;
+import soze.multilife.metrics.MetricsWebSocketHandler;
+import soze.multilife.metrics.repository.MetricsRepository;
+import soze.multilife.metrics.repository.MongoMetricsRepository;
 import soze.multilife.simulation.SimulationFactory;
 
 import java.util.Arrays;

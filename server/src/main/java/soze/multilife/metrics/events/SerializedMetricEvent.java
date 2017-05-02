@@ -1,4 +1,4 @@
-package soze.multilife.server.metrics.events;
+package soze.multilife.metrics.events;
 
 /**
  * Event based on outgoing serialized data.

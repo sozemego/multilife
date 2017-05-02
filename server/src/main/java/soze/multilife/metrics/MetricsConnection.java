@@ -1,4 +1,4 @@
-package soze.multilife.server.metrics;
+package soze.multilife.metrics;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,8 +7,8 @@ import soze.multilife.events.EventHandler;
 import soze.multilife.messages.outgoing.OutgoingMessage;
 import soze.multilife.server.connection.BaseConnection;
 import soze.multilife.server.connection.Connection;
-import soze.multilife.server.metrics.events.TypeMetricEvent;
-import soze.multilife.server.metrics.events.SerializedMetricEvent;
+import soze.multilife.metrics.events.TypeMetricEvent;
+import soze.multilife.metrics.events.SerializedMetricEvent;
 
 /**
  * A {@link Connection} implementation which measures various

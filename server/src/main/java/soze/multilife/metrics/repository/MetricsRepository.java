@@ -1,4 +1,4 @@
-package soze.multilife.server.metrics.repository;
+package soze.multilife.metrics.repository;
 
 /**
  * A interface for classes wanting to interact with metrics stored in a database.

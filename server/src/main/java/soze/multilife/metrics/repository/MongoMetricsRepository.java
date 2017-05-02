@@ -1,4 +1,4 @@
-package soze.multilife.server.metrics.repository;
+package soze.multilife.metrics.repository;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;

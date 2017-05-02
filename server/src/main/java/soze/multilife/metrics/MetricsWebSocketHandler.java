@@ -1,4 +1,4 @@
-package soze.multilife.server.metrics;
+package soze.multilife.metrics;
 
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;

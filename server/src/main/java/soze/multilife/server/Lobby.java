@@ -9,8 +9,8 @@ import soze.multilife.messages.incoming.LoginMessage;
 import soze.multilife.messages.outgoing.PlayerIdentity;
 import soze.multilife.messages.outgoing.PongMessage;
 import soze.multilife.server.connection.Connection;
-import soze.multilife.server.metrics.events.PlayerDisconnectedEvent;
-import soze.multilife.server.metrics.events.PlayerLoggedEvent;
+import soze.multilife.metrics.events.PlayerDisconnectedEvent;
+import soze.multilife.metrics.events.PlayerLoggedEvent;
 import soze.multilife.simulation.Player;
 
 import java.util.HashMap;

@@ -2,7 +2,7 @@ package soze.multilife.server.connection;
 
 import org.eclipse.jetty.websocket.api.Session;
 import soze.multilife.events.EventHandler;
-import soze.multilife.server.metrics.MetricsConnection;
+import soze.multilife.metrics.MetricsConnection;
 
 /**
  * Class used for wrapping socket objects provided

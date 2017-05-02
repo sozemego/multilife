@@ -1,13 +1,13 @@
-package soze.multilife.server.metrics;
+package soze.multilife.metrics;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import soze.multilife.server.metrics.events.PlayerDisconnectedEvent;
-import soze.multilife.server.metrics.events.PlayerLoggedEvent;
-import soze.multilife.server.metrics.events.SerializedMetricEvent;
-import soze.multilife.server.metrics.events.TypeMetricEvent;
-import soze.multilife.server.metrics.repository.MetricsRepository;
+import soze.multilife.metrics.events.PlayerDisconnectedEvent;
+import soze.multilife.metrics.events.PlayerLoggedEvent;
+import soze.multilife.metrics.events.SerializedMetricEvent;
+import soze.multilife.metrics.events.TypeMetricEvent;
+import soze.multilife.metrics.repository.MetricsRepository;
 
 import java.time.Instant;
 import java.util.Map;
