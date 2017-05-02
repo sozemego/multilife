@@ -3,6 +3,7 @@ package soze.multilife.metrics;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import soze.multilife.configuration.MetricsConfigurationImpl;
 import soze.multilife.metrics.events.PlayerDisconnectedEvent;
 import soze.multilife.metrics.events.PlayerLoggedEvent;
 import soze.multilife.metrics.events.SerializedMetricEvent;
@@ -14,7 +15,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.Supplier;
 
 /**
  * A service for storing, calculating and reporting various metrics.
@@ -24,7 +24,7 @@ public class MetricsService implements Runnable {
 	private static final Logger LOG = LoggerFactory.getLogger(MetricsService.class);
 
 	private final MetricsRepository repository;
-	private final Supplier<Long> calculateMetricsInterval;
+	private final MetricsConfigurationImpl configuration;
 
 	private final Queue<Object> events = new ConcurrentLinkedQueue<>();
 
@@ -36,16 +36,14 @@ public class MetricsService implements Runnable {
 	private double totalBytesDuringLastCheck = 0;
 	private double averageKbs = 0d;
 	private long lastSaveTime = 0L;
-	private Supplier<Long> intervalBetweenSaves;
 	private int maxPlayersBeforeSave = 0;
 
 	private final Map<String, Long> typeCountMap = new ConcurrentHashMap<>();
 	private final Map<Long, Long> playerMap = new ConcurrentHashMap<>();
 
-	public MetricsService(MetricsRepository repository, Supplier<Long> calculateMetricsInterval, Supplier<Long> intervalBetweenSaves) {
+	public MetricsService(MetricsRepository repository, MetricsConfigurationImpl configuration) {
 		this.repository = repository;
-		this.calculateMetricsInterval = calculateMetricsInterval;
-		this.intervalBetweenSaves = intervalBetweenSaves;
+		this.configuration = configuration;
 	}
 
 	@Override
@@ -73,7 +71,7 @@ public class MetricsService implements Runnable {
 			save();
 
 			try {
-				Thread.sleep(calculateMetricsInterval.get());
+				Thread.sleep(configuration.getCalculateMetricsInterval());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -131,7 +129,7 @@ public class MetricsService implements Runnable {
 
 	private void save() {
 		long currentTime = System.currentTimeMillis();
-		if(currentTime > lastSaveTime + intervalBetweenSaves.get()) {
+		if(currentTime > lastSaveTime + configuration.metricsSaveInterval()) {
 			saveKbs();
 			saveMaxPlayers();
 			lastSaveTime = currentTime;

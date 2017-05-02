@@ -3,20 +3,23 @@ package soze.multilife;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
+import soze.multilife.configuration.ConfigurationFactory;
+import soze.multilife.configuration.MetricsConfigurationImpl;
+import soze.multilife.configuration.MongoConfigurationImpl;
 import soze.multilife.events.EventBusHandler;
 import soze.multilife.events.EventHandler;
 import soze.multilife.helpers.UncaughtExceptionLogger;
+import soze.multilife.metrics.MetricsHttpHandler;
+import soze.multilife.metrics.MetricsService;
+import soze.multilife.metrics.MetricsWebSocketHandler;
+import soze.multilife.metrics.repository.MetricsRepository;
+import soze.multilife.metrics.repository.MongoMetricsRepository;
 import soze.multilife.server.GameSocketHandler;
 import soze.multilife.server.Instance;
 import soze.multilife.server.InstanceFactory;
 import soze.multilife.server.Lobby;
 import soze.multilife.server.Server.ServerBuilder;
 import soze.multilife.server.connection.ConnectionFactory;
-import soze.multilife.metrics.MetricsHttpHandler;
-import soze.multilife.metrics.MetricsService;
-import soze.multilife.metrics.MetricsWebSocketHandler;
-import soze.multilife.metrics.repository.MetricsRepository;
-import soze.multilife.metrics.repository.MongoMetricsRepository;
 import soze.multilife.simulation.SimulationFactory;
 
 import java.util.Arrays;
@@ -33,10 +36,9 @@ public class MultiLife {
 
 	public static void main(String[] args) throws InterruptedException, ExecutionException {
 
-		Configuration config = new Configuration();
-		config.load();
+		ConfigurationFactory cfgFactory = new ConfigurationFactory();
 
-		MultiLife ml = new MultiLife(config);
+		MultiLife ml = new MultiLife(cfgFactory);
 		ml.start();
 
 	}
@@ -47,23 +49,20 @@ public class MultiLife {
 	private final MetricsHttpHandler metricsHttpHandler;
 	private final EventHandler eventHandler;
 	private final MetricsService metricsService;
-	private final MongoClient mongoClient;
+	private MongoClient mongoClient;
 
-	private MultiLife(Configuration config) {
+	private MultiLife(ConfigurationFactory cfgFactory) {
 
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger());
 
 		SimulationFactory simulationFactory = new SimulationFactory(
-			config.getIntSupplier("gameDefaultWidth"),
-			config.getIntSupplier("gameDefaultHeight")
+			cfgFactory.getSimulationFactoryConfiguration()
 		);
 
 		Map<Long, Instance> instances = new HashMap<>();
 		InstanceFactory instanceFactory = new InstanceFactory(
 			instances,
-			config.getIntSupplier("maxPlayersPerInstance"),
-			config.getLongSupplier("gameDuration"),
-			config.getLongSupplier("gameIterationInterval"),
+			cfgFactory.getInstanceFactoryConfiguration(),
 			simulationFactory
 		);
 		this.eventHandler = new EventBusHandler();
@@ -71,28 +70,17 @@ public class MultiLife {
 
 		this.connectionFactory = new ConnectionFactory(eventHandler);
 
-		MongoCredential credential = MongoCredential.createCredential(
-			config.getStringSupplier("mongoUsername").get(),
-			config.getStringSupplier("mongoDatabase").get(),
-			config.getStringSupplier("mongoPassword").get().toCharArray()
-		);
-		this.mongoClient = new MongoClient(
-			new ServerAddress(
-				config.getStringSupplier("mongoHost").get(),
-				config.getIntSupplier("mongoPort").get()
-			),
-			Arrays.asList(credential));
-
-		MetricsRepository metricsRepository = new MongoMetricsRepository(mongoClient.getDatabase(config.getStringSupplier("mongoDatabase").get()));
+		MetricsRepository metricsRepository = getMetricsRepository(cfgFactory.getMongoConfiguration());
+		MetricsConfigurationImpl metricsConfiguration = cfgFactory.getMetricsConfiguration();
 		this.metricsService = new MetricsService(
 			metricsRepository,
-			config.getLongSupplier("calculateMetricsInterval"),
-			config.getLongSupplier("metricsKbsIntervalBetweenSaves")
+			metricsConfiguration
 		);
 		this.eventHandler.register(metricsService);
+
 		metricsHttpHandler = new MetricsHttpHandler();
 		this.metricsWebSocketHandler = new MetricsWebSocketHandler(
-			config.getLongSupplier("metricsPushUpdateRate"),
+			metricsConfiguration,
 			metricsService, connectionFactory
 		);
 
@@ -100,6 +88,22 @@ public class MultiLife {
 		executor.execute(lobby);
 		executor.execute(metricsService);
 		executor.execute(metricsWebSocketHandler);
+	}
+
+	private MetricsRepository getMetricsRepository(MongoConfigurationImpl config) {
+		MongoCredential credential = MongoCredential.createCredential(
+			config.getUsername(),
+			config.getDatabase(),
+			config.getPassword()
+		);
+		this.mongoClient = new MongoClient(
+			new ServerAddress(
+				config.getUrl(),
+				config.getPort()
+			),
+			Arrays.asList(credential));
+
+		return new MongoMetricsRepository(mongoClient.getDatabase(config.getDatabase()));
 	}
 
 	private void start() throws InterruptedException, ExecutionException {

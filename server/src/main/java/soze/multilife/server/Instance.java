@@ -3,7 +3,6 @@ package soze.multilife.server;
 import soze.multilife.messages.incoming.ClickMessage;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingType;
-import soze.multilife.messages.outgoing.TimeRemainingMessage;
 import soze.multilife.simulation.Player;
 import soze.multilife.simulation.Simulation;
 
@@ -21,31 +20,18 @@ public class Instance {
 	private final long id;
 	private final Simulation simulation;
 	private final Map<Long, Player> players = new HashMap<>();
-	private final int maxPlayers;
 	private boolean scheduledForRemoval;
-
-	/**
-	 * Time for this instance to live in ms.
-	 */
-	private final long timeToLive;
-	private long timePassed;
-	private long t0 = -1;
-
 
 	private final Queue<MessageQueueNode> queuedMessages = new ConcurrentLinkedQueue<>();
 
-	public Instance(long id, Simulation simulation, int maxPlayers, long timeToLive) {
+	public Instance(long id, Simulation simulation) {
 		this.id = id;
 		this.simulation = simulation;
-		this.maxPlayers = maxPlayers;
-		this.timeToLive = timeToLive;
 	}
 
 	public void update() {
-		updateTime();
 		handleMessages();
 		simulation.update();
-		sendRemainingTime();
 	}
 
 	public void addPlayer(Player player) {
@@ -60,18 +46,6 @@ public class Instance {
 
 	public void addMessage(IncomingMessage message, long id) {
 		queuedMessages.add(new MessageQueueNode(message, id));
-	}
-
-	public boolean isOutOfTime() {
-		return timePassed > timeToLive;
-	}
-
-	private void updateTime() {
-		if (t0 == -1) {
-			t0 = System.nanoTime();
-		}
-		timePassed += (System.nanoTime() - t0) / 1e6;
-		t0 = System.nanoTime();
 	}
 
 	private void handleMessages() {
@@ -90,15 +64,6 @@ public class Instance {
 		simulation.click(indices, id);
 	}
 
-	private void sendRemainingTime() {
-		TimeRemainingMessage timeRemainingMessage = new TimeRemainingMessage(timeToLive - timePassed);
-		synchronized (players) {
-			for (Player player : players.values()) {
-				player.send(timeRemainingMessage);
-			}
-		}
-	}
-
 	public long getId() {
 		return id;
 	}
@@ -108,7 +73,7 @@ public class Instance {
 	}
 
 	public boolean isFull() {
-		return getNumberOfPlayers() == maxPlayers;
+		return getNumberOfPlayers() == simulation.getMaxPlayers();
 	}
 
 	public boolean isScheduledForRemoval() {
@@ -117,6 +82,10 @@ public class Instance {
 
 	public void setScheduledForRemoval(boolean scheduledForRemoval) {
 		this.scheduledForRemoval = scheduledForRemoval;
+	}
+
+	public boolean isOutOfTime() {
+		return simulation.isOutOfTime();
 	}
 
 	public Simulation getSimulation() {

@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * An object which is the actual simulation of cells.
+ * An object which handles the simulation ({@link Grid}) and players.
  * This object is responsible for advancing the simulation and sending
  * data to players.
  */
@@ -39,6 +39,8 @@ public class Simulation {
 	 */
 	private final Map<Long, Player> players = new HashMap<>();
 
+	private final int maxPlayers;
+
 	/**
 	 * Maps playerId to color (#hex) of their alive cells.
 	 */
@@ -54,6 +56,14 @@ public class Simulation {
 	private final int width;
 
 	private final int height;
+
+	/**
+	 * Time for this instance to live in ms.
+	 */
+	private final long duration;
+	private long timePassed;
+	private long t0 = -1;
+
 
 	/**
 	 * Objects managing the cells. It manages all cells as well as the active cells and the cells
@@ -81,11 +91,13 @@ public class Simulation {
 	 */
 	private int simulationSteps = 0;
 
-	Simulation(int width, int height) {
+	Simulation(int width, int height, int maxPlayers, long duration) {
 		this.width = width;
 		this.height = height;
 		this.grid = new Grid(width, height);
 		grid.addRule(SIMULATION_PLAYER_ID, RuleFactory.getRule(RuleType.BASIC));
+		this.maxPlayers = maxPlayers;
+		this.duration = duration;
 	}
 
 	/**
@@ -160,6 +172,7 @@ public class Simulation {
 	public void update() {
 		updateLeavingPlayers();
 		updateFreshPlayers();
+		updateTime();
 		if (!players.isEmpty()) {
 			grid.click(clickedCells);
 			sendClickedCells();
@@ -167,6 +180,7 @@ public class Simulation {
 			simulationSteps++;
 			sendSimulationSteps();
 			sendPlayerData();
+			sendRemainingTime();
 		}
 	}
 
@@ -353,11 +367,29 @@ public class Simulation {
 		sendToPlayers(getAllCellData());
 	}
 
-	public int getWidth() {
-		return width;
+	public long getMaxPlayers() {
+		return maxPlayers;
 	}
 
-	public int getHeight() {
-		return height;
+	public boolean isOutOfTime() {
+		return timePassed > duration;
 	}
+
+	private void updateTime() {
+		if (t0 == -1) {
+			t0 = System.nanoTime();
+		}
+		timePassed += (System.nanoTime() - t0) / 1e6;
+		t0 = System.nanoTime();
+	}
+
+	private void sendRemainingTime() {
+		TimeRemainingMessage timeRemainingMessage = new TimeRemainingMessage(duration - timePassed);
+		synchronized (players) {
+			for (Player player : players.values()) {
+				player.send(timeRemainingMessage);
+			}
+		}
+	}
+
 }

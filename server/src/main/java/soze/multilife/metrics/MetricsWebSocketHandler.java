@@ -7,6 +7,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import soze.multilife.configuration.interfaces.MetricsConfiguration;
 import soze.multilife.messages.outgoing.MetricsMessage;
 import soze.multilife.server.connection.Connection;
 import soze.multilife.server.connection.ConnectionFactory;
@@ -14,7 +15,6 @@ import soze.multilife.server.connection.ConnectionFactory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Supplier;
 
 /**
  * A metrics endpoint handler for live data.
@@ -24,7 +24,7 @@ public class MetricsWebSocketHandler implements Runnable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MetricsWebSocketHandler.class);
 
-	private final Supplier<Long> metricsPushUpdateRate;
+	private final MetricsConfiguration configuration;
 
 	private final MetricsService metricsService;
 	private final ConnectionFactory connectionFactory;
@@ -33,8 +33,8 @@ public class MetricsWebSocketHandler implements Runnable {
 	private final Map<Session, Long> sessionIdMap = new ConcurrentHashMap<>();
 	private final Map<Long, Connection> connections = new ConcurrentHashMap<>();
 
-	public MetricsWebSocketHandler(Supplier<Long> metricsPushUpdateRate, MetricsService metricsService, ConnectionFactory connectionFactory) {
-		this.metricsPushUpdateRate = metricsPushUpdateRate;
+	public MetricsWebSocketHandler(MetricsConfiguration configuration, MetricsService metricsService, ConnectionFactory connectionFactory) {
+		this.configuration = configuration;
 		this.metricsService = metricsService;
 		this.connectionFactory = connectionFactory;
 	}
@@ -76,7 +76,7 @@ public class MetricsWebSocketHandler implements Runnable {
 			}
 
 			try {
-				Thread.sleep(metricsPushUpdateRate.get());
+				Thread.sleep(configuration.getMetricsPushInterval());
 			} catch (InterruptedException e) {
 				LOG.error("Thread interrupted [{}] ", e);
 			}

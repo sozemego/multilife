@@ -1,22 +1,20 @@
 package soze.multilife.simulation;
 
-import java.util.function.Supplier;
+import soze.multilife.configuration.SimulationFactoryConfiguration;
 
 /**
  * Produces simulation objects.
  */
 public class SimulationFactory {
 
-	private final Supplier<Integer> width;
-	private final Supplier<Integer> height;
+	private final SimulationFactoryConfiguration config;
 
-	public SimulationFactory(Supplier<Integer> width, Supplier<Integer> height) {
-		this.width = width;
-		this.height = height;
+	public SimulationFactory(SimulationFactoryConfiguration config) {
+		this.config = config;
 	}
 
 	public Simulation getSimulation() {
-		return new Simulation(width.get(), height.get());
+		return new Simulation(config.getGridWidth(), config.getGridHeight(), config.getMaxPlayers(), config.getGameDuration());
 	}
 
 }

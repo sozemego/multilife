@@ -1,4 +1,4 @@
-package soze.multilife;
+package soze.multilife.configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * Handles configuration for the application.
@@ -18,7 +17,7 @@ import java.util.function.Supplier;
  * the config file, a message will be logged, but no exception will be thrown.
  * Environmental variables will overwrite properties in the file.
  */
-public class Configuration {
+class Configuration {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
@@ -35,31 +34,19 @@ public class Configuration {
 		loaded = true;
 	}
 
-	public Supplier<Integer> getIntSupplier(String propertyName) {
-		return () -> getInt(propertyName);
-	}
-
-	public Supplier<String> getStringSupplier(String propertyName) {
-		return () -> getString(propertyName);
-	}
-
-	public Supplier<Long> getLongSupplier(String propertyName) {
-		return () -> getLong(propertyName);
-	}
-
-	private int getInt(String propertyName) {
+	public int getInt(String propertyName) {
 		checkLoaded();
 		String value = properties.get(propertyName);
 		return Integer.parseInt(value);
 	}
 
-	private long getLong(String propertyName) {
+	public long getLong(String propertyName) {
 		checkLoaded();
 		String value = properties.get(propertyName);
 		return Long.parseLong(value);
 	}
 
-	private String getString(String propertyName) {
+	public String getString(String propertyName) {
 		checkLoaded();
 		String value = properties.get(propertyName);
 		return value;
