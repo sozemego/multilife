@@ -167,7 +167,6 @@ public class Simulation {
 			simulationSteps++;
 			sendSimulationSteps();
 			sendPlayerData();
-			synchronize();
 		}
 	}
 
@@ -351,9 +350,7 @@ public class Simulation {
 	 * Sends all CellData to all players
 	 */
 	private void synchronize() {
-		if (simulationSteps % 10 == 0) {
-			//sendToPlayers(getAllCellData());
-		}
+		sendToPlayers(getAllCellData());
 	}
 
 	public int getWidth() {
