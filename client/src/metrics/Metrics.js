@@ -64,15 +64,15 @@ export default class Metrics extends React.Component {
 				<div style={styles.container}>
 					<Paper zDepth={2} style={styles.sidebar}>
 						<MenuItem onTouchTap={() => this.setState({selectedView: 0})}
-								  rightIcon={<img src={LineIcon} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
+								  leftIcon={<img src={LineIcon} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
 							Average kb/s
 						</MenuItem>
 						<MenuItem onTouchTap={() => this.setState({selectedView: 1})}
-								  rightIcon={<img src={BarChart} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
+								  leftIcon={<img src={BarChart} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
 							Type chart
 						</MenuItem>
 						<MenuItem onTouchTap={() => this.setState({selectedView: 2})}
-								  rightIcon={<img src={LineIcon} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
+								  leftIcon={<img src={LineIcon} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
 							Player count
 						</MenuItem>
 					</Paper>
@@ -91,7 +91,6 @@ export default class Metrics extends React.Component {
 							</div>
 						</div>
 						<div style={selectedView !== 2 ? {display:"none"} : styles.typeCountTitle}>
-							<p>Player count</p>
 							<div id="player-count">
 
 							</div>

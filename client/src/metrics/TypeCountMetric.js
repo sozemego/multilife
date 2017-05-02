@@ -19,13 +19,14 @@ export default class TypeCountMetric {
 		chart
 			.style("margin", "2px")
 			.style("font-size", "1em")
-			.style("height", "48px")
-			.style("line-height", "48px")
-			.style("border-style", "dashed")
+			.style("height", "40px")
+			.style("line-height", "40px")
+			.style("border-style", "solid")
 			.text(d => {
 				return d.type + "(" +  d.count + ")";
 			})
-			.transition().duration(750)
+			.transition()
+			.duration(500)
 			.style("width", d => length(d.count) + "px");
 
 		chart.enter()
@@ -33,7 +34,7 @@ export default class TypeCountMetric {
 			.style("background-color", d => colors(d.type))
 			.style("width", 25)
 			.transition()
-			.duration(750)
+			.duration(500)
 			.style("width", d => length(d.count) + "px");
 
 		chart.exit().remove();
