@@ -103,10 +103,12 @@ public class MetricsService implements Runnable {
 	}
 
 	private void calculateKilobytesPerSecond() {
-		long timePassedMs = System.currentTimeMillis() - lastKbsCalculationTime;
+		long currentTime = System.currentTimeMillis();
+		long timePassedMs = currentTime - lastKbsCalculationTime;
 		double kilobytesSentSinceLastCheck = (totalBytesSent - totalBytesDuringLastCheck) / 1024;
 		averageKbs = kilobytesSentSinceLastCheck / (timePassedMs / 1000);
 		totalBytesDuringLastCheck = totalBytesSent;
+		lastKbsCalculationTime = currentTime;
 		LOG.trace("Currently sending [{}] kb/s", averageKbs);
 	}
 
