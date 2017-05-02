@@ -5,7 +5,7 @@ export default class PlayerCountMetric {
 	constructor(socket) {
 		socket.addObserver(this._handlePlayerMapCount);
 		this._playerCount = [];
-		this._chart = new LineChart(document.getElementById("player-count")).width(850).height(420).init();
+		this._chart = new LineChart(document.getElementById("player-count"), 850, 420);
 		this._text = new TextD3(document.getElementById("player-count"), this._textFunction);
 	}
 

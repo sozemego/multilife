@@ -6,7 +6,7 @@ export default class AverageKbMetric {
 	constructor(socket) {
 		socket.addObserver(this._handleAverageKbs);
 		this._averageKbs = [];
-		this._chart = new LineChart(document.getElementById("average-kbs")).width(850).height(420).init();
+		this._chart = new LineChart(document.getElementById("average-kbs"), 850, 420);
 		this._text = new TextD3(document.getElementById("average-kbs"), this._textFunction);
 	}
 
