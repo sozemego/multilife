@@ -40,6 +40,11 @@ public class BaseConnection implements Connection {
 		}
 	}
 
+	@Override
+	public void disconnect() {
+		session.close();
+	}
+
 	private String serialize(OutgoingMessage message) {
 		try {
 			return mapper.writeValueAsString(message);

@@ -456,6 +456,17 @@ public class Game {
 		this.scheduledForRemoval = scheduledForRemoval;
 	}
 
+	/**
+	 * Ends the game, disconnects all players.
+	 */
+	public void end() {
+		synchronized (players) {
+			for (Player player : players.values()) {
+				player.disconnect();
+			}
+		}
+	}
+
 	private void sendRemainingTime() {
 		TimeRemainingMessage timeRemainingMessage = new TimeRemainingMessage(duration - timePassed);
 		synchronized (players) {

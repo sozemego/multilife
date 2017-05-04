@@ -23,4 +23,9 @@ public interface Connection {
 	 */
 	public void send(OutgoingMessage message);
 
+	/**
+	 * Terminates this connection.
+	 */
+	public void disconnect();
+
 }

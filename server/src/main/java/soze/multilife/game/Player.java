@@ -28,6 +28,10 @@ public class Player {
 		this.connection.send(msg);
 	}
 
+	public void disconnect() {
+		this.connection.disconnect();
+	}
+
 	public Connection getConnection() {
 		return connection;
 	}

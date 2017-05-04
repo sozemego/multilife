@@ -32,6 +32,9 @@ public class GameRunner implements Runnable {
 			}
 
 		}
+
+		game.end();
+
 	}
 
 }
