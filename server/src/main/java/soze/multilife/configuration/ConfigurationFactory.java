@@ -13,12 +13,8 @@ public class ConfigurationFactory {
 		this.configuration.load();
 	}
 
-	public SimulationFactoryConfiguration getSimulationFactoryConfiguration() {
-		return new SimulationFactoryConfiguration(configuration);
-	}
-
-	public InstanceFactoryConfiguration getInstanceFactoryConfiguration() {
-		return new InstanceFactoryConfiguration(configuration);
+	public GameConfigurationImpl getGameConfiguration() {
+		return new GameConfigurationImpl(configuration);
 	}
 
 	public MongoConfigurationImpl getMongoConfiguration() {

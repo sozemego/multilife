@@ -9,6 +9,7 @@ import soze.multilife.configuration.MongoConfigurationImpl;
 import soze.multilife.configuration.interfaces.ServerConfiguration;
 import soze.multilife.events.EventBusHandler;
 import soze.multilife.events.EventHandler;
+import soze.multilife.game.GameFactory;
 import soze.multilife.helpers.UncaughtExceptionLogger;
 import soze.multilife.metrics.MetricsHttpHandler;
 import soze.multilife.metrics.MetricsService;
@@ -16,16 +17,11 @@ import soze.multilife.metrics.MetricsWebSocketHandler;
 import soze.multilife.metrics.repository.MetricsRepository;
 import soze.multilife.metrics.repository.MongoMetricsRepository;
 import soze.multilife.server.GameSocketHandler;
-import soze.multilife.server.Instance;
-import soze.multilife.server.InstanceFactory;
 import soze.multilife.server.Lobby;
 import soze.multilife.server.Server.ServerBuilder;
 import soze.multilife.server.connection.ConnectionFactory;
-import soze.multilife.simulation.SimulationFactory;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -56,18 +52,12 @@ public class MultiLife {
 
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger());
 
-		SimulationFactory simulationFactory = new SimulationFactory(
-			cfgFactory.getSimulationFactoryConfiguration()
+		GameFactory gameFactory = new GameFactory(
+			cfgFactory.getGameConfiguration()
 		);
 
-		Map<Long, Instance> instances = new HashMap<>();
-		InstanceFactory instanceFactory = new InstanceFactory(
-			instances,
-			cfgFactory.getInstanceFactoryConfiguration(),
-			simulationFactory
-		);
 		this.eventHandler = new EventBusHandler();
-		this.lobby = new Lobby(eventHandler, instanceFactory, instances);
+		this.lobby = new Lobby(eventHandler, gameFactory);
 
 		this.connectionFactory = new ConnectionFactory(eventHandler);
 

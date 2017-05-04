@@ -9,4 +9,5 @@ public interface GameConfiguration {
 	public int getMaxPlayers();
 	public int getGridWidth();
 	public int getGridHeight();
+	public int getTickRate();
 }

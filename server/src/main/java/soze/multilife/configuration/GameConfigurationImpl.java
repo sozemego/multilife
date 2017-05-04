@@ -5,11 +5,11 @@ import soze.multilife.configuration.interfaces.GameConfiguration;
 /**
  * Configuration methods required by SimulationFactory.
  */
-public class SimulationFactoryConfiguration implements GameConfiguration {
+public class GameConfigurationImpl implements GameConfiguration {
 
 	private final Configuration configuration;
 
-	protected SimulationFactoryConfiguration(Configuration configuration) {
+	protected GameConfigurationImpl(Configuration configuration) {
 		this.configuration = configuration;
 	}
 
@@ -31,5 +31,10 @@ public class SimulationFactoryConfiguration implements GameConfiguration {
 	@Override
 	public int getGridHeight() {
 		return configuration.getInt("gameDefaultHeight");
+	}
+
+	@Override
+	public int getTickRate() {
+		return configuration.getInt("gameIterationInterval");
 	}
 }

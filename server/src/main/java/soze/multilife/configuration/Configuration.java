@@ -37,12 +37,12 @@ class Configuration {
 
 	public int getInt(String propertyName) {
 		checkLoaded();
-		return Integer.parseInt(Objects.requireNonNull(propertyName));
+		return Integer.parseInt(properties.get(Objects.requireNonNull(propertyName)));
 	}
 
 	public long getLong(String propertyName) {
 		checkLoaded();
-		return Long.parseLong(Objects.requireNonNull(propertyName));
+		return Long.parseLong(properties.get(Objects.requireNonNull(propertyName)));
 	}
 
 	public String getString(String propertyName) {

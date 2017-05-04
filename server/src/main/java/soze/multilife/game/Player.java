@@ -1,4 +1,4 @@
-package soze.multilife.simulation;
+package soze.multilife.game;
 
 import soze.multilife.messages.outgoing.OutgoingMessage;
 import soze.multilife.server.connection.Connection;

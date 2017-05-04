@@ -3,6 +3,9 @@ package soze.multilife.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soze.multilife.events.EventHandler;
+import soze.multilife.game.Game;
+import soze.multilife.game.GameFactory;
+import soze.multilife.game.Player;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingType;
 import soze.multilife.messages.incoming.LoginMessage;
@@ -11,51 +14,35 @@ import soze.multilife.messages.outgoing.PongMessage;
 import soze.multilife.metrics.events.PlayerDisconnectedEvent;
 import soze.multilife.metrics.events.PlayerLoggedEvent;
 import soze.multilife.server.connection.Connection;
-import soze.multilife.simulation.Player;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * A lobby. Connected, but not logged in users are stored here,
- * as well as all playing players. This object also starts new instances (simulations)
- * and assigns players to instances. It also passes messages along to appropriate rooms.
+ * as well as all playing players. This object also starts new games
+ * and assigns players to games.
+ * It also passes messages along to appropriate games.
  */
 public class Lobby implements Runnable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Lobby.class);
 
 	private final Map<Long, Connection> connections = new HashMap<>();
-	private final Map<Long, Player> players = new HashMap<>();
-	private final Map<Long, Instance> instances;
-	private final Map<Long, Long> playerToInstance = new HashMap<>();
-	private final InstanceFactory instanceFactory;
+	private final Map<Long, Game> games = new HashMap<>();
+	private final Map<Long, Long> playerToGame = new HashMap<>();
+	private final GameFactory gameFactory;
 
 	private final EventHandler eventHandler;
 
-	public Lobby(EventHandler eventHandler, InstanceFactory instanceFactory, Map<Long, Instance> instances) {
+	public Lobby(EventHandler eventHandler, GameFactory gameFactory) {
 		this.eventHandler = eventHandler;
-		this.instanceFactory = instanceFactory;
-		this.instances = instances;
+		this.gameFactory = gameFactory;
 	}
 
 	@Override
 	public void run() {
 		while (true) {
-
-			synchronized (instances) {
-				List<Long> instancesScheduledForRemoval =
-					instances
-						.values()
-						.stream()
-						.filter(Instance::isScheduledForRemoval)
-						.map(Instance::getId)
-						.collect(Collectors.toList());
-				instancesScheduledForRemoval.forEach(instances::remove);
-				LOG.trace("Lobby's sweepin', removed [{}] instances.", instancesScheduledForRemoval.size());
-			}
 
 			try {
 				Thread.sleep(1000 * 15);
@@ -93,9 +80,8 @@ public class Lobby implements Runnable {
 	void onDisconnect(Connection connection) {
 		long id = connection.getId();
 		connections.remove(id);
-		players.remove(id);
-		long instanceId = playerToInstance.remove(id);
-		instances.get(instanceId).removePlayer(id);
+		long gameId = playerToGame.remove(id);
+		games.get(gameId).removePlayer(id);
 		eventHandler.post(new PlayerDisconnectedEvent(id));
 	}
 
@@ -114,9 +100,9 @@ public class Lobby implements Runnable {
 			connections.get(id).send(new PongMessage());
 			return;
 		}
-		long instanceId = playerToInstance.get(id);
-		Instance instance = instances.get(instanceId);
-		instance.addMessage(incMessage, id);
+		long gameId = playerToGame.get(id);
+		Game game = games.get(gameId);
+		game.addMessage(incMessage, id);
 	}
 
 	/**
@@ -128,15 +114,28 @@ public class Lobby implements Runnable {
 	 */
 	private void handleLoginMessage(LoginMessage message, long id) {
 		LOG.info("Player with name [{}] is trying to login. ", message.getName());
-		Player player = createPlayer(connections.get(id), message.getName(), message.getRule());
-		players.put(id, player);
-		Instance instance = instanceFactory.getInstance();
-		instance.addPlayer(player);
-		synchronized (instances) {
-			instances.put(instance.getId(), instance);
+
+		Game game;
+		//1. find free, active room.
+		synchronized (games) {
+			for(Game g: games.values()) {
+				if(!g.isFull() && !g.isOutOfTime()) {
+					game = g;
+					break;
+				}
+			}
 		}
-		playerToInstance.put(id, instance.getId());
-		eventHandler.post(new PlayerLoggedEvent(id, instance.getId()));
+
+		//2. if no free or active rooms, create a new one
+		game = gameFactory.createGame();
+		Player player = createPlayer(connections.get(id), message.getName(), "BASIC");
+		game.addPlayer(player);
+
+		synchronized (games) {
+			games.put(game.getId(), game);
+		}
+		playerToGame.put(id, game.getId());
+		eventHandler.post(new PlayerLoggedEvent(id, game.getId()));
 	}
 
 	private Player createPlayer(Connection connection, String name, String rule) {

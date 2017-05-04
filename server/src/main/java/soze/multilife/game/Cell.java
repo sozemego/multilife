@@ -1,4 +1,4 @@
-package soze.multilife.simulation;
+package soze.multilife.game;
 
 /**
  * A class representing one cell in the simulation.

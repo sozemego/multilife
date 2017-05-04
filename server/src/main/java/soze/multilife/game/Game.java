@@ -1,13 +1,17 @@
-package soze.multilife.simulation;
+package soze.multilife.game;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import soze.multilife.game.rule.RuleFactory;
+import soze.multilife.game.rule.RuleType;
+import soze.multilife.messages.incoming.ClickMessage;
+import soze.multilife.messages.incoming.IncomingMessage;
+import soze.multilife.messages.incoming.IncomingType;
 import soze.multilife.messages.outgoing.*;
-import soze.multilife.simulation.rule.RuleFactory;
-import soze.multilife.simulation.rule.RuleType;
 
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 /**
@@ -15,14 +19,20 @@ import java.util.stream.Collectors;
  * This object is responsible for advancing the simulation and sending
  * data to players.
  */
-public class Simulation {
+public class Game {
 
-	private static final Logger LOG = LoggerFactory.getLogger(Simulation.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Game.class);
 
 	/**
 	 * playerId of this simulation.
 	 */
 	private static final long SIMULATION_PLAYER_ID = 0L;
+
+	private final long id;
+
+	private boolean scheduledForRemoval;
+
+	private final long tickRate;
 
 	/**
 	 * Players which recently joined, have not received map data yet.
@@ -91,13 +101,15 @@ public class Simulation {
 	 */
 	private int simulationSteps = 0;
 
-	Simulation(int width, int height, int maxPlayers, long duration) {
+	Game(long id, int width, int height, int maxPlayers, long duration, long tickRate) {
+		this.id = id;
 		this.width = width;
 		this.height = height;
 		this.grid = new Grid(width, height);
 		grid.addRule(SIMULATION_PLAYER_ID, RuleFactory.getRule(RuleType.BASIC));
 		this.maxPlayers = maxPlayers;
 		this.duration = duration;
+		this.tickRate = tickRate;
 	}
 
 	/**
@@ -113,6 +125,10 @@ public class Simulation {
 			}
 		}
 		grid.updateGrid(); // runs the simulation once, so that the first player logging can receive some data
+	}
+
+	public long getId() {
+		return id;
 	}
 
 	/**
@@ -170,6 +186,7 @@ public class Simulation {
 	 * and switches grids.
 	 */
 	public void update() {
+		handleMessages();
 		updateLeavingPlayers();
 		updateFreshPlayers();
 		updateTime();
@@ -181,6 +198,9 @@ public class Simulation {
 			sendSimulationSteps();
 			sendPlayerData();
 			sendRemainingTime();
+		}
+		if(isOutOfTime()) {
+			setScheduledForRemoval(true);
 		}
 	}
 
@@ -381,6 +401,59 @@ public class Simulation {
 		}
 		timePassed += (System.nanoTime() - t0) / 1e6;
 		t0 = System.nanoTime();
+	}
+
+	public boolean isFull() {
+		return getMaxPlayers() == players.size();
+	}
+
+	private final Queue<MessageQueueNode> queuedMessages = new ConcurrentLinkedQueue<>();
+
+	public void addMessage(IncomingMessage message, long id) {
+		queuedMessages.add(new MessageQueueNode(message, id));
+	}
+
+	private static class MessageQueueNode {
+
+		private final IncomingMessage incomingMessage;
+		private final long id;
+
+		public MessageQueueNode(IncomingMessage incomingMessage, long id) {
+			this.incomingMessage = incomingMessage;
+			this.id = id;
+		}
+
+		public IncomingMessage getIncomingMessage() {
+			return incomingMessage;
+		}
+
+		public long getId() {
+			return id;
+		}
+	}
+
+	private void handleMessages() {
+		MessageQueueNode node;
+		while ((node = queuedMessages.poll()) != null) {
+			IncomingMessage message = node.getIncomingMessage();
+			long id = node.getId();
+			if (message.getType() == IncomingType.CLICK) {
+				ClickMessage msg = (ClickMessage) message;
+				click(msg.getIndices(), id);
+			}
+		}
+	}
+
+	public long getTickRate() {
+		return tickRate;
+	}
+
+	public boolean isScheduledForRemoval() {
+		return scheduledForRemoval;
+	}
+
+	private void setScheduledForRemoval(boolean scheduledForRemoval) {
+		this.scheduledForRemoval = scheduledForRemoval;
 	}
 
 	private void sendRemainingTime() {

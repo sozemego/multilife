@@ -1,4 +1,4 @@
-package soze.multilife.simulation.rule;
+package soze.multilife.game.rule;
 
 public interface Rule {
 

@@ -1,6 +1,6 @@
 package soze.multilife.messages.outgoing;
 
-import soze.multilife.simulation.Cell;
+import soze.multilife.game.Cell;
 
 /**
  * Data about one cell.

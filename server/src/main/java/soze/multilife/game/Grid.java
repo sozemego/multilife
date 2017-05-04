@@ -1,6 +1,6 @@
-package soze.multilife.simulation;
+package soze.multilife.game;
 
-import soze.multilife.simulation.rule.Rule;
+import soze.multilife.game.rule.Rule;
 
 import java.awt.*;
 import java.util.*;
