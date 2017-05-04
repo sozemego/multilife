@@ -29,4 +29,8 @@ public class ConfigurationFactory {
 		return new MetricsConfigurationImpl(configuration);
 	}
 
+	public ServerConfigurationImpl getServerConfiguration() {
+		return new ServerConfigurationImpl(configuration);
+	}
+
 }

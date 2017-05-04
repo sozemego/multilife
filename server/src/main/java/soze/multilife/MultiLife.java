@@ -6,6 +6,7 @@ import com.mongodb.ServerAddress;
 import soze.multilife.configuration.ConfigurationFactory;
 import soze.multilife.configuration.MetricsConfigurationImpl;
 import soze.multilife.configuration.MongoConfigurationImpl;
+import soze.multilife.configuration.interfaces.ServerConfiguration;
 import soze.multilife.events.EventBusHandler;
 import soze.multilife.events.EventHandler;
 import soze.multilife.helpers.UncaughtExceptionLogger;
@@ -39,7 +40,7 @@ public class MultiLife {
 		ConfigurationFactory cfgFactory = new ConfigurationFactory();
 
 		MultiLife ml = new MultiLife(cfgFactory);
-		ml.start();
+		ml.start(cfgFactory.getServerConfiguration());
 
 	}
 
@@ -106,12 +107,12 @@ public class MultiLife {
 		return new MongoMetricsRepository(mongoClient.getDatabase(config.getDatabase()));
 	}
 
-	private void start() throws InterruptedException, ExecutionException {
-		new ServerBuilder(8080)
+	private void start(ServerConfiguration serverConfiguration) throws InterruptedException, ExecutionException {
+		new ServerBuilder(serverConfiguration.getPort())
 			.withWebSocketHandler("/game", new GameSocketHandler(lobby, connectionFactory))
 			.withWebSocketHandler("/metrics-live", metricsWebSocketHandler)
 			.withHttpHandler("/metrics", metricsHttpHandler)
-			.withExternalStaticFileHandler("f:/multilife/server/src/main/resources/public")
+			.withExternalStaticFileHandler(serverConfiguration.getExternalStaticFilesPath())
 			.build();
 	}
 
