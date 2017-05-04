@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Handles configuration for the application.
@@ -36,22 +37,22 @@ class Configuration {
 
 	public int getInt(String propertyName) {
 		checkLoaded();
-		String value = properties.get(propertyName);
-		return Integer.parseInt(value);
+		return Integer.parseInt(Objects.requireNonNull(propertyName));
 	}
 
 	public long getLong(String propertyName) {
 		checkLoaded();
-		String value = properties.get(propertyName);
-		return Long.parseLong(value);
+		return Long.parseLong(Objects.requireNonNull(propertyName));
 	}
 
 	public String getString(String propertyName) {
 		checkLoaded();
-		String value = properties.get(propertyName);
-		return value;
+		return properties.get(Objects.requireNonNull(propertyName));
 	}
 
+	/**
+	 * Throws a RuntimeException if configuration is not loaded.
+	 */
 	private void checkLoaded() {
 		if (!loaded) {
 			throw new RuntimeException("Load configuration first!");
@@ -76,7 +77,7 @@ class Configuration {
 		}
 		String[] tokens = line.split("=");
 		if (tokens.length != 2) {
-			throw new IOException("Invalid properties, not split with '='");
+			throw new IOException("Invalid property line, should be in key=value format. White space is ignored.");
 		}
 		properties.put(tokens[0].trim(), tokens[1].trim());
 	}
