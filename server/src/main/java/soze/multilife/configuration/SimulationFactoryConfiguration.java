@@ -20,7 +20,7 @@ public class SimulationFactoryConfiguration implements GameConfiguration {
 
 	@Override
 	public int getMaxPlayers() {
-		return configuration.getInt("maxPlayersPerInstance");
+		return configuration.getInt("maxPlayersPerGame");
 	}
 
 	@Override
