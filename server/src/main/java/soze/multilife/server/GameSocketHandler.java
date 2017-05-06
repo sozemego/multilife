@@ -8,7 +8,9 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import soze.multilife.game.Player;
 import soze.multilife.messages.incoming.IncomingMessage;
+import soze.multilife.messages.incoming.LoginMessage;
 import soze.multilife.server.connection.Connection;
 import soze.multilife.server.connection.ConnectionFactory;
 
@@ -25,14 +27,16 @@ public class GameSocketHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GameSocketHandler.class);
 
+	private final LoginService loginService;
 	private final Lobby lobby;
 	private final ConnectionFactory connectionFactory;
 	private final AtomicLong id = new AtomicLong(0L);
 	private final Map<Session, Long> sessionIdMap = new ConcurrentHashMap<>();
 	private final ObjectMapper mapper = new ObjectMapper();
 
-	public GameSocketHandler(Lobby lobby, ConnectionFactory connectionFactory) {
+	public GameSocketHandler(Lobby lobby, LoginService loginService, ConnectionFactory connectionFactory) {
 		this.lobby = lobby;
+		this.loginService = loginService;
 		this.connectionFactory = connectionFactory;
 	}
 
@@ -54,6 +58,11 @@ public class GameSocketHandler {
 	@OnWebSocketMessage
 	public void onMessage(Session session, String msg) throws Exception {
 		IncomingMessage inc = mapper.readValue(msg, IncomingMessage.class);
+		if(inc instanceof LoginMessage) {
+			Player player = loginService.login((LoginMessage)inc, getConnection(sessionIdMap.get(session), session));
+			lobby.addPlayer(player);
+			return;
+		}
 		lobby.onMessage(inc, sessionIdMap.get(session));
 	}
 

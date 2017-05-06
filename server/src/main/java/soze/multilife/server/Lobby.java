@@ -8,7 +8,6 @@ import soze.multilife.game.GameFactory;
 import soze.multilife.game.Player;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingType;
-import soze.multilife.messages.incoming.LoginMessage;
 import soze.multilife.messages.outgoing.PlayerIdentity;
 import soze.multilife.messages.outgoing.PongMessage;
 import soze.multilife.metrics.events.PlayerDisconnectedEvent;
@@ -42,7 +41,6 @@ public class Lobby implements Runnable {
 		this.gameFactory = gameFactory;
 	}
 
-	@Override
 	public void run() {
 		while (true) {
 
@@ -94,10 +92,6 @@ public class Lobby implements Runnable {
 	 * @param id
 	 */
 	void onMessage(IncomingMessage incMessage, long id) {
-		if (incMessage.getType() == IncomingType.LOGIN) {
-			handleLoginMessage((LoginMessage) incMessage, id);
-			return;
-		}
 		if (incMessage.getType() == IncomingType.PING) {
 			connections.get(id).send(new PongMessage());
 			return;
@@ -108,14 +102,11 @@ public class Lobby implements Runnable {
 	}
 
 	/**
-	 * Handles login message. Finds a game with free space
-	 * or creates a new once.
-	 *
-	 * @param message
-	 * @param id
+	 * Adds a newly logged player to one of the games.
+	 * @param player
 	 */
-	private void handleLoginMessage(LoginMessage message, long id) {
-		LOG.info("Player with name [{}] is trying to login. ", message.getName());
+	void addPlayer(Player player) {
+		LOG.info("Player with name [{}] is trying to login. ", player.getName());
 
 		Game game = null;
 		//1. find free, active room.
@@ -132,18 +123,14 @@ public class Lobby implements Runnable {
 		if(game == null) {
 			game = gameFactory.createGame();
 		}
-		Player player = createPlayer(connections.get(id), message.getName(), "BASIC");
+
 		game.addPlayer(player);
 
 		synchronized (games) {
 			games.put(game.getId(), game);
 		}
-		playerToGame.put(id, game.getId());
-		eventBus.post(new PlayerLoggedEvent(id, game.getId()));
-	}
-
-	private Player createPlayer(Connection connection, String name, String rule) {
-		return new Player(connection.getId(), connection, name, rule);
+		playerToGame.put(player.getId(), game.getId());
+		eventBus.post(new PlayerLoggedEvent(player.getId(), game.getId()));
 	}
 
 }
