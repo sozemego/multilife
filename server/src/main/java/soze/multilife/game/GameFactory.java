@@ -14,7 +14,7 @@ public class GameFactory {
 	private final Executor executor = Executors.newCachedThreadPool();
 
 	private final GameConfigurationImpl config;
-	private final AtomicInteger id = new AtomicInteger(0);
+	private final AtomicInteger id = new AtomicInteger(1);
 
 	public GameFactory(GameConfigurationImpl config) {
 		this.config = config;

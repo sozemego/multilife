@@ -25,7 +25,7 @@ public class GamePlayerHandler implements Game {
 	 */
 	private final List<Long> leavingPlayerIds = new ArrayList<>();
 
-	public GamePlayerHandler(Game game) {
+	GamePlayerHandler(Game game) {
 		this.game = game;
 	}
 

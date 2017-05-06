@@ -21,7 +21,7 @@ public class GameIncomingMessageHandler implements Game {
 	 */
 	private final Queue<MessageQueueNode> queuedMessages = new ConcurrentLinkedQueue<>();
 
-	public GameIncomingMessageHandler(Game game) {
+	GameIncomingMessageHandler(Game game) {
 		this.game = game;
 	}
 
@@ -48,16 +48,16 @@ public class GameIncomingMessageHandler implements Game {
 		private final IncomingMessage incomingMessage;
 		private final long playerId;
 
-		public MessageQueueNode(IncomingMessage incomingMessage, long playerId) {
+		MessageQueueNode(IncomingMessage incomingMessage, long playerId) {
 			this.incomingMessage = incomingMessage;
 			this.playerId = playerId;
 		}
 
-		public IncomingMessage getIncomingMessage() {
+		IncomingMessage getIncomingMessage() {
 			return incomingMessage;
 		}
 
-		public long getPlayerId() {
+		long getPlayerId() {
 			return playerId;
 		}
 	}

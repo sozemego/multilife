@@ -17,7 +17,7 @@ public class GameRunner implements Game {
 
 	private final Game game;
 
-	public GameRunner(Game game) {
+	GameRunner(Game game) {
 		this.game = game;
 	}
 

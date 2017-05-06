@@ -8,13 +8,13 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Handles outgoing messages from players to clients.
+ * Handles outgoing messages from game/players to clients.
  */
 public class GameOutgoingMessageHandler implements Game {
 
 	private final Game game;
 
-	public GameOutgoingMessageHandler(Game game) {
+	GameOutgoingMessageHandler(Game game) {
 		this.game = game;
 	}
 

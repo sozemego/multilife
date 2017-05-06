@@ -96,7 +96,7 @@ public class BaseGame implements Game {
 	/**
 	 * Spawns initial living cells.
 	 */
-	public void init() {
+	void init() {
 		SecureRandom random = new SecureRandom();
 		for (int i = 0; i < grid.getWidth(); i++) {
 			for (int j = 0; j < grid.getHeight(); j++) {
@@ -169,11 +169,11 @@ public class BaseGame implements Game {
 	public void run() {
 		updateTime();
 		if (!players.isEmpty()) {
+			clickedCells.clear();
+			clickedPlayers.clear();
 			grid.click(clickedCells);
 			grid.updateGrid();
 			iterations++;
-			clickedCells.clear();
-			clickedPlayers.clear();
 		}
 		if(isOutOfTime()) {
 			setScheduledForRemoval(true);
