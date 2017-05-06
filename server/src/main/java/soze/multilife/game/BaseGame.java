@@ -7,7 +7,8 @@ import soze.multilife.game.rule.RuleType;
 import soze.multilife.messages.incoming.ClickMessage;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingType;
-import soze.multilife.messages.outgoing.*;
+import soze.multilife.messages.outgoing.OutgoingMessage;
+import soze.multilife.messages.outgoing.PlayerData;
 
 import java.security.SecureRandom;
 import java.util.*;
@@ -28,7 +29,7 @@ public class BaseGame implements Game {
 	/**
 	 * Percent of alive cells spawned on simulation start.
 	 */
-	private final float initialDensity = 0.5f;
+	private final float initialDensity = 0.0f;
 
 	/**
 	 * Id of this game.
@@ -111,6 +112,9 @@ public class BaseGame implements Game {
 			}
 		}
 		grid.onCellDeath((strongestOwnerId) -> {
+			if(strongestOwnerId == -1) {
+				return;
+			}
 			Long points = playerPoints.get(strongestOwnerId);
 			playerPoints.put(strongestOwnerId, points == null ? 1L : ++points);
 		});
@@ -183,9 +187,9 @@ public class BaseGame implements Game {
 	public void run() {
 		updateTime();
 		if (!players.isEmpty()) {
+			grid.click(clickedCells);
 			clickedCells.clear();
 			clickedPlayers.clear();
-			grid.click(clickedCells);
 			grid.updateGrid();
 			iterations++;
 		}
@@ -215,7 +219,7 @@ public class BaseGame implements Game {
 	}
 
 	public Collection<Cell> getAllCells() {
-		return grid.getAllCells();
+		return new ArrayList<>(grid.getAllCells());
 	}
 
 	public void acceptMessage(IncomingMessage message, long playerId) {
@@ -230,7 +234,7 @@ public class BaseGame implements Game {
 	}
 
 	public Collection<Cell> getClickedCells() {
-		return clickedCells;
+		return new ArrayList<>(clickedCells);
 	}
 
 	public int getMaxPlayers() {
@@ -296,6 +300,6 @@ public class BaseGame implements Game {
 	}
 
 	public Collection<Player> getPlayers() {
-		return players.values();
+		return new ArrayList<>(players.values());
 	}
 }
