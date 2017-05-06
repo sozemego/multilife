@@ -108,7 +108,7 @@ public class Lobby implements Runnable {
 	}
 
 	/**
-	 * Handles login message. Finds an instance with free space
+	 * Handles login message. Finds a game with free space
 	 * or creates a new once.
 	 *
 	 * @param message
