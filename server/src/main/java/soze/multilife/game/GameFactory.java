@@ -1,28 +1,27 @@
 package soze.multilife.game;
 
 import soze.multilife.configuration.GameConfigurationImpl;
-import soze.multilife.server.GameRunner;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Produces simulation objects.
+ * Produces Game objects.
  */
 public class GameFactory {
 
 	private final Executor executor = Executors.newCachedThreadPool();
 
 	private final GameConfigurationImpl config;
-	private final AtomicLong id = new AtomicLong(0);
+	private final AtomicInteger id = new AtomicInteger(0);
 
 	public GameFactory(GameConfigurationImpl config) {
 		this.config = config;
 	}
 
 	public Game createGame() {
-		Game game = new Game(
+		BaseGame baseGame = new BaseGame(
 			id.getAndIncrement(),
 			config.getGridWidth(),
 			config.getGridHeight(),
@@ -30,8 +29,9 @@ public class GameFactory {
 			config.getGameDuration(),
 			config.getTickRate()
 		);
-		game.init();
-		executor.execute(new GameRunner(game));
+		baseGame.init();
+		Game game = new GameRunner(new GamePlayerHandler(new GameIncomingMessageHandler(new GameOutgoingMessageHandler(baseGame))));
+		executor.execute(game);
 		return game;
 	}
 

@@ -1,7 +1,7 @@
 package soze.multilife.server.connection;
 
 import org.eclipse.jetty.websocket.api.Session;
-import soze.multilife.events.EventHandler;
+import soze.multilife.events.EventBus;
 import soze.multilife.metrics.MetricsConnection;
 
 /**
@@ -10,10 +10,10 @@ import soze.multilife.metrics.MetricsConnection;
  */
 public class ConnectionFactory {
 
-	private final EventHandler eventHandler;
+	private final EventBus eventBus;
 
-	public ConnectionFactory(EventHandler eventHandler) {
-		this.eventHandler = eventHandler;
+	public ConnectionFactory(EventBus eventBus) {
+		this.eventBus = eventBus;
 	}
 
 	/**
@@ -26,7 +26,7 @@ public class ConnectionFactory {
 	}
 
 	private Connection getMetricsConnection(long id, Session session) {
-		return new MetricsConnection(id, session, eventHandler);
+		return new MetricsConnection(id, session, eventBus);
 	}
 
 }

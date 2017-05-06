@@ -3,7 +3,7 @@ package soze.multilife.metrics;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.jetty.websocket.api.Session;
-import soze.multilife.events.EventHandler;
+import soze.multilife.events.EventBus;
 import soze.multilife.messages.outgoing.OutgoingMessage;
 import soze.multilife.server.connection.BaseConnection;
 import soze.multilife.server.connection.Connection;
@@ -16,12 +16,12 @@ import soze.multilife.metrics.events.SerializedMetricEvent;
  */
 public class MetricsConnection extends BaseConnection {
 
-	private final EventHandler eventHandler;
+	private final EventBus eventBus;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	public MetricsConnection(long id, Session session, EventHandler eventHandler) {
+	public MetricsConnection(long id, Session session, EventBus eventBus) {
 		super(id, session);
-		this.eventHandler = eventHandler;
+		this.eventBus = eventBus;
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class MetricsConnection extends BaseConnection {
 	 */
 	private void postEvent(OutgoingMessage msg) {
 		TypeMetricEvent event = createEvent(msg);
-		eventHandler.post(event);
+		eventBus.post(event);
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class MetricsConnection extends BaseConnection {
 	 */
 	private void postEvent(String message) {
 		SerializedMetricEvent event = createEvent(message);
-		eventHandler.post(event);
+		eventBus.post(event);
 	}
 
 	/**

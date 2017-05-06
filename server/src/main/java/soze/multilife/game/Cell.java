@@ -8,7 +8,7 @@ public class Cell {
 	private final int x;
 	private final int y;
 	private boolean alive = false;
-	private long ownerId = 0L;
+	private long ownerId = 0;
 
 	public Cell(int x, int y) {
 		this.x = x;

@@ -8,7 +8,7 @@ package soze.multilife.events;
  * or subscribers, but by an intermediate object - one which relays
  * events from publishers to subscribers.
  */
-public interface EventHandler {
+public interface EventBus {
 
 	/**
 	 * Registers an observer. Same observer cannot be registered twice.

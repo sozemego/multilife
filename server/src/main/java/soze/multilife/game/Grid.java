@@ -100,7 +100,7 @@ public class Grid {
 	}
 
 	/**
-	 * Finds all cells that are clickable by this player.
+	 * Finds cells with given indices that are clickable by this player.
 	 *
 	 * @param indices array of indices of cells
 	 * @param ownerId id of the player who clicked
@@ -327,9 +327,16 @@ public class Grid {
 		return new Point(index % width, index / height);
 	}
 
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
 	public Map<Long, Long> getPlayerPoints() {
 		return playerPoints;
 	}
-
 
 }

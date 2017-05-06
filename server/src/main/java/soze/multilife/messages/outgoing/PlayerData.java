@@ -1,11 +1,11 @@
 package soze.multilife.messages.outgoing;
 
-import soze.multilife.server.Instance;
+import soze.multilife.game.Game;
 
 import java.util.Map;
 
 /**
- * Contains player data for one {@link Instance}.
+ * Player data for one {@link Game}.
  */
 public class PlayerData extends OutgoingMessage {
 
