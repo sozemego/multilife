@@ -64,7 +64,6 @@ public interface Game extends Runnable {
 	int getWidth();
 	int getHeight();
 
-	boolean isOutOfTime();
 	boolean isFull();
 
 	/**
@@ -78,6 +77,7 @@ public interface Game extends Runnable {
 	 * @return
 	 */
 	long getRemainingTime();
+	boolean isOutOfTime();
 
 	Collection<Cell> getClickedCells();
 	Collection<Cell> getAllCells();
