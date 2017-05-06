@@ -1,6 +1,5 @@
 package soze.multilife.game;
 
-import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.outgoing.*;
 
 import java.util.ArrayList;
@@ -10,17 +9,15 @@ import java.util.List;
 /**
  * Handles outgoing messages from game/players to clients.
  */
-public class GameOutgoingMessageHandler implements Game {
-
-	private final Game game;
+public class GameOutgoingMessageHandler extends GameDecorator {
 
 	GameOutgoingMessageHandler(Game game) {
-		this.game = game;
+		super(game);
 	}
 
 	public void run() {
 		sendClickedData();
-		game.run();
+		super.run();
 		sendIterationsData();
 		sendRemainingTime();
 		sendPlayerData();
@@ -31,12 +28,12 @@ public class GameOutgoingMessageHandler implements Game {
 	 * to all players.
 	 */
 	private void sendIterationsData() {
-		IterationData iterationData = new IterationData(game.getIterations());
+		IterationData iterationData = new IterationData(super.getIterations());
 		sendMessage(iterationData);
 	}
 
 	private void sendRemainingTime() {
-		TimeRemainingMessage timeRemainingMessage = new TimeRemainingMessage(game.getRemainingTime());
+		TimeRemainingMessage timeRemainingMessage = new TimeRemainingMessage(super.getRemainingTime());
 		sendMessage(timeRemainingMessage);
 	}
 
@@ -44,7 +41,7 @@ public class GameOutgoingMessageHandler implements Game {
 	 * Sends data about which cells were clicked this iteration.
 	 */
 	private void sendClickedData() {
-		CellList cellList = constructCellList(game.getClickedCells());
+		CellList cellList = constructCellList(super.getClickedCells());
 		sendMessage(cellList);
 	}
 
@@ -66,95 +63,8 @@ public class GameOutgoingMessageHandler implements Game {
 	 * Sends data about all players in this instance.
 	 */
 	private void sendPlayerData() {
-		PlayerData data = game.getPlayerData();
+		PlayerData data = super.getPlayerData();
 		sendMessage(data);
 	}
 
-	//
-	//
-	// DELEGATED METHODS
-	//
-	//
-
-	public int getId() {
-		return game.getId();
-	}
-
-	public int getMaxPlayers() {
-		return game.getMaxPlayers();
-	}
-
-	public void acceptMessage(IncomingMessage message, long id) {
-		game.acceptMessage(message, id);
-	}
-
-	public int getWidth() {
-		return game.getWidth();
-	}
-
-	public int getHeight() {
-		return game.getHeight();
-	}
-
-	public Collection<Cell> getAllCells() {
-		return game.getAllCells();
-	}
-
-	public boolean isOutOfTime() {
-		return game.isOutOfTime();
-	}
-
-	public boolean isFull() {
-		return game.isFull();
-	}
-
-	public void end() {
-		game.end();
-	}
-
-	public long getTickRate() {
-		return game.getTickRate();
-	}
-
-	public PlayerData getPlayerData() {
-		return game.getPlayerData();
-	}
-
-	public Collection<Player> getPlayers() {
-		return game.getPlayers();
-	}
-
-	public int getIterations() {
-		return game.getIterations();
-	}
-
-	public long getRemainingTime() {
-		return game.getRemainingTime();
-	}
-
-	public Collection<Cell> getClickedCells() {
-		return game.getClickedCells();
-	}
-
-	public void addPlayer(Player player) {
-		game.addPlayer(player);
-	}
-
-	public void removePlayer(long id) {
-		game.removePlayer(id);
-	}
-
-	public void sendMessage(OutgoingMessage message) {
-		game.sendMessage(message);
-	}
-
-	public boolean isScheduledForRemoval() {
-		return game.isScheduledForRemoval();
-	}
-
-	//
-	//
-	// END DELEGATED METHODS
-	//
-	//
 }
