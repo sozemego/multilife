@@ -30,7 +30,7 @@ public class GameFactory {
 			config.getTickRate()
 		);
 		baseGame.init();
-		Game game = new GameRunner(new GamePlayerHandler(new GameIncomingMessageHandler(new GameOutgoingMessageHandler(baseGame))));
+		Game game = new GameRunner(new GamePlayerHandler(new GameIncomingMessageQueue(new GameOutgoingMessageHandler(baseGame))));
 		executor.execute(game);
 		return game;
 	}

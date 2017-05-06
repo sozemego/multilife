@@ -84,6 +84,11 @@ public class BaseGame implements Game {
 	 */
 	private int iterations = 0;
 
+	/**
+	 * Map of playerId-playerPoints.
+	 */
+	private final Map<Long, Long> playerPoints = new HashMap<>();
+
 	BaseGame(int id, int width, int height, int maxPlayers, long duration, long tickRate) {
 		this.id = id;
 		this.grid = new Grid(width, height);
@@ -105,6 +110,15 @@ public class BaseGame implements Game {
 				}
 			}
 		}
+		grid.onCellDeath((strongestOwnerId) -> {
+			Long points = playerPoints.get(strongestOwnerId);
+			playerPoints.put(strongestOwnerId, points == null ? 1L : ++points);
+		});
+		grid.onCellBirth((cellOwner) -> {
+			Long points = playerPoints.get(cellOwner);
+			points = Math.max(points == null ? 0L : --points, 0L);
+			playerPoints.put(cellOwner, points);
+		});
 		grid.updateGrid(); // runs the simulation once, so that the first player logging can receive some data
 	}
 
@@ -181,7 +195,7 @@ public class BaseGame implements Game {
 	}
 
 	public PlayerData getPlayerData() {
-		Map<Long, Long> points = grid.getPlayerPoints(); //TODO think about moving player points from grid
+		Map<Long, Long> points = playerPoints;
 		Map<Long, String> names = new HashMap<>();
 		Map<Long, String> colors = new HashMap<>();
 		Map<Long, String> rules = new HashMap<>();

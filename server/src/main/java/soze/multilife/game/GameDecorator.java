@@ -6,6 +6,7 @@ import soze.multilife.messages.outgoing.PlayerData;
 
 import java.util.Collection;
 
+//TODO think about using chain of responsibility
 public class GameDecorator implements Game {
 
 	private final Game game;

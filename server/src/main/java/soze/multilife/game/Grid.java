@@ -5,6 +5,7 @@ import soze.multilife.game.rule.Rule;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -35,10 +36,8 @@ public class Grid {
 	private final int width;
 	private final int height;
 
-	/**
-	 * Map of playerId-playerPoints.
-	 */
-	private final Map<Long, Long> playerPoints = new HashMap<>();
+	private Consumer<Long> onCellDeath = (var) -> {};
+	private Consumer<Long> onCellBirth = (var) -> {};
 
 	Grid(int width, int height) {
 		this.width = width;
@@ -55,6 +54,22 @@ public class Grid {
 				cells.put(new Point(i, j), new Cell(i, j));
 			}
 		}
+	}
+
+	void onCellDeath(Consumer<Long> onCellDeath) {
+		this.onCellDeath = onCellDeath;
+	}
+
+	void onCellBirth(Consumer<Long> onCellBirth) {
+		this.onCellBirth = onCellBirth;
+	}
+
+	int getWidth() {
+		return width;
+	}
+
+	int getHeight() {
+		return height;
 	}
 
 	/**
@@ -193,13 +208,10 @@ public class Grid {
 				// 0 -> 1 | point to strongest owner
 				// 1 -> 0 | point from cell owner
 				if (state == -1) {
-					Long points = playerPoints.get(strongestOwnerId);
-					playerPoints.put(strongestOwnerId, points == null ? 1L : ++points);
+					onCellDeath.accept(strongestOwnerId);
 				}
 				if (state == 1) {
-					Long points = playerPoints.get(cell.getOwnerId());
-					points = Math.max(points == null ? 0L : --points, 0L);
-					playerPoints.put(cell.getOwnerId(), points);
+					onCellBirth.accept(cell.getOwnerId());
 				}
 				changeState(x, y, state > 0, strongestOwnerId == -1 ? cell.getOwnerId() : strongestOwnerId);
 			}
@@ -325,18 +337,6 @@ public class Grid {
 	private Point getPoint(int index) {
 		index = wrapIndex(index);
 		return new Point(index % width, index / height);
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public Map<Long, Long> getPlayerPoints() {
-		return playerPoints;
 	}
 
 }

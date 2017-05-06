@@ -9,14 +9,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * A game layer responsible for handling incoming messages.
  */
-public class GameIncomingMessageHandler extends GameDecorator {
+public class GameIncomingMessageQueue extends GameDecorator {
 
 	/**
 	 * Queue of messages received by this game.
 	 */
 	private final Queue<MessageQueueNode> queuedMessages = new ConcurrentLinkedQueue<>();
 
-	GameIncomingMessageHandler(Game game) {
+	GameIncomingMessageQueue(Game game) {
 		super(game);
 	}
 
