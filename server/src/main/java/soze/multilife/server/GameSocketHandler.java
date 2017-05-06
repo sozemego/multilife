@@ -61,7 +61,6 @@ public class GameSocketHandler {
 		if(inc instanceof LoginMessage) {
 			Player player = loginService.login((LoginMessage)inc, getConnection(sessionIdMap.get(session), session));
 			lobby.addPlayer(player);
-			return;
 		}
 		lobby.onMessage(inc, sessionIdMap.get(session));
 	}
