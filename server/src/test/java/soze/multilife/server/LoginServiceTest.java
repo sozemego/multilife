@@ -34,14 +34,14 @@ public class LoginServiceTest {
 	}
 
 	@Test(expected = NullPointerException.class)
-	public void testInvalidParameters() throws Exception {
+	public void testInvalidParametersLoginMessage() throws Exception {
 		Connection connection = Mockito.any(Connection.class);
 		Mockito.when(connection.getId()).thenReturn(1L);
 		loginService.login(null, connection);
 	}
 
 	@Test(expected = NullPointerException.class)
-	public void testInvalidParameters2() throws Exception {
+	public void testInvalidParametersConnection() throws Exception {
 		LoginMessage loginMessage = new LoginMessage();
 		loginMessage.setName("Player");
 		loginService.login(loginMessage, null);
