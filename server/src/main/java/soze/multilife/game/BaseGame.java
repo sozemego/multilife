@@ -27,11 +27,6 @@ public class BaseGame implements Game {
 	private static final int SIMULATION_PLAYER_ID = 0;
 
 	/**
-	 * Percent of alive cells spawned on simulation start.
-	 */
-	private final float initialDensity = 0.0f;
-
-	/**
 	 * Id of this game.
 	 */
 	private final int id;
@@ -39,6 +34,11 @@ public class BaseGame implements Game {
 	private boolean scheduledForRemoval;
 
 	private final long tickRate;
+
+	/**
+	 * Percent of alive cells spawned on simulation start.
+	 */
+	private final float initialDensity;
 
 	/**
 	 * Players already in-game.
@@ -90,19 +90,21 @@ public class BaseGame implements Game {
 	 */
 	private final Map<Long, Long> playerPoints = new HashMap<>();
 
-	BaseGame(int id, int width, int height, int maxPlayers, long duration, long tickRate) {
+	BaseGame(int id, float initialDensity, int width, int height, int maxPlayers, long duration, long tickRate) {
 		this.id = id;
+		this.initialDensity = initialDensity;
 		this.grid = new Grid(width, height);
 		grid.addRule(SIMULATION_PLAYER_ID, RuleFactory.getRule(RuleType.BASIC));
 		this.maxPlayers = maxPlayers;
 		this.duration = duration;
 		this.tickRate = tickRate;
+		init();
 	}
 
 	/**
 	 * Spawns initial living cells.
 	 */
-	void init() {
+	private void init() {
 		SecureRandom random = new SecureRandom();
 		for (int i = 0; i < grid.getWidth(); i++) {
 			for (int j = 0; j < grid.getHeight(); j++) {
@@ -111,6 +113,11 @@ public class BaseGame implements Game {
 				}
 			}
 		}
+		addCellStateChangeListeners();
+		grid.updateGrid(); // runs the simulation once, so that the first player logging can receive some data
+	}
+
+	private void addCellStateChangeListeners() {
 		grid.onCellDeath((strongestOwnerId) -> {
 			if(strongestOwnerId == -1) {
 				return;
@@ -123,23 +130,21 @@ public class BaseGame implements Game {
 			points = Math.max(points == null ? 0L : --points, 0L);
 			playerPoints.put(cellOwner, points);
 		});
-		grid.updateGrid(); // runs the simulation once, so that the first player logging can receive some data
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	/**
-	 * Adds a player to the simulation.
-	 *
-	 * @param player player
-	 */
-	public void addPlayer(Player player) {
+	public boolean addPlayer(Player player) {
+		if(getPlayers().size() == getMaxPlayers()) {
+			return false;
+		}
 		//TODO should be getNextColor();
 		players.put(player.getId(), player);
 		playerColors.put(player.getId(), availableColors[players.size() % availableColors.length]);
 		grid.addRule(player.getId(), RuleFactory.getRule(player.getRule()));
+		return true;
 	}
 
 	/**

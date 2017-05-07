@@ -25,8 +25,9 @@ public interface Game extends Runnable {
 	/**
 	 * Adds a player to the game.
 	 * @param player
+	 * @return true if player was added, false if game was full
 	 */
-	void addPlayer(Player player);
+	boolean addPlayer(Player player);
 
 	/**
 	 * Removes a player with given id from the game.

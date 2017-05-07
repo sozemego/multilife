@@ -5,6 +5,7 @@ package soze.multilife.configuration.interfaces;
  */
 public interface GameConfiguration {
 
+	public float getInitialDensity();
 	public long getGameDuration();
 	public int getMaxPlayers();
 	public int getGridWidth();

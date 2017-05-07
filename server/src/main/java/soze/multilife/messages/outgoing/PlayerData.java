@@ -1,7 +1,5 @@
 package soze.multilife.messages.outgoing;
 
-import soze.multilife.game.Game;
-
 import java.util.Map;
 
 /**

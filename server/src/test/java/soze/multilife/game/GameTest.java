@@ -1,0 +1,60 @@
+package soze.multilife.game;
+
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+class GameTest {
+
+	private static final int ID = 1;
+	private static final float DEFAULT_INITIAL_DENSITY = 0.0f;
+	private static final int DEFAULT_WIDTH = 50;
+	private static final int DEFAULT_HEIGHT = 50;
+	private static final int DEFAULT_MAX_PLAYERS = 4;
+	private static final long DEFAULT_DURATION = 1000 * 5;
+	private static final long DEFAULT_TICK_RATE = 250;
+
+	BaseGame createGameWithDefaultValues() {
+		return builder().build();
+	}
+
+	BaseGameBuilder builder() {
+		return new BaseGameBuilder();
+	}
+
+	Player createPlayerMock(long id) {
+		Player player = mock(Player.class);
+		when(player.getRule()).thenReturn("BASIC");
+		when(player.getId()).thenReturn(id);
+		doNothing().when(player).disconnect();
+		return player;
+	}
+
+	protected static class BaseGameBuilder {
+
+		private int id = ID;
+		private float initialDensity = DEFAULT_INITIAL_DENSITY;
+		private int width = DEFAULT_WIDTH;
+		private int height = DEFAULT_HEIGHT;
+		private int maxPlayers = DEFAULT_MAX_PLAYERS;
+		private long duration = DEFAULT_DURATION;
+		private long tickRate = DEFAULT_TICK_RATE;
+
+		protected BaseGameBuilder() {
+
+		}
+
+		BaseGameBuilder withMaxPlayers(int maxPlayers) {
+			this.maxPlayers = maxPlayers;
+			return this;
+		}
+
+		BaseGame build() {
+			return new BaseGame(id, initialDensity, width, height, maxPlayers, duration, tickRate);
+		}
+
+	}
+
+
+
+}

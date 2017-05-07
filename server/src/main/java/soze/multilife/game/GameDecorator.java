@@ -14,8 +14,8 @@ public class GameDecorator implements Game {
 		this.game = game;
 	}
 
-	public void addPlayer(Player player) {
-		game.addPlayer(player);
+	public boolean addPlayer(Player player) {
+		return game.addPlayer(player);
 	}
 
 	public void removePlayer(long id) {

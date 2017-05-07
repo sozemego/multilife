@@ -13,6 +13,10 @@ public class GameConfigurationImpl implements GameConfiguration {
 		this.configuration = configuration;
 	}
 
+	public float getInitialDensity() {
+		return configuration.getFloat("gameDefaultInitialDensity");
+	}
+
 	@Override
 	public long getGameDuration() {
 		return configuration.getLong("gameDuration");

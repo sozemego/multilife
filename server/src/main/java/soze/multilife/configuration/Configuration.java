@@ -50,6 +50,11 @@ class Configuration {
 		return properties.get(Objects.requireNonNull(propertyName));
 	}
 
+	public float getFloat(String propertyName) {
+		checkLoaded();
+		return Float.parseFloat(properties.get(Objects.requireNonNull(propertyName)));
+	}
+
 	/**
 	 * Throws a RuntimeException if configuration is not loaded.
 	 */

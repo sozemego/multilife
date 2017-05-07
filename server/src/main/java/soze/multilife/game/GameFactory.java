@@ -19,13 +19,13 @@ public class GameFactory {
 	public Game createGame() {
 		BaseGame baseGame = new BaseGame(
 			id.getAndIncrement(),
+			config.getInitialDensity(),
 			config.getGridWidth(),
 			config.getGridHeight(),
 			config.getMaxPlayers(),
 			config.getGameDuration(),
 			config.getTickRate()
 		);
-		baseGame.init();
 		Game game = new GameRunner(new GamePlayerHandler(new GameIncomingMessageQueue(new GameOutgoingMessageHandler(baseGame))));
 		return game;
 	}

@@ -35,10 +35,14 @@ public class GamePlayerHandler extends GameDecorator {
 		super.run();
 	}
 
-	public void addPlayer(Player player) {
+	public boolean addPlayer(Player player) {
 		synchronized (freshPlayers) {
+			if(getPlayers().size() + freshPlayers.size() == getMaxPlayers()) {
+				return false;
+			}
 			freshPlayers.add(player);
 		}
+		return true;
 	}
 
 	public void removePlayer(long id) {

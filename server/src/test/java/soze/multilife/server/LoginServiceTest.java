@@ -35,7 +35,7 @@ public class LoginServiceTest {
 
 	@Test(expected = NullPointerException.class)
 	public void testInvalidParametersLoginMessage() throws Exception {
-		Connection connection = Mockito.any(Connection.class);
+		Connection connection = Mockito.mock(Connection.class);
 		Mockito.when(connection.getId()).thenReturn(1L);
 		loginService.login(null, connection);
 	}
