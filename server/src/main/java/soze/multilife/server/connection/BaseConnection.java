@@ -1,6 +1,5 @@
 package soze.multilife.server.connection;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,8 @@ public class BaseConnection implements Connection {
 	public void send(OutgoingMessage message) {
 		Objects.requireNonNull(message);
 		try {
-			this.session.getRemote().sendString(stringify(message));
+			String json = JsonUtils.stringify(message);
+			this.session.getRemote().sendString(json);
 		} catch (IOException e) {
 			LOG.warn("Base connection could not send string.", e);
 		}
@@ -44,15 +44,6 @@ public class BaseConnection implements Connection {
 	@Override
 	public void disconnect() {
 		session.close();
-	}
-
-	private String stringify(OutgoingMessage message) {
-		try {
-			return JsonUtils.stringify(message);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-			return "";
-		}
 	}
 
 }
