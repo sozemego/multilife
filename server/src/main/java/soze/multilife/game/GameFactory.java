@@ -2,16 +2,12 @@ package soze.multilife.game;
 
 import soze.multilife.configuration.GameConfigurationImpl;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Produces Game objects.
  */
 public class GameFactory {
-
-	private final Executor executor = Executors.newCachedThreadPool();
 
 	private final GameConfigurationImpl config;
 	private final AtomicInteger id = new AtomicInteger(1);
@@ -31,7 +27,6 @@ public class GameFactory {
 		);
 		baseGame.init();
 		Game game = new GameRunner(new GamePlayerHandler(new GameIncomingMessageQueue(new GameOutgoingMessageHandler(baseGame))));
-		executor.execute(game);
 		return game;
 	}
 

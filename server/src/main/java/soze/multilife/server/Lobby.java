@@ -16,6 +16,8 @@ import soze.multilife.server.connection.Connection;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * A lobby. Connected, but not logged in users are stored here,
@@ -33,6 +35,7 @@ public class Lobby implements Runnable {
 	private final Map<Long, Integer> playerToGame = new HashMap<>();
 
 	private final GameFactory gameFactory;
+	private final Executor executor = Executors.newCachedThreadPool();
 
 	private final EventBus eventBus;
 
@@ -131,6 +134,7 @@ public class Lobby implements Runnable {
 		}
 		playerToGame.put(player.getId(), game.getId());
 		eventBus.post(new PlayerLoggedEvent(player.getId(), game.getId()));
+		executor.execute(game);
 	}
 
 }

@@ -18,6 +18,7 @@ import soze.multilife.metrics.repository.MetricsRepository;
 import soze.multilife.metrics.repository.MongoMetricsRepository;
 import soze.multilife.server.GameSocketHandler;
 import soze.multilife.server.Lobby;
+import soze.multilife.server.LoginService;
 import soze.multilife.server.Server.ServerBuilder;
 import soze.multilife.server.connection.ConnectionFactory;
 
@@ -41,6 +42,7 @@ public class MultiLife {
 	}
 
 	private final ConnectionFactory connectionFactory;
+	private final LoginService loginService;
 	private final Lobby lobby;
 	private final MetricsWebSocketHandler metricsWebSocketHandler;
 	private final MetricsHttpHandler metricsHttpHandler;
@@ -55,6 +57,8 @@ public class MultiLife {
 		GameFactory gameFactory = new GameFactory(
 			cfgFactory.getGameConfiguration()
 		);
+
+		this.loginService = new LoginService();
 
 		this.eventBus = new EventBusImpl();
 		this.lobby = new Lobby(eventBus, gameFactory);
@@ -99,7 +103,7 @@ public class MultiLife {
 
 	private void start(ServerConfiguration serverConfiguration) throws InterruptedException, ExecutionException {
 		new ServerBuilder(serverConfiguration.getPort())
-			.withWebSocketHandler("/game", new GameSocketHandler(lobby, connectionFactory))
+			.withWebSocketHandler("/game", new GameSocketHandler(lobby, loginService, connectionFactory))
 			.withWebSocketHandler("/metrics-live", metricsWebSocketHandler)
 			.withHttpHandler("/metrics", metricsHttpHandler)
 			.withExternalStaticFileHandler(serverConfiguration.getExternalStaticFilesPath())
