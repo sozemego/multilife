@@ -3,6 +3,8 @@ package soze.multilife.game;
 import soze.multilife.messages.outgoing.OutgoingMessage;
 import soze.multilife.server.connection.Connection;
 
+import java.util.Objects;
+
 /**
  * Created by soze on 2/21/2017.
  */
@@ -15,9 +17,9 @@ public class Player {
 
 	public Player(long id, Connection connection, String name, String rule) {
 		this.id = id;
-		this.connection = connection;
-		this.name = name;
-		this.rule = rule;
+		this.connection = Objects.requireNonNull(connection);
+		this.name = Objects.requireNonNull(name);
+		this.rule = Objects.requireNonNull(rule);
 	}
 
 	public long getId() {

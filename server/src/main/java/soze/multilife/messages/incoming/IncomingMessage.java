@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(
 	use = JsonTypeInfo.Id.NAME,
-	include = JsonTypeInfo.As.PROPERTY,
+	include = JsonTypeInfo.As.EXISTING_PROPERTY,
 	property = "type",
 	visible = true)
 @JsonSubTypes({
@@ -19,7 +19,7 @@ public abstract class IncomingMessage {
 
 	private IncomingType type;
 
-	public void setType(IncomingType type) {
+	void setType(IncomingType type) {
 		this.type = type;
 	}
 

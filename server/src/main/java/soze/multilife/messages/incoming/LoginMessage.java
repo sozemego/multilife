@@ -4,6 +4,10 @@ public class LoginMessage extends IncomingMessage {
 
 	private String name;
 
+	public LoginMessage() {
+		setType(IncomingType.LOGIN);
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
