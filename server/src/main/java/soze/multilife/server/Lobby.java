@@ -6,6 +6,8 @@ import soze.multilife.events.EventBus;
 import soze.multilife.game.Game;
 import soze.multilife.game.GameFactory;
 import soze.multilife.game.Player;
+import soze.multilife.game.exceptions.PlayerAlreadyInGameException;
+import soze.multilife.game.exceptions.PlayerNotInGameException;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingType;
 import soze.multilife.messages.outgoing.PlayerIdentity;
@@ -84,7 +86,12 @@ public class Lobby implements Runnable {
 		long id = connection.getId();
 		connections.remove(id);
 		int gameId = playerToGame.remove(id);
-		games.get(gameId).removePlayer(id);
+		try {
+			games.get(gameId).removePlayer(id);
+		} catch (PlayerNotInGameException e) {
+			LOG.warn("Trying to remove a player with id [{}] that is not in-game.", e.getPlayerId());
+			return;
+		}
 		eventBus.post(new PlayerDisconnectedEvent(id));
 	}
 
@@ -101,7 +108,11 @@ public class Lobby implements Runnable {
 		}
 		int gameId = playerToGame.get(id);
 		Game game = games.get(gameId);
-		game.acceptMessage(incMessage, id);
+		try {
+			game.acceptMessage(incMessage, id);
+		} catch (PlayerNotInGameException e) {
+			LOG.warn("Trying to pass a message by a player [{}] who is not in-game.", e.getPlayerId());
+		}
 	}
 
 	/**
@@ -125,16 +136,21 @@ public class Lobby implements Runnable {
 		//2. if no free or active rooms, create a new one
 		if(game == null) {
 			game = gameFactory.createGame();
+			executor.execute(game);
+			synchronized (games) {
+				games.put(game.getId(), game);
+			}
 		}
 
-		game.addPlayer(player);
-
-		synchronized (games) {
-			games.put(game.getId(), game);
+		try {
+			game.addPlayer(player);
+		} catch (PlayerAlreadyInGameException e) {
+			LOG.warn("Trying to add a player [{}] to a game and this player is already in that game.", e.getPlayerId());
+			return;
 		}
+
 		playerToGame.put(player.getId(), game.getId());
 		eventBus.post(new PlayerLoggedEvent(player.getId(), game.getId()));
-		executor.execute(game);
 	}
 
 }

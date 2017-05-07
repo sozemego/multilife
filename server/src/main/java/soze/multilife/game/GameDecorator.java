@@ -1,5 +1,7 @@
 package soze.multilife.game;
 
+import soze.multilife.game.exceptions.PlayerAlreadyInGameException;
+import soze.multilife.game.exceptions.PlayerNotInGameException;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.outgoing.OutgoingMessage;
 import soze.multilife.messages.outgoing.PlayerData;
@@ -14,11 +16,11 @@ public class GameDecorator implements Game {
 		this.game = game;
 	}
 
-	public boolean addPlayer(Player player) {
+	public boolean addPlayer(Player player) throws PlayerAlreadyInGameException {
 		return game.addPlayer(player);
 	}
 
-	public void removePlayer(long id) {
+	public void removePlayer(long id) throws PlayerNotInGameException {
 		game.removePlayer(id);
 	}
 
@@ -30,7 +32,7 @@ public class GameDecorator implements Game {
 		return game.getId();
 	}
 
-	public void acceptMessage(IncomingMessage message, long playerId) {
+	public void acceptMessage(IncomingMessage message, long playerId) throws PlayerNotInGameException {
 		game.acceptMessage(message, playerId);
 	}
 

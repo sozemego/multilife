@@ -1,5 +1,8 @@
 package soze.multilife.game;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import soze.multilife.game.exceptions.PlayerAlreadyInGameException;
 import soze.multilife.messages.outgoing.CellData;
 import soze.multilife.messages.outgoing.CellList;
 import soze.multilife.messages.outgoing.MapData;
@@ -14,6 +17,8 @@ import java.util.stream.Collectors;
  * A decorator layer which handles players joining the game.
  */
 public class GamePlayerHandler extends GameDecorator {
+
+	private static final Logger LOG = LoggerFactory.getLogger(GamePlayerHandler.class);
 
 	/**
 	 * Players which recently joined, have not received map data yet.
@@ -35,7 +40,7 @@ public class GamePlayerHandler extends GameDecorator {
 		super.run();
 	}
 
-	public boolean addPlayer(Player player) {
+	public boolean addPlayer(Player player) throws PlayerAlreadyInGameException {
 		synchronized (freshPlayers) {
 			if(getPlayers().size() + freshPlayers.size() == getMaxPlayers()) {
 				return false;
@@ -64,7 +69,14 @@ public class GamePlayerHandler extends GameDecorator {
 		synchronized (freshPlayers) {
 			if (!freshPlayers.isEmpty()) {
 
-				freshPlayers.forEach(super::addPlayer);
+				for(Player player: freshPlayers) {
+					try {
+						super.addPlayer(player);
+					} catch (PlayerAlreadyInGameException e) {
+
+					}
+				}
+
 				freshPlayers.clear();
 
 				sendPlayerData();

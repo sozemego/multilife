@@ -49,6 +49,11 @@ class GameTest {
 			return this;
 		}
 
+		BaseGameBuilder withInitialDensity(float initialDensity) {
+			this.initialDensity = initialDensity;
+			return this;
+		}
+
 		BaseGame build() {
 			return new BaseGame(id, initialDensity, width, height, maxPlayers, duration, tickRate);
 		}

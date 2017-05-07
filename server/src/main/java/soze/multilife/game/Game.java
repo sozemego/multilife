@@ -1,10 +1,13 @@
 package soze.multilife.game;
 
+import soze.multilife.game.exceptions.PlayerAlreadyInGameException;
+import soze.multilife.game.exceptions.PlayerNotInGameException;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.outgoing.OutgoingMessage;
 import soze.multilife.messages.outgoing.PlayerData;
 
 import java.util.Collection;
+import java.util.Map;
 
 public interface Game extends Runnable {
 
@@ -19,21 +22,24 @@ public interface Game extends Runnable {
 	 * PlayerId denotes id of the player who sent the message.
 	 * @param message
 	 * @param playerId
+	 * @throws PlayerNotInGameException if player with given id is not in game
 	 */
-	void acceptMessage(IncomingMessage message, long playerId);
+	void acceptMessage(IncomingMessage message, long playerId) throws PlayerNotInGameException;
 
 	/**
 	 * Adds a player to the game.
 	 * @param player
 	 * @return true if player was added, false if game was full
+	 * @throws PlayerAlreadyInGameException if this player is already in game
 	 */
-	boolean addPlayer(Player player);
+	boolean addPlayer(Player player) throws PlayerAlreadyInGameException;
 
 	/**
 	 * Removes a player with given id from the game.
-	 * @param id
+	 * @param playerId
+	 * @throws PlayerNotInGameException if a player with given id is not in game
 	 */
-	void removePlayer(long id);
+	void removePlayer(long playerId) throws PlayerNotInGameException;
 
 	/**
 	 * Ends the game. Disconnects all players and schedules this game for removal.
@@ -57,10 +63,10 @@ public interface Game extends Runnable {
 	PlayerData getPlayerData();
 
 	/**
-	 * Returns a collection of players connected to the game.
+	 * Returns a map of playerId-player pairs connected to the game.
 	 * @return
 	 */
-	Collection<Player> getPlayers();
+	Map<Long, Player> getPlayers();
 
 	int getWidth();
 	int getHeight();

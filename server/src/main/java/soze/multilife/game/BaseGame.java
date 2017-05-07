@@ -2,6 +2,7 @@ package soze.multilife.game;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import soze.multilife.game.exceptions.PlayerNotInGameException;
 import soze.multilife.game.rule.RuleFactory;
 import soze.multilife.game.rule.RuleType;
 import soze.multilife.messages.incoming.ClickMessage;
@@ -152,7 +153,8 @@ public class BaseGame implements Game {
 	 *
 	 * @param id id of the player to remove
 	 */
-	public void removePlayer(long id) {
+	public void removePlayer(long id) throws PlayerNotInGameException {
+		checkContainsPlayer(id);
 		grid.killAll(id);
 		players.remove(id);
 	}
@@ -227,7 +229,8 @@ public class BaseGame implements Game {
 		return new ArrayList<>(grid.getAllCells());
 	}
 
-	public void acceptMessage(IncomingMessage message, long playerId) {
+	public void acceptMessage(IncomingMessage message, long playerId) throws PlayerNotInGameException {
+		checkContainsPlayer(playerId);
 		if (message.getType() == IncomingType.CLICK) {
 			ClickMessage msg = (ClickMessage) message;
 			click(msg.getIndices(), playerId);
@@ -306,5 +309,12 @@ public class BaseGame implements Game {
 
 	public Collection<Player> getPlayers() {
 		return new ArrayList<>(players.values());
+	}
+
+	private void checkContainsPlayer(long playerId) throws PlayerNotInGameException {
+		Player player = players.get(playerId);
+		if(player == null) {
+			throw new PlayerNotInGameException(playerId);
+		}
 	}
 }
