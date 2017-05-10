@@ -40,6 +40,7 @@ public class Grid {
 	private Consumer<Long> onCellBirth = (var) -> {};
 
 	Grid(int width, int height) {
+		if(width <= 0 || height <= 0) throw new IllegalArgumentException("Invalid height or width, cannot be below 1.");
 		this.width = width;
 		this.height = height;
 		init();
@@ -85,8 +86,8 @@ public class Grid {
 	/**
 	 * @return all cells in this grid
 	 */
-	Collection<Cell> getAllCells() {
-		return cells.values();
+	Map<Point, Cell> getAllCells() {
+		return cells;
 	}
 
 	/**

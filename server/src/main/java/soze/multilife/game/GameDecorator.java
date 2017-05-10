@@ -6,6 +6,7 @@ import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.outgoing.OutgoingMessage;
 import soze.multilife.messages.outgoing.PlayerData;
 
+import java.awt.*;
 import java.util.Collection;
 import java.util.Map;
 
@@ -65,7 +66,7 @@ public class GameDecorator implements Game {
 		return game.getHeight();
 	}
 
-	public Collection<Cell> getAllCells() {
+	public Map<Point, Cell> getAllCells() {
 		return game.getAllCells();
 	}
 

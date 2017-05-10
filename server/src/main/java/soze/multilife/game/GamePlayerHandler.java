@@ -131,7 +131,7 @@ public class GamePlayerHandler extends GameDecorator {
 	 * @return CellList
 	 */
 	private CellList getAllAliveCellData() {
-		List<Cell> cells = super.getAllCells().stream()
+		List<Cell> cells = super.getAllCells().values().stream()
 			.filter(Cell::isAlive)
 			.collect(Collectors.toList());
 		return constructCellList(cells);

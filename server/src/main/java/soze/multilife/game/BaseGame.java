@@ -11,8 +11,10 @@ import soze.multilife.messages.incoming.IncomingType;
 import soze.multilife.messages.outgoing.OutgoingMessage;
 import soze.multilife.messages.outgoing.PlayerData;
 
+import java.awt.*;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.List;
 
 /**
  * An object which handles the simulation ({@link Grid}) and players.
@@ -225,8 +227,8 @@ public class BaseGame implements Game {
 		return new PlayerData(points, names, colors, rules);
 	}
 
-	public Collection<Cell> getAllCells() {
-		return new ArrayList<>(grid.getAllCells());
+	public Map<Point, Cell> getAllCells() {
+		return new HashMap<>(grid.getAllCells());
 	}
 
 	public void acceptMessage(IncomingMessage message, long playerId) throws PlayerNotInGameException {
@@ -250,7 +252,7 @@ public class BaseGame implements Game {
 	}
 
 	public boolean isOutOfTime() {
-		return timePassed > duration;
+		return timePassed >= duration;
 	}
 
 	private void updateTime() {
@@ -282,6 +284,7 @@ public class BaseGame implements Game {
 	}
 
 	public void sendMessage(OutgoingMessage message) {
+		Objects.requireNonNull(message);
 		for (Player p : getPlayers().values()) {
 			p.send(message);
 		}

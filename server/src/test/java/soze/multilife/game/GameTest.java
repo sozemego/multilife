@@ -14,15 +14,15 @@ class GameTest {
 	private static final long DEFAULT_DURATION = 1000 * 5;
 	private static final long DEFAULT_TICK_RATE = 250;
 
-	BaseGame createGameWithDefaultValues() {
+	protected BaseGame createGameWithDefaultValues() {
 		return builder().build();
 	}
 
-	BaseGameBuilder builder() {
+	protected BaseGameBuilder builder() {
 		return new BaseGameBuilder();
 	}
 
-	Player createPlayerMock(long id) {
+	protected Player createPlayerMock(long id) {
 		Player player = mock(Player.class);
 		when(player.getRule()).thenReturn("BASIC");
 		when(player.getId()).thenReturn(id);
@@ -51,6 +51,26 @@ class GameTest {
 
 		BaseGameBuilder withInitialDensity(float initialDensity) {
 			this.initialDensity = initialDensity;
+			return this;
+		}
+
+		BaseGameBuilder withWidth(int width) {
+			this.width = width;
+			return this;
+		}
+
+		BaseGameBuilder withHeight(int height) {
+			this.height = height;
+			return this;
+		}
+
+		BaseGameBuilder withDuration(long duration) {
+			this.duration = duration;
+			return this;
+		}
+
+		BaseGameBuilder withTickRate(long tickRate) {
+			this.tickRate = tickRate;
 			return this;
 		}
 

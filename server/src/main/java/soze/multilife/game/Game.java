@@ -6,6 +6,7 @@ import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.outgoing.OutgoingMessage;
 import soze.multilife.messages.outgoing.PlayerData;
 
+import java.awt.*;
 import java.util.Collection;
 import java.util.Map;
 
@@ -87,7 +88,7 @@ public interface Game extends Runnable {
 	boolean isOutOfTime();
 
 	Collection<Cell> getClickedCells();
-	Collection<Cell> getAllCells();
+	Map<Point, Cell> getAllCells();
 
 	/**
 	 * Sends the given message to all players connected to the game.

@@ -1,11 +1,12 @@
 package soze.multilife.messages.incoming;
 
-/**
- * Created by KJurek on 22.02.2017.
- */
 public class ClickMessage extends IncomingMessage {
 
 	public int[] indices;
+
+	public ClickMessage() {
+		setType(IncomingType.CLICK);
+	}
 
 	public int[] getIndices() {
 		return indices;
