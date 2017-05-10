@@ -29,7 +29,7 @@ public class MongoConfigurationImpl implements MongoConfiguration {
 	}
 
 	@Override
-	public String getUrl() {
+	public String getHost() {
 		return configuration.getString("mongoHost");
 	}
 

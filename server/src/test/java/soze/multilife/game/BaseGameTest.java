@@ -67,7 +67,7 @@ public class BaseGameTest extends GameTest {
 
 		game.removePlayer(player2.getId());
 		assertEquals(game.getPlayers().size(), 1);
-		assertTrue(game.getPlayers().contains(player1));
+		assertTrue(game.getPlayers().containsKey(player1));
 	}
 
 	@Test

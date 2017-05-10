@@ -95,7 +95,7 @@ public class MultiLife {
 		);
 		return new MongoClient(
 			new ServerAddress(
-				config.getUrl(),
+				config.getHost(),
 				config.getPort()
 			),
 			Arrays.asList(credential));

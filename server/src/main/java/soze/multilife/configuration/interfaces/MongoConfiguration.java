@@ -8,7 +8,7 @@ public interface MongoConfiguration {
 	public String getUsername();
 	public char[] getPassword();
 	public String getDatabase();
-	public String getUrl();
+	public String getHost();
 	public int getPort();
 
 }

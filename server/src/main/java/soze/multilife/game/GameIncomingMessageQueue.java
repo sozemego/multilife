@@ -36,13 +36,7 @@ public class GameIncomingMessageQueue extends GameDecorator {
 	}
 
 	private void checkPlayerInGame(long id) throws PlayerNotInGameException {
-		boolean playerInGame = false;
-		for (Player p : getPlayers()) {
-			if(p.getId() == id) {
-				playerInGame = true;
-			}
-		}
-		if(!playerInGame) {
+		if(!getPlayers().containsKey(id)) {
 			throw new PlayerNotInGameException(id);
 		}
 	}

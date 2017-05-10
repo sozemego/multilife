@@ -3,6 +3,7 @@ package soze.multilife.game;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soze.multilife.game.exceptions.PlayerAlreadyInGameException;
+import soze.multilife.game.exceptions.PlayerNotInGameException;
 import soze.multilife.messages.outgoing.CellData;
 import soze.multilife.messages.outgoing.CellList;
 import soze.multilife.messages.outgoing.MapData;
@@ -59,7 +60,11 @@ public class GamePlayerHandler extends GameDecorator {
 	private void updateLeavingPlayers() {
 		synchronized (leavingPlayerIds) {
 			for (long playerId : leavingPlayerIds) {
-				super.removePlayer(playerId);
+				try {
+					super.removePlayer(playerId);
+				} catch (PlayerNotInGameException e) {
+					LOG.warn("Trying to remove a player which does not exist.", e);
+				}
 			}
 			leavingPlayerIds.clear();
 		}

@@ -7,6 +7,7 @@ import soze.multilife.messages.outgoing.OutgoingMessage;
 import soze.multilife.messages.outgoing.PlayerData;
 
 import java.util.Collection;
+import java.util.Map;
 
 public class GameDecorator implements Game {
 
@@ -52,7 +53,7 @@ public class GameDecorator implements Game {
 		return game.getPlayerData();
 	}
 
-	public Collection<Player> getPlayers() {
+	public Map<Long, Player> getPlayers() {
 		return game.getPlayers();
 	}
 

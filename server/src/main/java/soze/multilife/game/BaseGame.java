@@ -282,7 +282,7 @@ public class BaseGame implements Game {
 	}
 
 	public void sendMessage(OutgoingMessage message) {
-		for (Player p : getPlayers()) {
+		for (Player p : getPlayers().values()) {
 			p.send(message);
 		}
 	}
@@ -307,8 +307,8 @@ public class BaseGame implements Game {
 		return grid.getHeight();
 	}
 
-	public Collection<Player> getPlayers() {
-		return new ArrayList<>(players.values());
+	public Map<Long, Player> getPlayers() {
+		return new HashMap<>(players);
 	}
 
 	private void checkContainsPlayer(long playerId) throws PlayerNotInGameException {
