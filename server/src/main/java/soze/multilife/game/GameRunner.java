@@ -29,7 +29,6 @@ public class GameRunner extends GameDecorator {
 		}
 
 		super.end();
-
 	}
 
 }

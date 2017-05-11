@@ -11,7 +11,7 @@ class GameTest {
 	private static final int DEFAULT_WIDTH = 50;
 	private static final int DEFAULT_HEIGHT = 50;
 	private static final int DEFAULT_MAX_PLAYERS = 4;
-	private static final long DEFAULT_DURATION = 1000 * 5;
+	private static final long DEFAULT_DURATION = 1000 * 1;
 	private static final long DEFAULT_TICK_RATE = 250;
 
 	protected BaseGame createGameWithDefaultValues() {
@@ -40,6 +40,10 @@ class GameTest {
 
 	protected GamePlayerHandler getGamePlayerHandler(Game game) {
 		return new GamePlayerHandler(game);
+	}
+
+	protected GameRunner getGameRunner(Game game) {
+		return new GameRunner(game);
 	}
 
 	protected static class BaseGameBuilder {
