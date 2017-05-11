@@ -3,7 +3,6 @@ package soze.multilife.game;
 import org.junit.Test;
 import soze.multilife.messages.outgoing.OutgoingMessage;
 
-import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
