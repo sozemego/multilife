@@ -30,6 +30,14 @@ class GameTest {
 		return player;
 	}
 
+	protected GameIncomingMessageQueue getGameIncomingMessageQueue(Game game) {
+		return new GameIncomingMessageQueue(game);
+	}
+
+	protected GameOutgoingMessageHandler getGameOutgoingMessageHandler(Game game) {
+		return new GameOutgoingMessageHandler(game);
+	}
+
 	protected static class BaseGameBuilder {
 
 		private int id = ID;
