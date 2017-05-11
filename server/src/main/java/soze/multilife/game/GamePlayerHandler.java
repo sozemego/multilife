@@ -9,9 +9,7 @@ import soze.multilife.messages.outgoing.CellList;
 import soze.multilife.messages.outgoing.MapData;
 import soze.multilife.messages.outgoing.PlayerData;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -24,12 +22,12 @@ public class GamePlayerHandler extends GameDecorator {
 	/**
 	 * Players which recently joined, have not received map data yet.
 	 */
-	private final List<Player> freshPlayers = new ArrayList<>();
+	private final Set<Player> freshPlayers = new HashSet<>();
 
 	/**
 	 * Ids of players which disconnected, but were not processed yet.
 	 */
-	private final List<Long> leavingPlayerIds = new ArrayList<>();
+	private final Set<Long> leavingPlayerIds = new HashSet<>();
 
 	GamePlayerHandler(Game game) {
 		super(game);
@@ -42,6 +40,7 @@ public class GamePlayerHandler extends GameDecorator {
 	}
 
 	public boolean addPlayer(Player player) throws PlayerAlreadyInGameException {
+		checkExists(player);
 		synchronized (freshPlayers) {
 			if(getPlayers().size() + freshPlayers.size() == getMaxPlayers()) {
 				return false;
@@ -51,7 +50,20 @@ public class GamePlayerHandler extends GameDecorator {
 		return true;
 	}
 
-	public void removePlayer(long id) {
+	private void checkExists(Player player) throws PlayerAlreadyInGameException {
+		if(freshPlayers.contains(player) || getPlayers().containsKey(player.getId())) {
+			throw new PlayerAlreadyInGameException(player.getId());
+		}
+	}
+
+	private void checkExists(long id) throws PlayerNotInGameException {
+		if(!getPlayers().containsKey(id)) {
+			throw new PlayerNotInGameException(id);
+		}
+	}
+
+	public void removePlayer(long id) throws PlayerNotInGameException {
+		checkExists(id);
 		synchronized (leavingPlayerIds) {
 			leavingPlayerIds.add(id);
 		}

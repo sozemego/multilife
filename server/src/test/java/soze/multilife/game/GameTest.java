@@ -38,6 +38,10 @@ class GameTest {
 		return new GameOutgoingMessageHandler(game);
 	}
 
+	protected GamePlayerHandler getGamePlayerHandler(Game game) {
+		return new GamePlayerHandler(game);
+	}
+
 	protected static class BaseGameBuilder {
 
 		private int id = ID;

@@ -45,4 +45,19 @@ public class Player {
 	public String getRule() {
 		return rule;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Player player = (Player) o;
+
+		return id == player.id;
+	}
+
+	@Override
+	public int hashCode() {
+		return (int) (id ^ (id >>> 32));
+	}
 }
