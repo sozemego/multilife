@@ -15,6 +15,10 @@ import java.util.stream.Collectors;
 public class Grid {
 
 	/**
+	 * Game of life rule to use for this grid.
+	 */
+	private final Rule rule;
+	/**
 	 * This map contains all cells.
 	 */
 	private final Map<Point, Cell> cells = new HashMap<>();
@@ -29,20 +33,17 @@ public class Grid {
 	 */
 	private final Map<Point, Cell> nextCells = new HashMap<>();
 
-	/**
-	 * Contains rules for players.
-	 */
-	private final Map<Long, Rule> rules = new HashMap<>();
 	private final int width;
 	private final int height;
 
 	private Consumer<Long> onCellDeath = (var) -> {};
 	private Consumer<Long> onCellBirth = (var) -> {};
 
-	Grid(int width, int height) {
+	Grid(int width, int height, Rule rule) {
 		if(width <= 0 || height <= 0) throw new IllegalArgumentException("Invalid height or width, cannot be below 1.");
 		this.width = width;
 		this.height = height;
+		this.rule = rule;
 		init();
 	}
 
@@ -73,21 +74,15 @@ public class Grid {
 		return height;
 	}
 
-	/**
-	 * Adds a rule for a given player.
-	 *
-	 * @param ownerId id of the player this rule should apply to
-	 * @param rule    rule to apply to cells. Cannot be null.
-	 */
-	void addRule(long ownerId, Rule rule) {
-		rules.put(ownerId, Objects.requireNonNull(rule));
+	void setRule(Rule rule) {
+
 	}
 
 	/**
 	 * @return all cells in this grid
 	 */
 	Map<Point, Cell> getAllCells() {
-		return cells;
+		return new HashMap<>(cells);
 	}
 
 	/**
@@ -202,9 +197,9 @@ public class Grid {
 			int x = cell.getX();
 			int y = cell.getY();
 			List<Cell> aliveNeighbours = getAliveNeighbourCells(x, y);
-			long ownerId = cell.getOwnerId();
-			int state = rules.get(ownerId).apply(aliveNeighbours.size(), cell.isAlive());
+			int state = rule.apply(aliveNeighbours.size(), cell.isAlive());
 			if (state != 0) {
+				long ownerId = cell.getOwnerId();
 				long strongestOwnerId = getStrongestOwnerId(aliveNeighbours);
 				// 0 -> 1 | point to strongest owner
 				// 1 -> 0 | point from cell owner
@@ -212,9 +207,9 @@ public class Grid {
 					onCellDeath.accept(strongestOwnerId);
 				}
 				if (state == 1) {
-					onCellBirth.accept(cell.getOwnerId());
+					onCellBirth.accept(ownerId);
 				}
-				changeState(x, y, state > 0, strongestOwnerId == -1 ? cell.getOwnerId() : strongestOwnerId);
+				changeState(x, y, state > 0, strongestOwnerId == -1 ? ownerId : strongestOwnerId);
 			}
 		}
 	}

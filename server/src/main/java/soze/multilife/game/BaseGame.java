@@ -96,8 +96,7 @@ public class BaseGame implements Game {
 	BaseGame(int id, float initialDensity, int width, int height, int maxPlayers, long duration, long tickRate) {
 		this.id = id;
 		this.initialDensity = initialDensity;
-		this.grid = new Grid(width, height);
-		grid.addRule(SIMULATION_PLAYER_ID, RuleFactory.getRule(RuleType.BASIC));
+		this.grid = new Grid(width, height, RuleFactory.getRule("BASIC"));
 		this.maxPlayers = maxPlayers;
 		this.duration = duration;
 		this.tickRate = tickRate;
@@ -146,7 +145,6 @@ public class BaseGame implements Game {
 		//TODO should be getNextColor();
 		players.put(player.getId(), player);
 		playerColors.put(player.getId(), availableColors[players.size() % availableColors.length]);
-		grid.addRule(player.getId(), RuleFactory.getRule(player.getRule()));
 		return true;
 	}
 
