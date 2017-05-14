@@ -42,6 +42,10 @@ public class GameSocketHandler {
 
 	@OnWebSocketConnect
 	public void onOpen(Session session) throws Exception {
+		connect(session);
+	}
+
+	private void connect(Session session) {
 		long nextId = id.incrementAndGet();
 		LOG.info("User connected. ConnectionID [{}].", nextId);
 		sessionIdMap.put(session, nextId);
@@ -50,6 +54,10 @@ public class GameSocketHandler {
 
 	@OnWebSocketClose
 	public void onClose(Session session, int statusCode, String reason) throws Exception {
+		disconnect(session, statusCode, reason);
+	}
+
+	private void disconnect(Session session, int statusCode, String reason) {
 		long userId = sessionIdMap.remove(session);
 		LOG.info("User disconnected. ConnectionID [{}]. Status code [{}]. Reason [{}]", userId, statusCode, reason);
 		lobby.onDisconnect(getConnection(userId, session));
@@ -57,6 +65,10 @@ public class GameSocketHandler {
 
 	@OnWebSocketMessage
 	public void onMessage(Session session, String msg) throws Exception {
+		sendMessage(session, msg);
+	}
+
+	private void sendMessage(Session session, String msg) throws java.io.IOException {
 		IncomingMessage inc = mapper.readValue(msg, IncomingMessage.class);
 		if(inc instanceof LoginMessage) {
 			Player player = loginService.login((LoginMessage)inc, getConnection(sessionIdMap.get(session), session));
