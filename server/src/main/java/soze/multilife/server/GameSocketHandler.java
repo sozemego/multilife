@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soze.multilife.game.Player;
 import soze.multilife.messages.incoming.IncomingMessage;
+import soze.multilife.messages.incoming.IncomingType;
 import soze.multilife.messages.incoming.LoginMessage;
 import soze.multilife.server.connection.Connection;
 import soze.multilife.server.connection.ConnectionFactory;
@@ -70,9 +71,10 @@ public class GameSocketHandler {
 
 	private void sendMessage(Session session, String msg) throws java.io.IOException {
 		IncomingMessage inc = mapper.readValue(msg, IncomingMessage.class);
-		if(inc instanceof LoginMessage) {
+		if(inc.getType() == IncomingType.LOGIN) {
 			Player player = loginService.login((LoginMessage)inc, getConnection(sessionIdMap.get(session), session));
 			lobby.addPlayer(player);
+			return;
 		}
 		lobby.onMessage(inc, sessionIdMap.get(session));
 	}

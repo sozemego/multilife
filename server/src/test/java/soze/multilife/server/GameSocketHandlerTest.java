@@ -4,6 +4,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import soze.multilife.messages.incoming.ClickMessage;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.LoginMessage;
 import soze.multilife.server.connection.Connection;
@@ -42,7 +43,7 @@ public class GameSocketHandlerTest {
     }
 
     @Test
-    public void testOnMessage() throws Exception {
+    public void testLoginMessageMessage() throws Exception {
         Lobby lobby = Mockito.mock(Lobby.class);
         LoginService loginService = Mockito.mock(LoginService.class);
         ConnectionFactory connectionFactory = Mockito.mock(ConnectionFactory.class);
@@ -52,7 +53,23 @@ public class GameSocketHandlerTest {
         gameSocketHandler.onOpen(session);
 
         gameSocketHandler.onMessage(session, "{\"name\": \"Player\", \"type\":\"LOGIN\"}");
-        verify(lobby, times(1)).onMessage(any(LoginMessage.class), eq(1L));
+        verify(lobby, times(0)).onMessage(any(LoginMessage.class), eq(1L));
     }
+
+    @Test
+    public void testOnClickMessage() throws Exception {
+        Lobby lobby = Mockito.mock(Lobby.class);
+        LoginService loginService = Mockito.mock(LoginService.class);
+        ConnectionFactory connectionFactory = Mockito.mock(ConnectionFactory.class);
+        GameSocketHandler gameSocketHandler = new GameSocketHandler(lobby, loginService, connectionFactory);
+
+        Session session = Mockito.mock(Session.class);
+        gameSocketHandler.onOpen(session);
+
+        gameSocketHandler.onMessage(session, "{\"indices\": [1, 2, 3], \"type\":\"CLICK\"}");
+        verify(lobby, times(1)).onMessage(any(ClickMessage.class), eq(1L));
+    }
+
+
 
 }
