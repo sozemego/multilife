@@ -18,6 +18,7 @@ import soze.multilife.server.connection.Connection;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -42,8 +43,8 @@ public class Lobby implements Runnable {
 	private final EventBus eventBus;
 
 	public Lobby(EventBus eventBus, GameFactory gameFactory) {
-		this.eventBus = eventBus;
-		this.gameFactory = gameFactory;
+		this.eventBus = Objects.requireNonNull(eventBus);
+		this.gameFactory = Objects.requireNonNull(gameFactory);
 	}
 
 	public void run() {
@@ -63,6 +64,7 @@ public class Lobby implements Runnable {
 	 * @param connection
 	 */
 	void onConnect(Connection connection) {
+		Objects.requireNonNull(connection);
 		connections.put(connection.getId(), connection);
 		connection.send(getPlayerIdentity(connection.getId()));
 	}
@@ -83,9 +85,14 @@ public class Lobby implements Runnable {
 	 * @param connection
 	 */
 	void onDisconnect(Connection connection) {
+		Objects.requireNonNull(connection);
 		long id = connection.getId();
 		connections.remove(id);
-		int gameId = playerToGame.remove(id);
+		Integer gameId = playerToGame.remove(id);
+		if(gameId == null) {
+			//player was not in any game, so no further action is neccesary
+			return;
+		}
 		try {
 			games.get(gameId).removePlayer(id);
 		} catch (PlayerNotInGameException e) {
