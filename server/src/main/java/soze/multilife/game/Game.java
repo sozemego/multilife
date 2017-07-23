@@ -14,22 +14,18 @@ public interface Game extends Runnable {
 
 	/**
 	 * Returns id of this game. Ids should be unique.
-	 * @return
 	 */
 	int getId();
 
 	/**
 	 * Processes an incoming message. Those messages are sent from the client.
 	 * PlayerId denotes id of the player who sent the message.
-	 * @param message
-	 * @param playerId
 	 * @throws PlayerNotInGameException if player with given id is not in game
 	 */
 	void acceptMessage(IncomingMessage message, long playerId) throws PlayerNotInGameException;
 
 	/**
 	 * Adds a player to the game.
-	 * @param player
 	 * @return true if player was added, false if game was full
 	 * @throws PlayerAlreadyInGameException if this player is already in game
 	 */
@@ -37,7 +33,6 @@ public interface Game extends Runnable {
 
 	/**
 	 * Removes a player with given id from the game.
-	 * @param playerId
 	 * @throws PlayerNotInGameException if a player with given id is not in game
 	 */
 	void removePlayer(long playerId) throws PlayerNotInGameException;
@@ -49,7 +44,6 @@ public interface Game extends Runnable {
 
 	/**
 	 * Returns time in milliseonds between game updates.
-	 * @return
 	 */
 	long getTickRate();
 
@@ -65,7 +59,6 @@ public interface Game extends Runnable {
 
 	/**
 	 * Returns a map of playerId-player pairs connected to the game.
-	 * @return
 	 */
 	Map<Long, Player> getPlayers();
 
@@ -76,13 +69,11 @@ public interface Game extends Runnable {
 
 	/**
 	 * Returns number of iterations this game has gone through so far.
-	 * @return
 	 */
 	int getIterations();
 
 	/**
 	 * Returns remaining time in milliseconds.
-	 * @return
 	 */
 	long getRemainingTime();
 	boolean isOutOfTime();
@@ -92,7 +83,6 @@ public interface Game extends Runnable {
 
 	/**
 	 * Sends the given message to all players connected to the game.
-	 * @param message
 	 */
 	void sendMessage(OutgoingMessage message);
 

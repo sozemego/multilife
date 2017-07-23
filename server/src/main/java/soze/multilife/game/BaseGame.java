@@ -127,6 +127,7 @@ public class BaseGame implements Game {
 			Long points = playerPoints.get(strongestOwnerId);
 			playerPoints.put(strongestOwnerId, points == null ? 1L : ++points);
 		});
+
 		grid.onCellBirth((cellOwner) -> {
 			Long points = playerPoints.get(cellOwner);
 			points = Math.max(points == null ? 0L : --points, 0L);

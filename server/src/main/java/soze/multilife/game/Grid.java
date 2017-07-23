@@ -74,10 +74,6 @@ public class Grid {
 		return height;
 	}
 
-	void setRule(Rule rule) {
-
-	}
-
 	/**
 	 * @return all cells in this grid
 	 */
@@ -101,8 +97,6 @@ public class Grid {
 
 	/**
 	 * Adds all given cells to the next cells.
-	 *
-	 * @param cells
 	 */
 	void click(Collection<Cell> cells) {
 		for (Cell cell : cells) {
@@ -153,8 +147,6 @@ public class Grid {
 	 * Adds this cell to the map of active cells.
 	 * This method also adds neighbours of this cell to active cells.
 	 * If cells already exist, cells are not replaced.
-	 *
-	 * @param cell
 	 */
 	private void addToActive(Cell cell) {
 		int x = cell.getX();
@@ -171,8 +163,6 @@ public class Grid {
 	 * Returns a cell at this position. If x or y is out of bounds,
 	 * this method will wrap around the grid.
 	 *
-	 * @param x
-	 * @param y
 	 * @return cell at given coordinates (from all cells)
 	 */
 	private Cell getCell(int x, int y) {
@@ -216,10 +206,6 @@ public class Grid {
 
 	/**
 	 * Returns all alive cells around a cell at location x, y.
-	 *
-	 * @param x
-	 * @param y
-	 * @return
 	 */
 	private List<Cell> getAliveNeighbourCells(int x, int y) {
 		List<Cell> aliveNeighbourCells = new ArrayList<>();
@@ -236,9 +222,6 @@ public class Grid {
 	/**
 	 * Finds the most frequently (mode) occuring ownerId among given cells.
 	 * If there are no cells, returns -1.
-	 *
-	 * @param cells
-	 * @return
 	 */
 	private long getStrongestOwnerId(List<Cell> cells) {
 		if (cells.isEmpty()) {
@@ -284,8 +267,6 @@ public class Grid {
 
 	/**
 	 * Kills all cells belonging to a given playerId.
-	 *
-	 * @param playerId
 	 */
 	void killAll(long playerId) {
 		for (Cell cell : cells.values()) {
@@ -300,8 +281,6 @@ public class Grid {
 	 * Creates a point object with a given x, y values.
 	 * If the point lies out of bounds then x, y values
 	 * are wrapped around.
-	 *
-	 * @return
 	 */
 	private Point getPoint(int x, int y) {
 		int index = getIndex(x, y);
@@ -326,13 +305,12 @@ public class Grid {
 	 * Returns x, y coordinates of a cell at a given index,
 	 * as if the cells were contained in an 1D array.
 	 * The coordinates are returned in a Point object.
-	 *
-	 * @param index
-	 * @return
 	 */
 	private Point getPoint(int index) {
 		index = wrapIndex(index);
-		return new Point(index % width, index / height);
+		int wrappedX = index % width;
+		int wrappedY = index / width;
+		return new Point(wrappedX, wrappedY);
 	}
 
 }

@@ -12,7 +12,7 @@ public class Configuration
 
 	private final ConfigurationLoader configurationLoader;
 
-	public Configuration(ConfigurationLoader configurationLoader) {
+	Configuration(ConfigurationLoader configurationLoader) {
 		this.configurationLoader = Objects.requireNonNull(configurationLoader);
 	}
 

@@ -32,4 +32,8 @@ public class GameFactory {
 								new GameOutgoingMessageHandler(baseGame))));
 	}
 
+	private static class NewGameConfigBundle {
+
+	}
+
 }

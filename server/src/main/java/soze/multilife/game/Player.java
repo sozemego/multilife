@@ -5,9 +5,6 @@ import soze.multilife.server.connection.Connection;
 
 import java.util.Objects;
 
-/**
- * Created by soze on 2/21/2017.
- */
 public class Player {
 
 	private final long id;
