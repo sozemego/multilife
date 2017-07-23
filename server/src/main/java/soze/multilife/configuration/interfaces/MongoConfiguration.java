@@ -9,6 +9,6 @@ public interface MongoConfiguration {
 	public char[] getPassword();
 	public String getDatabase();
 	public String getHost();
-	public int getPort();
+	public int getDatabasePort();
 
 }

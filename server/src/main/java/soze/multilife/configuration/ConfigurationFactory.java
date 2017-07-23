@@ -1,32 +1,39 @@
 package soze.multilife.configuration;
 
+import soze.multilife.configuration.interfaces.GameConfiguration;
+import soze.multilife.configuration.interfaces.MetricsConfiguration;
+import soze.multilife.configuration.interfaces.MongoConfiguration;
+import soze.multilife.configuration.interfaces.ServerConfiguration;
+
 /**
  * Reads configuration from file and returns classes which expose a narrow, specialized
  * set of configuration.
  */
 public class ConfigurationFactory {
 
+	private final ConfigurationLoader configurationLoader;
 	private final Configuration configuration;
 
 	public ConfigurationFactory() {
-		this.configuration = new Configuration();
-		this.configuration.load();
+		this.configurationLoader = new ConfigurationLoader();
+		this.configurationLoader.load();
+		this.configuration = new Configuration(this.configurationLoader);
 	}
 
-	public GameConfigurationImpl getGameConfiguration() {
-		return new GameConfigurationImpl(configuration);
+	public GameConfiguration getGameConfiguration() {
+		return this.configuration;
 	}
 
-	public MongoConfigurationImpl getMongoConfiguration() {
-		return new MongoConfigurationImpl(configuration);
+	public MongoConfiguration getMongoConfiguration() {
+		return this.configuration;
 	}
 
-	public MetricsConfigurationImpl getMetricsConfiguration() {
-		return new MetricsConfigurationImpl(configuration);
+	public MetricsConfiguration getMetricsConfiguration() {
+		return this.configuration;
 	}
 
-	public ServerConfigurationImpl getServerConfiguration() {
-		return new ServerConfigurationImpl(configuration);
+	public ServerConfiguration getServerConfiguration() {
+		return this.configuration;
 	}
 
 }

@@ -3,7 +3,7 @@ package soze.multilife.metrics;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import soze.multilife.configuration.MetricsConfigurationImpl;
+import soze.multilife.configuration.interfaces.MetricsConfiguration;
 import soze.multilife.metrics.events.PlayerDisconnectedEvent;
 import soze.multilife.metrics.events.PlayerLoggedEvent;
 import soze.multilife.metrics.events.SerializedMetricEvent;
@@ -24,7 +24,7 @@ public class MetricsService implements Runnable {
 	private static final Logger LOG = LoggerFactory.getLogger(MetricsService.class);
 
 	private final MetricsRepository repository;
-	private final MetricsConfigurationImpl configuration;
+	private final MetricsConfiguration configuration;
 
 	private final Queue<Object> events = new ConcurrentLinkedQueue<>();
 
@@ -41,7 +41,7 @@ public class MetricsService implements Runnable {
 	private final Map<String, Long> typeCountMap = new ConcurrentHashMap<>();
 	private final Map<Long, Long> playerMap = new ConcurrentHashMap<>();
 
-	public MetricsService(MetricsRepository repository, MetricsConfigurationImpl configuration) {
+	public MetricsService(MetricsRepository repository, MetricsConfiguration configuration) {
 		this.repository = repository;
 		this.configuration = configuration;
 	}

@@ -4,13 +4,13 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import soze.multilife.configuration.ConfigurationFactory;
-import soze.multilife.configuration.MetricsConfigurationImpl;
-import soze.multilife.configuration.MongoConfigurationImpl;
+import soze.multilife.configuration.interfaces.MetricsConfiguration;
+import soze.multilife.configuration.interfaces.MongoConfiguration;
 import soze.multilife.configuration.interfaces.ServerConfiguration;
 import soze.multilife.events.EventBus;
 import soze.multilife.events.EventBusImpl;
 import soze.multilife.game.GameFactory;
-import soze.multilife.helpers.UncaughtExceptionLogger;
+import soze.multilife.utils.UncaughtExceptionLogger;
 import soze.multilife.metrics.MetricsHttpHandler;
 import soze.multilife.metrics.MetricsService;
 import soze.multilife.metrics.MetricsWebSocketHandler;
@@ -68,7 +68,7 @@ public class MultiLife {
 		this.mongoClient = createMongoClient(cfgFactory.getMongoConfiguration());
 
 		MetricsRepository metricsRepository = new MongoMetricsRepository(mongoClient.getDatabase(cfgFactory.getMongoConfiguration().getDatabase()));
-		MetricsConfigurationImpl metricsConfiguration = cfgFactory.getMetricsConfiguration();
+		MetricsConfiguration metricsConfiguration = cfgFactory.getMetricsConfiguration();
 		this.metricsService = new MetricsService(
 			metricsRepository,
 			metricsConfiguration
@@ -87,7 +87,7 @@ public class MultiLife {
 		executor.execute(metricsWebSocketHandler);
 	}
 
-	private MongoClient createMongoClient(MongoConfigurationImpl config) {
+	private MongoClient createMongoClient(MongoConfiguration config) {
 		MongoCredential credential = MongoCredential.createCredential(
 			config.getUsername(),
 			config.getDatabase(),
@@ -96,13 +96,13 @@ public class MultiLife {
 		return new MongoClient(
 			new ServerAddress(
 				config.getHost(),
-				config.getPort()
+				config.getDatabasePort()
 			),
 			Arrays.asList(credential));
 	}
 
 	private void start(ServerConfiguration serverConfiguration) throws InterruptedException, ExecutionException {
-		new ServerBuilder(serverConfiguration.getPort())
+		new ServerBuilder(serverConfiguration.getServerPort())
 			.withWebSocketHandler("/game", new GameSocketHandler(lobby, loginService, connectionFactory))
 			.withWebSocketHandler("/metrics-live", metricsWebSocketHandler)
 			.withHttpHandler("/metrics", metricsHttpHandler)

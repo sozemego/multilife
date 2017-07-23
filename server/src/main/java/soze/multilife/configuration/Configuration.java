@@ -1,94 +1,82 @@
 package soze.multilife.configuration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import soze.multilife.configuration.interfaces.GameConfiguration;
+import soze.multilife.configuration.interfaces.MetricsConfiguration;
+import soze.multilife.configuration.interfaces.MongoConfiguration;
+import soze.multilife.configuration.interfaces.ServerConfiguration;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-/**
- * Handles configuration for the application.
- * All environmental variables are loaded, as well as all key-value pairs
- * from the specified file in CONFIG_PATH. If the app does not find
- * the config file, a message will be logged, but no exception will be thrown.
- * Environmental variables will overwrite properties in the file.
- */
-class Configuration {
+public class Configuration
+		implements GameConfiguration, MetricsConfiguration, MongoConfiguration, ServerConfiguration {
 
-	private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
+	private final ConfigurationLoader configurationLoader;
 
-	private static final Map<String, String> properties = new HashMap<>();
-
-	private static final String CONFIG_PATH = "app.cfg";
-
-	private boolean loaded = false;
-
-	public void load() {
-		loadPropertiesFromFile();
-		//loading env variables last because they will overwrite
-		loadEnvironmentalVariables();
-		loaded = true;
+	public Configuration(ConfigurationLoader configurationLoader) {
+		this.configurationLoader = Objects.requireNonNull(configurationLoader);
 	}
 
-	public int getInt(String propertyName) {
-		checkLoaded();
-		return Integer.parseInt(properties.get(Objects.requireNonNull(propertyName)));
+	public float getInitialDensity() {
+		return configurationLoader.getFloat("gameDefaultInitialDensity");
 	}
 
-	public long getLong(String propertyName) {
-		checkLoaded();
-		return Long.parseLong(properties.get(Objects.requireNonNull(propertyName)));
+	public long getGameDuration() {
+		return configurationLoader.getLong("gameDuration");
 	}
 
-	public String getString(String propertyName) {
-		checkLoaded();
-		return properties.get(Objects.requireNonNull(propertyName));
+	public int getMaxPlayers() {
+		return configurationLoader.getInt("maxPlayersPerGame");
 	}
 
-	public float getFloat(String propertyName) {
-		checkLoaded();
-		return Float.parseFloat(properties.get(Objects.requireNonNull(propertyName)));
+	public int getGridWidth() {
+		return configurationLoader.getInt("gameDefaultWidth");
 	}
 
-	/**
-	 * Throws a RuntimeException if configuration is not loaded.
-	 */
-	private void checkLoaded() {
-		if (!loaded) {
-			throw new RuntimeException("Load configuration first!");
-		}
+	public int getGridHeight() {
+		return configurationLoader.getInt("gameDefaultHeight");
 	}
 
-	private void loadPropertiesFromFile() {
-		try {
-			List<String> lines = Files.readAllLines(Paths.get(CONFIG_PATH));
-			for (String line : lines) {
-				parseConfigLine(line);
-			}
-		} catch (IOException e) {
-			LOG.warn("Problem while reading config file.", e);
-		}
+	public int getTickRate() {
+		return configurationLoader.getInt("gameIterationInterval");
 	}
 
-	private void parseConfigLine(String line) throws IOException {
-		//ignore empty lines
-		if(line.trim().length() == 0) {
-			return;
-		}
-		String[] tokens = line.split("=");
-		if (tokens.length != 2) {
-			throw new IOException("Invalid property line, should be in key=value format. White space is ignored.");
-		}
-		properties.put(tokens[0].trim(), tokens[1].trim());
+	public long getCalculateMetricsInterval() {
+		return configurationLoader.getLong("calculateMetricsInterval");
 	}
 
-	private void loadEnvironmentalVariables() {
-		properties.putAll(System.getenv());
+	public long getMetricsPushInterval() {
+		return configurationLoader.getLong("metricsPushUpdateRate");
 	}
 
+	public long metricsSaveInterval() {
+		return configurationLoader.getLong("metricsIntervalBetweenSaves");
+	}
+
+	public String getUsername() {
+		return configurationLoader.getString("mongoUsername");
+	}
+
+	public char[] getPassword() {
+		return configurationLoader.getString("mongoPassword").toCharArray();
+	}
+
+	public String getDatabase() {
+		return configurationLoader.getString("mongoDatabase");
+	}
+
+	public String getHost() {
+		return configurationLoader.getString("mongoHost");
+	}
+
+	public int getDatabasePort() {
+		return configurationLoader.getInt("mongoPort");
+	}
+
+	public int getServerPort() {
+		return configurationLoader.getInt("port");
+	}
+
+	public String getExternalStaticFilesPath() {
+		return configurationLoader.getString("externalStaticFilesPath");
+	}
 }

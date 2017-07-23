@@ -1,4 +1,4 @@
-package soze.multilife.helpers;
+package soze.multilife.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

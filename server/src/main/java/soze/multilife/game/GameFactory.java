@@ -1,6 +1,6 @@
 package soze.multilife.game;
 
-import soze.multilife.configuration.GameConfigurationImpl;
+import soze.multilife.configuration.interfaces.GameConfiguration;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -9,10 +9,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class GameFactory {
 
-	private final GameConfigurationImpl config;
+	private final GameConfiguration config;
 	private final AtomicInteger id = new AtomicInteger(1);
 
-	public GameFactory(GameConfigurationImpl config) {
+	public GameFactory(GameConfiguration config) {
 		this.config = config;
 	}
 
@@ -26,8 +26,10 @@ public class GameFactory {
 			config.getGameDuration(),
 			config.getTickRate()
 		);
-		Game game = new GameRunner(new GamePlayerHandler(new GameIncomingMessageQueue(new GameOutgoingMessageHandler(baseGame))));
-		return game;
+		return new GameRunner(
+				new GamePlayerHandler(
+						new GameIncomingMessageQueue(
+								new GameOutgoingMessageHandler(baseGame))));
 	}
 
 }
