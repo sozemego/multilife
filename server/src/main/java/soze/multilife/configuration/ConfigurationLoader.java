@@ -1,15 +1,15 @@
 package soze.multilife.configuration;
 
+import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Handles configuration loading for the application.
@@ -65,6 +65,7 @@ class ConfigurationLoader {
 	}
 
 	private void loadPropertiesFromFile() {
+		prepareDefaultConfigFile();
 		try {
 			List<String> lines = Files.readAllLines(Paths.get(CONFIG_PATH));
 			for (String line : lines) {
@@ -75,9 +76,43 @@ class ConfigurationLoader {
 		}
 	}
 
+	/**
+	 * Checks if config file exists, and if not creates it
+	 * and populates it with all possible configuration options.
+	 * For some of them, default values are supplied.
+	 */
+	private void prepareDefaultConfigFile() {
+		Path configPath = Paths.get(CONFIG_PATH);
+		boolean configExists = Files.exists(configPath);
+		if(!configExists) {
+			try {
+				LOG.info("Configuration file does not exist, creating a new one.");
+				Files.createFile(configPath);
+				Files.write(configPath, getDefaultConfigurationLines());
+			} catch (IOException e) {
+				LOG.warn("Problem creating default config file.", e);
+			}
+			LOG.info("Successfully created default config file.");
+		}
+	}
+
+	private List<String> getDefaultConfigurationLines() {
+		List<String> configLines = new ArrayList<>();
+		Multimap<String, String> defaultProperties = Configuration.getAllDefaultProperties();
+		for(String group: defaultProperties.keySet()) {
+			configLines.add("# " + group);
+			Collection<String> properties = defaultProperties.get(group);
+			configLines.addAll(properties);
+		}
+		return configLines;
+	}
+
 	private void parseConfigLine(String line) throws IOException {
 		//ignore empty lines
 		if(line.trim().length() == 0) {
+			return;
+		}
+		if(line.charAt(0) == '#') {
 			return;
 		}
 		String[] tokens = line.split("=");
