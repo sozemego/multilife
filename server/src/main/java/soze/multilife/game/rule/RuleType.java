@@ -37,10 +37,7 @@ public enum RuleType {
 	 * Basically, digits after B mean number of alive neighbours that cause a dead
 	 * cell to come alive. Digits after S mean a number of alive neighbours that
 	 * let a cell stay alive (it dies otherwise). This method returns an
-	 * anonymous object, using a lambda to create it.
-	 *
-	 * @param ruleString
-	 * @return
+	 * anonymous {@link Rule} which is a functional interface.
 	 */
 	private Rule parseRuleString(String ruleString) {
 		String[] tokens = ruleString.split("/");
@@ -60,9 +57,6 @@ public enum RuleType {
 	/**
 	 * Extracts all digits from a given text
 	 * and returns a List of those numbers (Integer).
-	 *
-	 * @param text
-	 * @return
 	 */
 	private Set<Integer> extractNumbers(String text) {
 		Pattern pattern = Pattern.compile("\\d");

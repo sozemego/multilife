@@ -10,6 +10,8 @@ import soze.multilife.server.connection.Connection;
 import soze.multilife.metrics.events.TypeMetricEvent;
 import soze.multilife.metrics.events.SerializedMetricEvent;
 
+import java.util.Objects;
+
 /**
  * A {@link Connection} implementation which measures various
  * metrics about outgoing messages.
@@ -21,10 +23,9 @@ public class MetricsConnection extends BaseConnection {
 
 	public MetricsConnection(long id, Session session, EventBus eventBus) {
 		super(id, session);
-		this.eventBus = eventBus;
+		this.eventBus = Objects.requireNonNull(eventBus);
 	}
 
-	@Override
 	public void send(OutgoingMessage message) {
 		postEvent(message);
 		String serializedMessage = serialize(message);
@@ -34,7 +35,6 @@ public class MetricsConnection extends BaseConnection {
 
 	/**
 	 * Assemblers and posts event based on this message.
-	 *
 	 * @param msg outgoing message
 	 */
 	private void postEvent(OutgoingMessage msg) {
@@ -55,8 +55,6 @@ public class MetricsConnection extends BaseConnection {
 
 	/**
 	 * Assembles and posts an event based on this data.
-	 *
-	 * @param message
 	 */
 	private void postEvent(String message) {
 		SerializedMetricEvent event = createEvent(message);
@@ -65,13 +63,10 @@ public class MetricsConnection extends BaseConnection {
 
 	/**
 	 * Creates an event based on this message.
-	 *
-	 * @param message
-	 * @return
 	 */
 	private SerializedMetricEvent createEvent(String message) {
 		long timeStamp = System.nanoTime();
-		return new SerializedMetricEvent(timeStamp, getId(), message.length() / 2);
+		return new SerializedMetricEvent(timeStamp, getId(), message.getBytes().length);
 	}
 
 	private String serialize(OutgoingMessage message) {
@@ -82,6 +77,5 @@ public class MetricsConnection extends BaseConnection {
 			return "";
 		}
 	}
-
 
 }
