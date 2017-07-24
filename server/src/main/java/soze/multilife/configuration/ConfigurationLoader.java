@@ -100,7 +100,7 @@ class ConfigurationLoader {
 		List<String> configLines = new ArrayList<>();
 		Multimap<String, String> defaultProperties = Configuration.getAllDefaultProperties();
 		for(String group: defaultProperties.keySet()) {
-			configLines.add("# " + group);
+			configLines.add("#" + group);
 			Collection<String> properties = defaultProperties.get(group);
 			configLines.addAll(properties);
 		}
@@ -112,6 +112,7 @@ class ConfigurationLoader {
 		if(line.trim().length() == 0) {
 			return;
 		}
+		//ignore comments
 		if(line.charAt(0) == '#') {
 			return;
 		}
