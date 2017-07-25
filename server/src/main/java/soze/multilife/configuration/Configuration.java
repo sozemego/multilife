@@ -23,6 +23,7 @@ public class Configuration
 
 	private static final String METRICS_CONFIGURATION = "METRICS_CONFIGURATION";
 	private static final String CALCULATE_METRICS_INTERVAL = "calculateMetricsInterval";
+	private static final String METRICS_ENABLED = "metricsEnabled";
 	private static final String METRICS_PUSH_UPDATE_RATE = "metricsPushUpdateRate";
 	private static final String METRICS_INTERVAL_BETWEEN_SAVES = "metricsIntervalBetweenSaves";
 
@@ -47,6 +48,7 @@ public class Configuration
 		defaultProperties.put(GAME_CONFIGURATION, GAME_DEFAULT_WIDTH + " = " + 50);
 		defaultProperties.put(GAME_CONFIGURATION, GAME_DEFAULT_HEIGHT + " = " + 50);
 		defaultProperties.put(GAME_CONFIGURATION, GAME_ITERATION_INTERVAL + " = " + 250);
+		defaultProperties.put(METRICS_CONFIGURATION, METRICS_ENABLED + " = " + true);
 		defaultProperties.put(METRICS_CONFIGURATION, CALCULATE_METRICS_INTERVAL + " = " + (1000 * 60));
 		defaultProperties.put(METRICS_CONFIGURATION, METRICS_PUSH_UPDATE_RATE + " = " + (1000 * 60));
 		defaultProperties.put(METRICS_CONFIGURATION, METRICS_INTERVAL_BETWEEN_SAVES + " = " + (1000 * 60));
@@ -88,6 +90,10 @@ public class Configuration
 
 	public int getTickRate() {
 		return configurationLoader.getInt(GAME_ITERATION_INTERVAL);
+	}
+
+	public boolean isMetricsEnabled() {
+		return configurationLoader.getBoolean(METRICS_ENABLED);
 	}
 
 	public long getCalculateMetricsInterval() {

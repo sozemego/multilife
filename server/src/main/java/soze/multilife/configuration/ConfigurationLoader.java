@@ -36,23 +36,57 @@ class ConfigurationLoader {
 	}
 
 	int getInt(String propertyName) {
+		Objects.requireNonNull(propertyName);
 		checkLoaded();
-		return Integer.parseInt(PROPERTIES.get(Objects.requireNonNull(propertyName)));
+		String value = PROPERTIES.get(propertyName);
+		try {
+			return Integer.parseInt(value);
+		} catch (NumberFormatException e) {
+			LOG.warn("[{}] could not be parsed as an integer when requesting [{}].", value, propertyName);
+			throw e;
+		}
 	}
 
 	long getLong(String propertyName) {
+		Objects.requireNonNull(propertyName);
 		checkLoaded();
-		return Long.parseLong(PROPERTIES.get(Objects.requireNonNull(propertyName)));
+		String value = PROPERTIES.get(propertyName);
+		try {
+			return Long.parseLong(value);
+		} catch (NumberFormatException e) {
+			LOG.warn("[{}] could not be parsed as a long when requesting [{}].", value, propertyName);
+			throw e;
+		}
 	}
 
 	String getString(String propertyName) {
+		Objects.requireNonNull(propertyName);
 		checkLoaded();
-		return PROPERTIES.get(Objects.requireNonNull(propertyName));
+		return PROPERTIES.get(propertyName);
 	}
 
 	float getFloat(String propertyName) {
+		Objects.requireNonNull(propertyName);
 		checkLoaded();
-		return Float.parseFloat(PROPERTIES.get(Objects.requireNonNull(propertyName)));
+		String value = PROPERTIES.get(propertyName);
+		try {
+			return Float.parseFloat(value);
+		} catch (NumberFormatException e) {
+			LOG.warn("[{}] could not be parsed as a float when requesting [{}].", value, propertyName);
+			throw e;
+		}
+	}
+
+	boolean getBoolean(String propertyName) {
+		Objects.requireNonNull(propertyName);
+		checkLoaded();
+		String value = PROPERTIES.get(propertyName);
+		try {
+			return Boolean.getBoolean(value);
+		} catch (NumberFormatException e) {
+			LOG.warn("[{}] could not be parsed as a boolean when requesting [{}].", value, propertyName);
+			throw e;
+		}
 	}
 
 	/**

@@ -4,6 +4,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -14,7 +15,7 @@ public class MongoMetricsRepository implements MetricsRepository {
 	private final MongoDatabase db;
 
 	public MongoMetricsRepository(MongoDatabase db) {
-		this.db = db;
+		this.db = Objects.requireNonNull(db);
 	}
 
 	public void saveKilobytesPerSecond(double kbs, long timestamp) {
