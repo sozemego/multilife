@@ -58,7 +58,7 @@ public class Configuration
 		defaultProperties.put(MONGO_CONFIGURATION, MONGO_HOST + " = ");
 		defaultProperties.put(MONGO_CONFIGURATION, MONGO_PORT + " = ");
 		defaultProperties.put(SERVER_CONFIGURATION, SERVER_PORT + " = " + 8000);
-		defaultProperties.put(SERVER_CONFIGURATION, EXTERNAL_STATIC_FILES_PATH + "= ");
+		defaultProperties.put(SERVER_CONFIGURATION, EXTERNAL_STATIC_FILES_PATH + " = ");
 		ALL_DEFAULT_PROPERTIES = ImmutableListMultimap.copyOf(defaultProperties);
 	}
 
