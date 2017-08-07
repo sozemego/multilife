@@ -115,14 +115,13 @@ public class Lobby implements Runnable {
 		}
 
 		int gameId = playerToGame.get(id);
-		Optional<Game> game = gameRunner.getGameById(gameId);
-		if(game.isPresent()) {
+		gameRunner.getGameById(gameId).ifPresent(game -> {
 			try {
-				game.get().acceptMessage(incMessage, id);
+				game.acceptMessage(incMessage, id);
 			} catch (PlayerNotInGameException e) {
 				LOG.warn("Trying to pass a message by a player [{}] who is not in-game.", e.getPlayerId());
 			}
-		}
+		});
 	}
 
 	/**
