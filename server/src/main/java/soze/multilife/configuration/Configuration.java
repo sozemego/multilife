@@ -3,15 +3,13 @@ package soze.multilife.configuration;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
-import soze.multilife.configuration.interfaces.GameConfiguration;
-import soze.multilife.configuration.interfaces.MetricsConfiguration;
-import soze.multilife.configuration.interfaces.MongoConfiguration;
-import soze.multilife.configuration.interfaces.ServerConfiguration;
+import soze.multilife.configuration.interfaces.*;
 
 import java.util.*;
 
 public class Configuration
-		implements GameConfiguration, MetricsConfiguration, MongoConfiguration, ServerConfiguration {
+		implements GameConfiguration, MetricsConfiguration, MongoConfiguration, ServerConfiguration,
+		GameRunnerConfiguration {
 
 	private static final String GAME_CONFIGURATION = "GAME_CONFIGURATION";
 	private static final String GAME_DEFAULT_INITIAL_DENSITY = "gameDefaultInitialDensity";
@@ -38,6 +36,9 @@ public class Configuration
 	private static final String SERVER_PORT = "serverPort";
 	private static final String EXTERNAL_STATIC_FILES_PATH = "externalStaticFilesPath";
 
+	private static final String GAME_RUNNER_CONFIGURATION = "GAME_RUNNER_CONFIGURATION";
+	private static final String GAMES_PER_THREAD = "gamesPerThread";
+
 	private static final Multimap<String, String> ALL_DEFAULT_PROPERTIES;
 
 	static {
@@ -59,6 +60,7 @@ public class Configuration
 		defaultProperties.put(MONGO_CONFIGURATION, MONGO_PORT + " = ");
 		defaultProperties.put(SERVER_CONFIGURATION, SERVER_PORT + " = " + 8000);
 		defaultProperties.put(SERVER_CONFIGURATION, EXTERNAL_STATIC_FILES_PATH + " = ");
+		defaultProperties.put(GAME_RUNNER_CONFIGURATION, GAMES_PER_THREAD + " = 20");
 		ALL_DEFAULT_PROPERTIES = ImmutableListMultimap.copyOf(defaultProperties);
 	}
 
@@ -134,6 +136,10 @@ public class Configuration
 
 	public String getExternalStaticFilesPath() {
 		return configurationLoader.getString(EXTERNAL_STATIC_FILES_PATH);
+	}
+
+	public int getGamesPerThread() {
+		return configurationLoader.getInt(GAMES_PER_THREAD);
 	}
 
 	static Multimap<String, String> getAllDefaultProperties() {

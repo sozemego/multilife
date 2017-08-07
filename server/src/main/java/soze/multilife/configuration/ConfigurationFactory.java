@@ -1,9 +1,6 @@
 package soze.multilife.configuration;
 
-import soze.multilife.configuration.interfaces.GameConfiguration;
-import soze.multilife.configuration.interfaces.MetricsConfiguration;
-import soze.multilife.configuration.interfaces.MongoConfiguration;
-import soze.multilife.configuration.interfaces.ServerConfiguration;
+import soze.multilife.configuration.interfaces.*;
 
 /**
  * Reads configuration from file and returns classes which expose a narrow, specialized
@@ -33,6 +30,10 @@ public class ConfigurationFactory {
 	}
 
 	public ServerConfiguration getServerConfiguration() {
+		return this.configuration;
+	}
+
+	public GameRunnerConfiguration getGameRunnerConfiguration() {
 		return this.configuration;
 	}
 

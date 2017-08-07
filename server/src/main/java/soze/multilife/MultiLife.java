@@ -3,7 +3,6 @@ package soze.multilife;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
-import org.eclipse.jetty.websocket.api.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soze.multilife.configuration.ConfigurationFactory;
@@ -13,8 +12,8 @@ import soze.multilife.configuration.interfaces.ServerConfiguration;
 import soze.multilife.events.EventBus;
 import soze.multilife.events.EventBusImpl;
 import soze.multilife.game.GameFactory;
+import soze.multilife.game.GameRunner;
 import soze.multilife.metrics.*;
-import soze.multilife.utils.UncaughtExceptionLogger;
 import soze.multilife.metrics.repository.MetricsRepository;
 import soze.multilife.metrics.repository.MongoMetricsRepository;
 import soze.multilife.server.GameSocketHandler;
@@ -22,6 +21,7 @@ import soze.multilife.server.Lobby;
 import soze.multilife.server.LoginService;
 import soze.multilife.server.Server.ServerBuilder;
 import soze.multilife.server.connection.ConnectionFactory;
+import soze.multilife.utils.UncaughtExceptionLogger;
 import spark.Request;
 import spark.Response;
 
@@ -58,14 +58,14 @@ public class MultiLife {
 
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger());
 
-		GameFactory gameFactory = new GameFactory(
-			cfgFactory.getGameConfiguration()
-		);
-
 		this.loginService = new LoginService();
 
 		this.eventBus = new EventBusImpl();
-		this.lobby = new Lobby(eventBus, gameFactory);
+		GameRunner gameRunner = new GameRunner(cfgFactory.getGameRunnerConfiguration());
+		GameFactory gameFactory = new GameFactory(
+				cfgFactory.getGameConfiguration()
+		);
+		this.lobby = new Lobby(eventBus, gameRunner, gameFactory);
 
 		this.connectionFactory = new ConnectionFactory(eventBus);
 

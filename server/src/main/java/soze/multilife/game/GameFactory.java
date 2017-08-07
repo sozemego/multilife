@@ -26,7 +26,7 @@ public class GameFactory {
 			config.getGameDuration(),
 			config.getTickRate()
 		);
-		return new GameRunner(
+		return new GameRunnerDecorator(
 				new GamePlayerHandler(
 						new GameIncomingMessageQueue(
 								new GameOutgoingMessageHandler(baseGame))));

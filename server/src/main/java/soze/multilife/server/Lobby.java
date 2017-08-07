@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import soze.multilife.events.EventBus;
 import soze.multilife.game.Game;
 import soze.multilife.game.GameFactory;
+import soze.multilife.game.GameRunner;
 import soze.multilife.game.Player;
 import soze.multilife.game.exceptions.PlayerAlreadyInGameException;
 import soze.multilife.game.exceptions.PlayerNotInGameException;
@@ -16,34 +17,37 @@ import soze.multilife.metrics.events.PlayerDisconnectedEvent;
 import soze.multilife.metrics.events.PlayerLoggedEvent;
 import soze.multilife.server.connection.Connection;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A lobby. Connected, but not logged in users are stored here,
  * as well as all playing players. This object also starts new games
  * and assigns players to games.
  * This object acts like the messaging hub. It knows which player is in which game,
- * so it can send messages to appropiate game.
+ * so it can send messages to appropriate game.
  */
 public class Lobby implements Runnable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Lobby.class);
 
-	private final Map<Long, Connection> connections = new HashMap<>();
-	private final Map<Integer, Game> games = new HashMap<>();
-	private final Map<Long, Integer> playerToGame = new HashMap<>();
+	private final Map<Long, Connection> connections = new ConcurrentHashMap<>();
+	private final Map<Long, Integer> playerToGame = new ConcurrentHashMap<>();
 
+	private final GameRunner gameRunner;
 	private final GameFactory gameFactory;
-	private final Executor executor = Executors.newCachedThreadPool();
-
 	private final EventBus eventBus;
 
-	public Lobby(EventBus eventBus, GameFactory gameFactory) {
+	/**
+	 * Object used for locking when a new player is added.
+	 */
+	private final Object addPlayerLock = new Object();
+
+	public Lobby(EventBus eventBus, GameRunner gameRunner,  GameFactory gameFactory) {
 		this.eventBus = Objects.requireNonNull(eventBus);
+		this.gameRunner = Objects.requireNonNull(gameRunner);
 		this.gameFactory = Objects.requireNonNull(gameFactory);
 	}
 
@@ -60,8 +64,6 @@ public class Lobby implements Runnable {
 
 	/**
 	 * Called when a new player connects.
-	 *
-	 * @param connection
 	 */
 	void onConnect(Connection connection) {
 		Objects.requireNonNull(connection);
@@ -71,9 +73,7 @@ public class Lobby implements Runnable {
 
 	/**
 	 * Creates a PersonIdentity object.
-	 *
-	 * @param id unique id of the player
-	 * @return
+	 * This object is sent back to the client.
 	 */
 	private PlayerIdentity getPlayerIdentity(long id) {
 		return new PlayerIdentity(id);
@@ -81,8 +81,6 @@ public class Lobby implements Runnable {
 
 	/**
 	 * Called when a player disconnects.
-	 *
-	 * @param connection
 	 */
 	void onDisconnect(Connection connection) {
 		Objects.requireNonNull(connection);
@@ -93,71 +91,60 @@ public class Lobby implements Runnable {
 			//player was not in any game, so no further action is neccesary
 			return;
 		}
-		try {
-			games.get(gameId).removePlayer(id);
-		} catch (PlayerNotInGameException e) {
-			LOG.warn("Trying to remove a player with id [{}] that is not in-game.", e.getPlayerId());
-			return;
+
+		Optional<Game> game = gameRunner.getGameById(gameId);
+
+		if(game.isPresent()) {
+			try {
+				game.get().removePlayer(id);
+			} catch (PlayerNotInGameException e) {
+				LOG.warn("Trying to remove a player with id [{}] that is not in-game.", e.getPlayerId());
+				return;
+			}
+			eventBus.post(new PlayerDisconnectedEvent(id));
 		}
-		eventBus.post(new PlayerDisconnectedEvent(id));
 	}
 
 	/**
 	 * Handles incoming messages. Id is the connection id.
-	 *
-	 * @param incMessage
-	 * @param id
 	 */
 	void onMessage(IncomingMessage incMessage, long id) {
 		if (incMessage.getType() == IncomingType.PING) {
 			connections.get(id).send(new PongMessage());
 			return;
 		}
+
 		int gameId = playerToGame.get(id);
-		Game game = games.get(gameId);
-		try {
-			game.acceptMessage(incMessage, id);
-		} catch (PlayerNotInGameException e) {
-			LOG.warn("Trying to pass a message by a player [{}] who is not in-game.", e.getPlayerId());
+		Optional<Game> game = gameRunner.getGameById(gameId);
+		if(game.isPresent()) {
+			try {
+				game.get().acceptMessage(incMessage, id);
+			} catch (PlayerNotInGameException e) {
+				LOG.warn("Trying to pass a message by a player [{}] who is not in-game.", e.getPlayerId());
+			}
 		}
 	}
 
 	/**
 	 * Adds a newly logged player to one of the games.
-	 * @param player
 	 */
 	void addPlayer(Player player) {
 		LOG.info("Player with name [{}] is trying to login. ", player.getName());
 
-		Game game = null;
-		//1. find free, active room.
-		synchronized (games) {
-			for(Game g: games.values()) {
-				if(!g.isFull() && !g.isOutOfTime()) {
-					game = g;
-					break;
-				}
+		synchronized (addPlayerLock) {
+
+			Game game = gameRunner.getFreeGame().orElse(gameFactory.createGame());
+
+			try {
+				game.addPlayer(player);
+			} catch (PlayerAlreadyInGameException e) {
+				LOG.warn("Trying to add a player [{}] to a game and this player is already in that game.", e.getPlayerId());
 			}
-		}
 
-		//2. if no free or active rooms, create a new one
-		if(game == null) {
-			game = gameFactory.createGame();
-			executor.execute(game);
-			synchronized (games) {
-				games.put(game.getId(), game);
-			}
+			gameRunner.addGame(game);
+			playerToGame.put(player.getId(), game.getId());
+			eventBus.post(new PlayerLoggedEvent(player.getId(), game.getId()));
 		}
-
-		try {
-			game.addPlayer(player);
-		} catch (PlayerAlreadyInGameException e) {
-			LOG.warn("Trying to add a player [{}] to a game and this player is already in that game.", e.getPlayerId());
-			return;
-		}
-
-		playerToGame.put(player.getId(), game.getId());
-		eventBus.post(new PlayerLoggedEvent(player.getId(), game.getId()));
 	}
 
 }

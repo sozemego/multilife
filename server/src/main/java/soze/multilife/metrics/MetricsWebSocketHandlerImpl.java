@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * A metrics endpoint handler for live data.
  */
+@WebSocket
 public class MetricsWebSocketHandlerImpl implements MetricsWebSocketHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MetricsWebSocketHandlerImpl.class);
