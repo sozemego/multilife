@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Handles configuration loading for the application.
@@ -82,7 +81,7 @@ class ConfigurationLoader {
 		checkLoaded();
 		String value = PROPERTIES.get(propertyName);
 		try {
-			return Boolean.getBoolean(value);
+			return Boolean.valueOf(value);
 		} catch (NumberFormatException e) {
 			LOG.warn("[{}] could not be parsed as a boolean when requesting [{}].", value, propertyName);
 			throw e;
