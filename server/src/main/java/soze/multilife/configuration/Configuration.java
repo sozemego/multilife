@@ -48,7 +48,6 @@ public class Configuration
 		defaultProperties.put(GAME_CONFIGURATION, GAME_MAX_PLAYERS_PER_GAME + " = " + 4);
 		defaultProperties.put(GAME_CONFIGURATION, GAME_DEFAULT_WIDTH + " = " + 50);
 		defaultProperties.put(GAME_CONFIGURATION, GAME_DEFAULT_HEIGHT + " = " + 50);
-		defaultProperties.put(GAME_CONFIGURATION, GAME_ITERATION_INTERVAL + " = " + 250);
 		defaultProperties.put(METRICS_CONFIGURATION, METRICS_ENABLED + " = " + true);
 		defaultProperties.put(METRICS_CONFIGURATION, CALCULATE_METRICS_INTERVAL + " = " + (1000 * 60));
 		defaultProperties.put(METRICS_CONFIGURATION, METRICS_PUSH_UPDATE_RATE + " = " + (1000 * 60));
@@ -61,6 +60,7 @@ public class Configuration
 		defaultProperties.put(SERVER_CONFIGURATION, SERVER_PORT + " = " + 8000);
 		defaultProperties.put(SERVER_CONFIGURATION, EXTERNAL_STATIC_FILES_PATH + " = ");
 		defaultProperties.put(GAME_RUNNER_CONFIGURATION, GAMES_PER_THREAD + " = 20");
+		defaultProperties.put(GAME_RUNNER_CONFIGURATION, GAME_ITERATION_INTERVAL + " = " + 250);
 		ALL_DEFAULT_PROPERTIES = ImmutableListMultimap.copyOf(defaultProperties);
 	}
 

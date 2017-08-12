@@ -10,7 +10,7 @@ import java.awt.*;
 import java.util.Collection;
 import java.util.Map;
 
-public interface Game extends Runnable {
+public interface Game {
 
 	/**
 	 * Returns id of this game. Ids should be unique.
@@ -41,11 +41,6 @@ public interface Game extends Runnable {
 	 * Ends the game. Disconnects all players and schedules this game for removal.
 	 */
 	void end();
-
-	/**
-	 * Returns time in milliseonds between game updates.
-	 */
-	long getTickRate();
 
 	int getMaxPlayers();
 
@@ -87,5 +82,7 @@ public interface Game extends Runnable {
 	void sendMessage(OutgoingMessage message);
 
 	boolean isScheduledForRemoval();
+
+	public void run();
 
 }

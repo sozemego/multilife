@@ -4,11 +4,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class GameRunnerTest extends GameTest {
+public class GameManagerDecoratorTest extends GameTest {
 
 	@Test
 	public void testRunnerEndsGameAfterCompletion() throws Exception {
-		GameRunner game = getGameRunner(builder().build());
+		GameRunnerDecorator game = getGameRunner(builder().build());
 		game.run();
 		assertTrue(game.isScheduledForRemoval());
 	}

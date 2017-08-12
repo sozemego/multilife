@@ -1,28 +1,30 @@
-package soze.multilife.game;
+package soze.multilife.server.gamerunner;
 
 import soze.multilife.configuration.interfaces.GameRunnerConfiguration;
+import soze.multilife.game.Game;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**
- * This class is responsible for running the games.
+ * This class is responsible for managing the games.
  * It assigns games to threads, creates and manages threads for games
  * and removes finished/inactive games.
  */
-public class GameRunner {
+public class GameManager {
 
 	private final Executor executor = Executors.newCachedThreadPool();
 	private final Map<Integer, Game> games = new ConcurrentHashMap<>();
+	private final List<GameContainer> gameContainers = Collections.synchronizedList(new ArrayList<>());
 
 	private final int gamesPerThread;
+	private final int tickRate;
 
-	public GameRunner(GameRunnerConfiguration cfg) {
+	public GameManager(GameRunnerConfiguration cfg) {
 		this.gamesPerThread = cfg.getGamesPerThread();
+		this.tickRate = cfg.getTickRate();
 	}
 
 	/**
@@ -34,7 +36,25 @@ public class GameRunner {
 		Objects.requireNonNull(game);
 		Game previousGame = games.putIfAbsent(game.getId(), game);
 		if(previousGame == null) {
-			executor.execute(game);
+			addToContainer(game);
+		}
+	}
+
+	private void addToContainer(Game game) {
+		synchronized (gameContainers) {
+			boolean added = false;
+			for (GameContainer gameContainer : gameContainers) {
+				if(gameContainer.getGamesCount() < this.gamesPerThread) {
+					gameContainer.addGame(game);
+					added = true;
+				}
+			}
+			if(!added) {
+				GameContainer gameContainer = new GameContainer(this.tickRate);
+				gameContainers.add(gameContainer);
+				gameContainer.addGame(game);
+				executor.execute(gameContainer);
+			}
 		}
 	}
 

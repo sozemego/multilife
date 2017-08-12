@@ -2,6 +2,7 @@ package soze.multilife.game;
 
 import soze.multilife.configuration.interfaces.GameConfiguration;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -13,7 +14,7 @@ public class GameFactory {
 	private final AtomicInteger id = new AtomicInteger(1);
 
 	public GameFactory(GameConfiguration config) {
-		this.config = config;
+		this.config = Objects.requireNonNull(config);
 	}
 
 	public Game createGame() {
@@ -23,17 +24,12 @@ public class GameFactory {
 			config.getGridWidth(),
 			config.getGridHeight(),
 			config.getMaxPlayers(),
-			config.getGameDuration(),
-			config.getTickRate()
+			config.getGameDuration()
 		);
-		return new GameRunnerDecorator(
-				new GamePlayerHandler(
-						new GameIncomingMessageQueue(
-								new GameOutgoingMessageHandler(baseGame))));
-	}
 
-	private static class NewGameConfigBundle {
-
+		return new GamePlayerHandler(
+				new GameIncomingMessageQueue(
+						new GameOutgoingMessageHandler(baseGame)));
 	}
 
 }

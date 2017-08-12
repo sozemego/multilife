@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A game layer responsible for updating the game on a timer.
  */
+@Deprecated
 public class GameRunnerDecorator extends GameDecorator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GameRunnerDecorator.class);
@@ -21,7 +22,7 @@ public class GameRunnerDecorator extends GameDecorator {
 			super.run();
 
 			try {
-				Thread.sleep(super.getTickRate());
+				Thread.sleep(0);
 			} catch (InterruptedException e) {
 				LOG.error("Instance runner was stopped. ", e);
 			}

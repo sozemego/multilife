@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import soze.multilife.events.EventBus;
 import soze.multilife.game.Game;
 import soze.multilife.game.GameFactory;
-import soze.multilife.game.GameRunner;
 import soze.multilife.game.Player;
 import soze.multilife.game.exceptions.PlayerAlreadyInGameException;
 import soze.multilife.game.exceptions.PlayerNotInGameException;
@@ -16,6 +15,7 @@ import soze.multilife.messages.outgoing.PongMessage;
 import soze.multilife.metrics.events.PlayerDisconnectedEvent;
 import soze.multilife.metrics.events.PlayerLoggedEvent;
 import soze.multilife.server.connection.Connection;
+import soze.multilife.server.gamerunner.GameManager;
 
 import java.util.Map;
 import java.util.Objects;
@@ -36,7 +36,7 @@ public class Lobby implements Runnable {
 	private final Map<Long, Connection> connections = new ConcurrentHashMap<>();
 	private final Map<Long, Integer> playerToGame = new ConcurrentHashMap<>();
 
-	private final GameRunner gameRunner;
+	private final GameManager gameManager;
 	private final GameFactory gameFactory;
 	private final EventBus eventBus;
 
@@ -45,9 +45,9 @@ public class Lobby implements Runnable {
 	 */
 	private final Object addPlayerLock = new Object();
 
-	public Lobby(EventBus eventBus, GameRunner gameRunner,  GameFactory gameFactory) {
+	public Lobby(EventBus eventBus, GameManager gameManager, GameFactory gameFactory) {
 		this.eventBus = Objects.requireNonNull(eventBus);
-		this.gameRunner = Objects.requireNonNull(gameRunner);
+		this.gameManager = Objects.requireNonNull(gameManager);
 		this.gameFactory = Objects.requireNonNull(gameFactory);
 	}
 
@@ -92,7 +92,7 @@ public class Lobby implements Runnable {
 			return;
 		}
 
-		Optional<Game> game = gameRunner.getGameById(gameId);
+		Optional<Game> game = gameManager.getGameById(gameId);
 
 		if(game.isPresent()) {
 			try {
@@ -115,7 +115,7 @@ public class Lobby implements Runnable {
 		}
 
 		int gameId = playerToGame.get(id);
-		gameRunner.getGameById(gameId).ifPresent(game -> {
+		gameManager.getGameById(gameId).ifPresent(game -> {
 			try {
 				game.acceptMessage(incMessage, id);
 			} catch (PlayerNotInGameException e) {
@@ -132,7 +132,7 @@ public class Lobby implements Runnable {
 
 		synchronized (addPlayerLock) {
 
-			Game game = gameRunner.getFreeGame().orElse(gameFactory.createGame());
+			Game game = gameManager.getFreeGame().orElse(gameFactory.createGame());
 
 			try {
 				game.addPlayer(player);
@@ -140,7 +140,7 @@ public class Lobby implements Runnable {
 				LOG.warn("Trying to add a player [{}] to a game and this player is already in that game.", e.getPlayerId());
 			}
 
-			gameRunner.addGame(game);
+			gameManager.addGame(game);
 			playerToGame.put(player.getId(), game.getId());
 			eventBus.post(new PlayerLoggedEvent(player.getId(), game.getId()));
 		}

@@ -4,4 +4,5 @@ public interface GameRunnerConfiguration {
 
 	int getGamesPerThread();
 
+	int getTickRate();
 }

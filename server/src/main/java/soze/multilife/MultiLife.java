@@ -12,7 +12,7 @@ import soze.multilife.configuration.interfaces.ServerConfiguration;
 import soze.multilife.events.EventBus;
 import soze.multilife.events.EventBusImpl;
 import soze.multilife.game.GameFactory;
-import soze.multilife.game.GameRunner;
+import soze.multilife.server.gamerunner.GameManager;
 import soze.multilife.metrics.*;
 import soze.multilife.metrics.repository.MetricsRepository;
 import soze.multilife.metrics.repository.MongoMetricsRepository;
@@ -61,11 +61,11 @@ public class MultiLife {
 		this.loginService = new LoginService();
 
 		this.eventBus = new EventBusImpl();
-		GameRunner gameRunner = new GameRunner(cfgFactory.getGameRunnerConfiguration());
+		GameManager gameManager = new GameManager(cfgFactory.getGameRunnerConfiguration());
 		GameFactory gameFactory = new GameFactory(
 				cfgFactory.getGameConfiguration()
 		);
-		this.lobby = new Lobby(eventBus, gameRunner, gameFactory);
+		this.lobby = new Lobby(eventBus, gameManager, gameFactory);
 
 		this.connectionFactory = new ConnectionFactory(eventBus);
 

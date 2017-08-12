@@ -12,7 +12,6 @@ class GameTest {
 	private static final int DEFAULT_HEIGHT = 50;
 	private static final int DEFAULT_MAX_PLAYERS = 4;
 	private static final long DEFAULT_DURATION = 1000 * 1;
-	private static final long DEFAULT_TICK_RATE = 250;
 
 	protected BaseGame createGameWithDefaultValues() {
 		return builder().build();
@@ -42,8 +41,8 @@ class GameTest {
 		return new GamePlayerHandler(game);
 	}
 
-	protected GameRunner getGameRunner(Game game) {
-		return new GameRunner(game);
+	protected GameRunnerDecorator getGameRunner(Game game) {
+		return new GameRunnerDecorator(game);
 	}
 
 	protected static class BaseGameBuilder {
@@ -54,7 +53,6 @@ class GameTest {
 		private int height = DEFAULT_HEIGHT;
 		private int maxPlayers = DEFAULT_MAX_PLAYERS;
 		private long duration = DEFAULT_DURATION;
-		private long tickRate = DEFAULT_TICK_RATE;
 
 		protected BaseGameBuilder() {
 
@@ -85,13 +83,8 @@ class GameTest {
 			return this;
 		}
 
-		BaseGameBuilder withTickRate(long tickRate) {
-			this.tickRate = tickRate;
-			return this;
-		}
-
 		BaseGame build() {
-			return new BaseGame(id, initialDensity, width, height, maxPlayers, duration, tickRate);
+			return new BaseGame(id, initialDensity, width, height, maxPlayers, duration);
 		}
 
 	}

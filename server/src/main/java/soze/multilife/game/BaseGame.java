@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soze.multilife.game.exceptions.PlayerNotInGameException;
 import soze.multilife.game.rule.RuleFactory;
-import soze.multilife.game.rule.RuleType;
 import soze.multilife.messages.incoming.ClickMessage;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingType;
@@ -35,8 +34,6 @@ public class BaseGame implements Game {
 	private final int id;
 
 	private boolean scheduledForRemoval;
-
-	private final long tickRate;
 
 	/**
 	 * Percent of alive cells spawned on simulation start.
@@ -93,13 +90,12 @@ public class BaseGame implements Game {
 	 */
 	private final Map<Long, Long> playerPoints = new HashMap<>();
 
-	BaseGame(int id, float initialDensity, int width, int height, int maxPlayers, long duration, long tickRate) {
+	BaseGame(int id, float initialDensity, int width, int height, int maxPlayers, long duration) {
 		this.id = id;
 		this.initialDensity = initialDensity;
 		this.grid = new Grid(width, height, RuleFactory.getRule("BASIC"));
 		this.maxPlayers = maxPlayers;
 		this.duration = duration;
-		this.tickRate = tickRate;
 		init();
 	}
 
@@ -264,10 +260,6 @@ public class BaseGame implements Game {
 
 	public boolean isFull() {
 		return getMaxPlayers() == players.size();
-	}
-
-	public long getTickRate() {
-		return tickRate;
 	}
 
 	public boolean isScheduledForRemoval() {

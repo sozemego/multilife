@@ -26,10 +26,6 @@ public class GameDecorator implements Game {
 		game.removePlayer(id);
 	}
 
-	public void run() {
-		game.run();
-	}
-
 	public int getId() {
 		return game.getId();
 	}
@@ -40,10 +36,6 @@ public class GameDecorator implements Game {
 
 	public void end() {
 		game.end();
-	}
-
-	public long getTickRate() {
-		return game.getTickRate();
 	}
 
 	public int getMaxPlayers() {
@@ -96,6 +88,10 @@ public class GameDecorator implements Game {
 
 	public boolean isScheduledForRemoval() {
 		return game.isScheduledForRemoval();
+	}
+
+	public void run() {
+		game.run();
 	}
 
 }
