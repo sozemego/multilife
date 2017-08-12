@@ -41,10 +41,6 @@ class GameTest {
 		return new GamePlayerHandler(game);
 	}
 
-	protected GameRunnerDecorator getGameRunner(Game game) {
-		return new GameRunnerDecorator(game);
-	}
-
 	protected static class BaseGameBuilder {
 
 		private int id = ID;
