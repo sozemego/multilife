@@ -94,6 +94,7 @@ class Game {
 		name.setAttribute("id", "name");
 		name.setAttribute("placeholder", "Type your name");
 		dom.appendChild(name);
+	  	name.focus();
 
 		let button = document.createElement("button");
 		button.appendChild(document.createTextNode("ENTER!"));
@@ -112,7 +113,7 @@ class Game {
 			return;
 		}
 
-		this.webSocket = new WebSocket("ws://127.0.0.1:8080/game");
+		this.webSocket = new WebSocket("ws://127.0.0.1:8000/game");
 		this.webSocket.onopen = () => {
 			this.webSocket.send(JSON.stringify({type: "LOGIN", name: name, rule: "BASIC"}));
 			document.getElementById("login-container").classList.add("logged");
