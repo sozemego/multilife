@@ -311,4 +311,10 @@ public class BaseGame implements Game {
 			throw new PlayerNotInGameException(playerId);
 		}
 	}
+
+	public String toString() {
+		return "BaseGame{" +
+				"id=" + id +
+				'}';
+	}
 }

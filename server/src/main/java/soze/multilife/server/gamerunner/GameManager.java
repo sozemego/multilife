@@ -1,5 +1,7 @@
 package soze.multilife.server.gamerunner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import soze.multilife.configuration.interfaces.GameRunnerConfiguration;
 import soze.multilife.game.Game;
 
@@ -14,6 +16,8 @@ import java.util.concurrent.Executors;
  * and removes finished/inactive games.
  */
 public class GameManager {
+
+	private static final Logger LOG = LoggerFactory.getLogger(GameManager.class);
 
 	private final Executor executor = Executors.newCachedThreadPool();
 	private final Map<Integer, Game> games = new ConcurrentHashMap<>();
@@ -41,6 +45,7 @@ public class GameManager {
 	}
 
 	private void addToContainer(Game game) {
+		LOG.trace("Adding a game [{}]", game);
 		synchronized (gameContainers) {
 			boolean added = false;
 			for (GameContainer gameContainer : gameContainers) {

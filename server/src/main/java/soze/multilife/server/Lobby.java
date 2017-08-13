@@ -3,6 +3,7 @@ package soze.multilife.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soze.multilife.events.EventBus;
+import soze.multilife.game.Cell;
 import soze.multilife.game.Game;
 import soze.multilife.game.GameFactory;
 import soze.multilife.game.Player;
@@ -10,17 +11,15 @@ import soze.multilife.game.exceptions.PlayerAlreadyInGameException;
 import soze.multilife.game.exceptions.PlayerNotInGameException;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingType;
-import soze.multilife.messages.outgoing.PlayerIdentity;
-import soze.multilife.messages.outgoing.PongMessage;
+import soze.multilife.messages.outgoing.*;
 import soze.multilife.metrics.events.PlayerDisconnectedEvent;
 import soze.multilife.metrics.events.PlayerLoggedEvent;
 import soze.multilife.server.connection.Connection;
 import soze.multilife.server.gamerunner.GameManager;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * A lobby. Connected, but not logged in users are stored here,
@@ -142,10 +141,40 @@ public class Lobby implements Runnable {
 				LOG.warn("Trying to add a player [{}] to a game and this player is already in that game.", e.getPlayerId());
 			}
 
+			game.sendMessage(game.getPlayerData());
+			game.sendMessage(new MapData(game.getWidth(), game.getHeight()));
+			game.sendMessage(getAllAliveCellData(game));
+
 			gameManager.addGame(game);
 			playerToGame.put(player.getId(), game.getId());
 			eventBus.post(new PlayerLoggedEvent(player.getId(), game.getId()));
 		}
+	}
+
+	/**
+	 * Assembles {@link CellList} from all alive cells
+	 * of this game.
+	 *
+	 */
+	private CellList getAllAliveCellData(Game game) {
+		List<Cell> cells = game.getAllCells().values().stream()
+				.filter(Cell::isAlive)
+				.collect(Collectors.toList());
+		return constructCellList(cells);
+	}
+
+	/**
+	 * Assembles {@link CellList} from a given list of cells.
+	 *
+	 * @param cells cells
+	 * @return CellList
+	 */
+	private CellList constructCellList(Collection<Cell> cells) {
+		List<CellData> cellData = new ArrayList<>();
+		for (Cell cell : cells) {
+			cellData.add(new CellData(cell));
+		}
+		return new CellList(cellData);
 	}
 
 }

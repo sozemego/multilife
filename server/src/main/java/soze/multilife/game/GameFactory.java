@@ -27,9 +27,8 @@ public class GameFactory {
 			config.getGameDuration()
 		);
 
-		return new GamePlayerHandler(
-				new GameIncomingMessageQueue(
-						new GameOutgoingMessageHandler(baseGame)));
+		return new GameIncomingMessageQueue(
+				new GameOutgoingMessageHandler(baseGame));
 	}
 
 }
