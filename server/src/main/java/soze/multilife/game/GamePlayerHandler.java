@@ -69,6 +69,10 @@ public class GamePlayerHandler extends GameDecorator {
 		}
 	}
 
+	public boolean isFull() {
+		return (getPlayers().size() + freshPlayers.size()) == getMaxPlayers();
+	}
+
 	private void updateLeavingPlayers() {
 		synchronized (leavingPlayerIds) {
 			for (long playerId : leavingPlayerIds) {
