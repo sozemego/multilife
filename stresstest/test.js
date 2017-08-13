@@ -3,9 +3,9 @@ let args = require("minimist")(process.argv.slice(2));
 console.log(args);
 
 let maxPlayers = parseInt(args["players"]) || 50;
-let loginDelay = parseInt(args["loginDelay"]) || 50;
-let path = args["path"] || "ws://127.0.0.1:8080/game";
-let click = args["click"] ? args["click"] == "true" : undefined || true;
+let loginDelay = parseInt(args["loginDelay"]) || 15;
+let path = args["path"] || "ws://127.0.0.1:8000/game";
+let click = args["click"] == "true";
 console.log(click);
 
 let loginNew = function(players) {
@@ -71,7 +71,14 @@ let loginNew = function(players) {
 			indices.push(randomIndex);
 		}
 
-    	ws.send(JSON.stringify({type:"CLICK", indices: indices}));
+		const message = JSON.stringify({type:"CLICK", indices: indices});
+
+		try {
+			ws.send(message);
+		} catch (e) {
+			console.log(e);
+			connected = false;
+		}
 	}
 
 	let pings = [];
@@ -107,7 +114,7 @@ let loginNew = function(players) {
 		setInterval(sendClick, getRandomInt(25, 1250));
 	}
 	setTimeout(loginNew, loginDelay, --players);
-}
+};
 
 setTimeout(loginNew, loginDelay, maxPlayers);
 
