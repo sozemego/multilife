@@ -23,6 +23,9 @@ public class GameContainer implements Runnable {
 	}
 
 	public void addGame(Game game) {
+		if(!isRunning()) {
+			throw new IllegalStateException("Cannot add a game to a game container which is not running!");
+		}
 		Objects.requireNonNull(game);
 		games.put(game.getId(), game);
 	}
@@ -35,6 +38,10 @@ public class GameContainer implements Runnable {
 		this.isRunning = false;
 	}
 
+	public boolean isRunning() {
+		return isRunning;
+	}
+
 	public void run() {
 		while(isRunning) {
 
@@ -43,9 +50,14 @@ public class GameContainer implements Runnable {
 			if(LOG.isTraceEnabled()) {
 				startTime = System.nanoTime();
 			}
-
-			games.values().removeIf(Game::isScheduledForRemoval);
-			games.values().forEach(Game::run);
+			games.values()
+					.stream()
+					.filter(Game::isOutOfTime)
+					.forEach(Game::end);
+			games.values()
+					.removeIf(Game::isScheduledForRemoval);
+			games.values()
+					.forEach(Game::run);
 
 			if(LOG.isTraceEnabled()) {
 				long totalTime = System.nanoTime() - startTime;
@@ -56,6 +68,10 @@ public class GameContainer implements Runnable {
 				Thread.sleep(this.tickRate);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+			}
+
+			if(games.isEmpty()) {
+				stop();
 			}
 		}
 	}

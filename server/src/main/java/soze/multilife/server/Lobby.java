@@ -54,6 +54,8 @@ public class Lobby implements Runnable {
 	public void run() {
 		while (true) {
 
+			gameManager.clearEmptyContainers();
+
 			try {
 				Thread.sleep(1000 * 15);
 			} catch (InterruptedException e) {

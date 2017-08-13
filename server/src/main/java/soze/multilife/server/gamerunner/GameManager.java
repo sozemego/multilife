@@ -75,4 +75,8 @@ public class GameManager {
 		return Optional.empty();
 	}
 
+	public void clearEmptyContainers() {
+		gameContainers.removeIf(g -> !g.isRunning());
+	}
+
 }
