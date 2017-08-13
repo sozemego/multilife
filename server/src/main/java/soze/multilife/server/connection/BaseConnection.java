@@ -35,7 +35,7 @@ public class BaseConnection implements Connection {
 		Objects.requireNonNull(message);
 		try {
 			String json = JsonUtils.stringify(message);
-			this.session.getRemote().sendString(json);
+			this.session.getRemote().sendStringByFuture(json);
 		} catch (IOException e) {
 			LOG.warn("Base connection could not send string.", e);
 		}
