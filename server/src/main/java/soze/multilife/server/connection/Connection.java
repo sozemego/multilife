@@ -19,6 +19,8 @@ public interface Connection {
 	 */
 	public void send(OutgoingMessage message);
 
+	public void send(byte[] bytes);
+
 	/**
 	 * Terminates this connection.
 	 */

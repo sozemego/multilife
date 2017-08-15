@@ -122,8 +122,14 @@ class Game {
 		};
 
 		this.webSocket.onmessage = (msg) => {
-			this._handleMessage(JSON.parse(msg.data));
+			if(msg.data instanceof ArrayBuffer) {
+				this._handleByteMessage(new Uint8Array(msg.data));
+			} else {
+				this._handleMessage(JSON.parse(msg.data));
+			}
 		};
+
+		this.webSocket.binaryType = "arraybuffer";
 	};
 
 	_styleCanvas = (p5Canvas) => {
@@ -285,6 +291,7 @@ class Game {
 	_advanceSimulation = () => {
 		this.simulation.update();
 		this.simulationSteps++;
+		this._sendPingMessage();
 	};
 
 	/**
@@ -398,6 +405,10 @@ class Game {
 			this._onRemainingTime(msg);
 		}
 	};
+
+	_handleByteMessage(msg) {
+		console.log(msg);
+	}
 
 	_onPlayerData = (msg) => {
 		this.playerData = msg;
@@ -567,6 +578,10 @@ class Game {
 		minute = ("00" + minute).substr(minute.length);
 
 		return minute + ":" + second;
+	};
+
+	_sendPingMessage = () => {
+		this.webSocket.send(JSON.stringify({type: "PING"}));
 	};
 
 }

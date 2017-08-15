@@ -116,7 +116,7 @@ public class Lobby implements Runnable {
 	 */
 	void onMessage(IncomingMessage incMessage, long connectionId) {
 		if (incMessage.getType() == IncomingType.PING) {
-			connections.get(connectionId).send(new PongMessage());
+			connections.get(connectionId).send(MessageConverter.convertMessage(new PongMessage()));
 			return;
 		}
 

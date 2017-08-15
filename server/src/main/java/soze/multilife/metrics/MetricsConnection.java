@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.jetty.websocket.api.Session;
 import soze.multilife.events.EventBus;
 import soze.multilife.messages.outgoing.OutgoingMessage;
+import soze.multilife.messages.outgoing.OutgoingType;
+import soze.multilife.metrics.events.SerializedMetricEvent;
+import soze.multilife.metrics.events.TypeMetricEvent;
 import soze.multilife.server.connection.BaseConnection;
 import soze.multilife.server.connection.Connection;
-import soze.multilife.metrics.events.TypeMetricEvent;
-import soze.multilife.metrics.events.SerializedMetricEvent;
 
 import java.util.Objects;
 
@@ -31,6 +32,27 @@ public class MetricsConnection extends BaseConnection {
 		String serializedMessage = serialize(message);
 		postEvent(serializedMessage);
 		super.send(message);
+	}
+
+	public void send(byte[] bytes) {
+		if(bytes.length == 0) {
+			throw new IllegalArgumentException("You cannot send empty messages.");
+		}
+
+		OutgoingType type = OutgoingType.getType(bytes[0]);
+		postEvent(type);
+		postEvent(bytes);
+		super.send(bytes);
+	}
+
+	private void postEvent(byte[] bytes) {
+		long timeStamp = System.nanoTime();
+		eventBus.post(new SerializedMetricEvent(timeStamp, getId(), bytes.length));
+	}
+
+	private void postEvent(OutgoingType type) {
+		long timeStamp = System.nanoTime();
+		eventBus.post(new TypeMetricEvent(timeStamp, type.toString(), getId()));
 	}
 
 	/**

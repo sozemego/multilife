@@ -27,6 +27,10 @@ public class Player {
 		this.connection.send(msg);
 	}
 
+	public void send(byte[] bytes) {
+		this.connection.send(bytes);
+	}
+
 	public void disconnect() {
 		this.connection.disconnect();
 	}

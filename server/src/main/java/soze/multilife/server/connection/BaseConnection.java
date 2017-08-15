@@ -7,6 +7,7 @@ import soze.multilife.messages.outgoing.OutgoingMessage;
 import soze.multilife.utils.JsonUtils;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Objects;
 
 /**
@@ -39,6 +40,11 @@ public class BaseConnection implements Connection {
 		} catch (IOException e) {
 			LOG.warn("Base connection could not send string.", e);
 		}
+	}
+
+	@Override
+	public void send(byte[] bytes) {
+		this.session.getRemote().sendBytesByFuture(ByteBuffer.wrap(bytes));
 	}
 
 	@Override
