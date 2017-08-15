@@ -1,5 +1,8 @@
 package soze.multilife.server;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soze.multilife.events.EventBus;
@@ -34,6 +37,7 @@ public class Lobby implements Runnable {
 
 	private final Map<Long, Connection> connections = new ConcurrentHashMap<>();
 	private final Map<Long, Integer> playerToGame = new ConcurrentHashMap<>();
+	private final Multimap<Integer, Player> gameToPlayers = Multimaps.synchronizedMultimap(ArrayListMultimap.create());
 
 	private final GameManager gameManager;
 	private final GameFactory gameFactory;
@@ -93,8 +97,9 @@ public class Lobby implements Runnable {
 			return;
 		}
 
-		Optional<Game> game = gameManager.getGameById(gameId);
+		gameToPlayers.removeAll(gameId);
 
+		Optional<Game> game = gameManager.getGameById(gameId);
 		if(game.isPresent()) {
 			try {
 				game.get().removePlayer(id);
@@ -107,22 +112,16 @@ public class Lobby implements Runnable {
 	}
 
 	/**
-	 * Handles incoming messages. Id is the connection id.
+	 * Handles incoming messages. Id is the connection connectionId.
 	 */
-	void onMessage(IncomingMessage incMessage, long id) {
+	void onMessage(IncomingMessage incMessage, long connectionId) {
 		if (incMessage.getType() == IncomingType.PING) {
-			connections.get(id).send(new PongMessage());
+			connections.get(connectionId).send(new PongMessage());
 			return;
 		}
 
-		int gameId = playerToGame.get(id);
-		gameManager.getGameById(gameId).ifPresent(game -> {
-			try {
-				game.acceptMessage(incMessage, id);
-			} catch (PlayerNotInGameException e) {
-				LOG.warn("Trying to pass a message by a player [{}] who is not in-game.", e.getPlayerId());
-			}
-		});
+		int gameId = playerToGame.get(connectionId);
+		gameManager.acceptMessage(incMessage, connectionId, gameId);
 	}
 
 	/**
@@ -141,13 +140,17 @@ public class Lobby implements Runnable {
 				LOG.warn("Trying to add a player [{}] to a game and this player is already in that game.", e.getPlayerId());
 			}
 
-			game.sendMessage(game.getPlayerData());
-			game.sendMessage(new MapData(game.getWidth(), game.getHeight()));
-			game.sendMessage(getAllAliveCellData(game));
-
 			gameManager.addGame(game);
 			playerToGame.put(player.getId(), game.getId());
 			eventBus.post(new PlayerLoggedEvent(player.getId(), game.getId()));
+			gameToPlayers.put(game.getId(), player);
+
+			Collection<Player> players = gameToPlayers.get(game.getId());
+			players.forEach(p -> {
+				p.send(game.getPlayerData());
+				p.send(new MapData(game.getWidth(), game.getHeight()));
+				p.send(getAllAliveCellData(game));
+			});
 		}
 	}
 

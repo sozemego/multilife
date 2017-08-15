@@ -4,11 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soze.multilife.configuration.interfaces.GameRunnerConfiguration;
 import soze.multilife.game.Game;
+import soze.multilife.messages.incoming.IncomingMessage;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * This class is responsible for managing the games.
@@ -20,8 +22,15 @@ public class GameManager {
 	private static final Logger LOG = LoggerFactory.getLogger(GameManager.class);
 
 	private final Executor executor = Executors.newCachedThreadPool();
+
+	/**
+	 * Game id to game map.
+	 */
 	private final Map<Integer, Game> games = new ConcurrentHashMap<>();
 	private final List<GameContainer> gameContainers = Collections.synchronizedList(new ArrayList<>());
+	private final AtomicLong idGenerator = new AtomicLong(1L);
+	private final Map<Integer, GameContainer> gamesToContainers = new ConcurrentHashMap<>();
+
 
 	private final int gamesPerThread;
 	private final int tickRate;
@@ -44,6 +53,13 @@ public class GameManager {
 		}
 	}
 
+	public void acceptMessage(IncomingMessage message, long playerId, int gameId) {
+		GameContainer container = gamesToContainers.get(gameId);
+		if(container != null) {
+			container.acceptMessage(message, playerId, gameId);
+		}
+	}
+
 	private void addToContainer(Game game) {
 		LOG.trace("Adding a game [{}]", game);
 		synchronized (gameContainers) {
@@ -51,13 +67,15 @@ public class GameManager {
 			for (GameContainer gameContainer : gameContainers) {
 				if(gameContainer.getGamesCount() < this.gamesPerThread) {
 					gameContainer.addGame(game);
+					gamesToContainers.put(game.getId(), gameContainer);
 					added = true;
 				}
 			}
 			if(!added) {
-				GameContainer gameContainer = new GameContainer(this.tickRate);
+				GameContainer gameContainer = new GameContainer(idGenerator.getAndIncrement(), this.tickRate);
 				gameContainers.add(gameContainer);
 				gameContainer.addGame(game);
+				gamesToContainers.put(game.getId(), gameContainer);
 				executor.execute(gameContainer);
 			}
 		}

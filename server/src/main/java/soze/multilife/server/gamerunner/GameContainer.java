@@ -3,14 +3,20 @@ package soze.multilife.server.gamerunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soze.multilife.game.Game;
+import soze.multilife.game.exceptions.PlayerNotInGameException;
+import soze.multilife.messages.incoming.IncomingMessage;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class GameContainer implements Runnable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GameContainer.class);
+
+	private final long id;
 
 	private final Map<Integer, Game> games = new ConcurrentHashMap<>();
 
@@ -18,8 +24,15 @@ public class GameContainer implements Runnable {
 
 	private boolean isRunning = true;
 
-	public GameContainer(long tickRate) {
+	private final Queue<MessageQueueNode> queuedMessages = new ConcurrentLinkedQueue<>();
+
+	public GameContainer(long id, long tickRate) {
+		this.id = id;
 		this.tickRate = tickRate;
+	}
+
+	public long getId() {
+		return id;
 	}
 
 	public void addGame(Game game) {
@@ -42,6 +55,27 @@ public class GameContainer implements Runnable {
 		return isRunning;
 	}
 
+	public void acceptMessage(IncomingMessage message, long playerId, int gameId) {
+		queuedMessages.add(new MessageQueueNode(message, playerId, gameId));
+	}
+
+	private void handleMessages() {
+		MessageQueueNode node;
+		while ((node = queuedMessages.poll()) != null) {
+			IncomingMessage message = node.getIncomingMessage();
+			long id = node.getPlayerId();
+			Game game = games.get(node.getGameId());
+			if(game != null) {
+				try {
+					game.acceptMessage(message, id);
+				} catch (PlayerNotInGameException e) {
+					LOG.warn("Trying to pass a message to a player who is not in game. ");
+				}
+			}
+
+		}
+	}
+
 	public void run() {
 		while(isRunning) {
 
@@ -50,12 +84,17 @@ public class GameContainer implements Runnable {
 			if(LOG.isTraceEnabled()) {
 				startTime = System.nanoTime();
 			}
+
+			handleMessages();
+
 			games.values()
 					.stream()
 					.filter(Game::isOutOfTime)
 					.forEach(Game::end);
+
 			games.values()
 					.removeIf(Game::isScheduledForRemoval);
+
 			games.values()
 					.forEach(Game::run);
 

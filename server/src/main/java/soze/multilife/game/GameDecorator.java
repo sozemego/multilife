@@ -10,7 +10,7 @@ import java.awt.*;
 import java.util.Collection;
 import java.util.Map;
 
-public class GameDecorator implements Game {
+class GameDecorator implements Game {
 
 	private final Game game;
 
