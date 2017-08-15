@@ -21,7 +21,9 @@ public class GameManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GameManager.class);
 
-	private final Executor executor = Executors.newCachedThreadPool();
+	private final Executor executor = Executors.newCachedThreadPool(
+			new GameContainerThreadFactory("GameContainer")
+	);
 
 	/**
 	 * Game id to game map.
