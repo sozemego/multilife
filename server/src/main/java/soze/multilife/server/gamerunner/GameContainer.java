@@ -2,13 +2,16 @@ package soze.multilife.server.gamerunner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import soze.multilife.game.Cell;
 import soze.multilife.game.Game;
 import soze.multilife.game.exceptions.PlayerNotInGameException;
 import soze.multilife.messages.incoming.IncomingMessage;
+import soze.multilife.messages.outgoing.CellData;
+import soze.multilife.messages.outgoing.CellList;
+import soze.multilife.messages.outgoing.IterationData;
+import soze.multilife.messages.outgoing.TimeRemainingMessage;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -76,6 +79,36 @@ public class GameContainer implements Runnable {
 		}
 	}
 
+	private void sendClickedData(Game game) {
+		game.getPlayers().values().forEach(p -> {
+			CellList cellList = constructCellList(game.getClickedCells());
+			p.send(cellList);
+		});
+	}
+
+	/**
+	 * Assembles {@link CellList} from a given list of cells.
+	 *
+	 * @param cells cells
+	 * @return CellList
+	 */
+	private CellList constructCellList(Collection<Cell> cells) {
+		List<CellData> cellData = new ArrayList<>();
+		for (Cell cell : cells) {
+			cellData.add(new CellData(cell));
+		}
+		return new CellList(cellData);
+	}
+
+	private void sendRemainingMessages(Game game) {
+		IterationData iterationData = new IterationData(game.getIterations());
+		game.sendMessage(iterationData);
+		TimeRemainingMessage timeRemainingMessage = new TimeRemainingMessage(game.getRemainingTime());
+		game.sendMessage(timeRemainingMessage);
+		CellList cellList = constructCellList(game.getClickedCells());
+		game.sendMessage(cellList);
+	}
+
 	public void run() {
 		while(isRunning) {
 
@@ -92,11 +125,10 @@ public class GameContainer implements Runnable {
 					.filter(Game::isOutOfTime)
 					.forEach(Game::end);
 
-			games.values()
-					.removeIf(Game::isScheduledForRemoval);
-
-			games.values()
-					.forEach(Game::run);
+			games.values().removeIf(Game::isScheduledForRemoval);
+			games.values().forEach(this::sendClickedData);
+			games.values().forEach(Game::run);
+			games.values().forEach(this::sendRemainingMessages);
 
 			if(LOG.isTraceEnabled()) {
 				long totalTime = System.nanoTime() - startTime;

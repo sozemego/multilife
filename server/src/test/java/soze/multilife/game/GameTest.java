@@ -29,10 +29,6 @@ class GameTest {
 		return player;
 	}
 
-	protected GameOutgoingMessageHandler getGameOutgoingMessageHandler(Game game) {
-		return new GameOutgoingMessageHandler(game);
-	}
-
 	protected static class BaseGameBuilder {
 
 		private int id = ID;
