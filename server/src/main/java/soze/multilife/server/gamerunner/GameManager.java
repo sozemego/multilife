@@ -38,6 +38,7 @@ public class GameManager {
 	private final int tickRate;
 
 	public GameManager(GameRunnerConfiguration cfg) {
+		Objects.requireNonNull(cfg);
 		this.gamesPerThread = cfg.getGamesPerThread();
 		this.tickRate = cfg.getTickRate();
 	}
