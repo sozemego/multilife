@@ -440,7 +440,7 @@ class Game {
 			cells.push({
 				x, y, alive, ownerId
 			});
-			offset += 17;
+			offset += bytesPerCell;
 		}
 
 		return {cells};
