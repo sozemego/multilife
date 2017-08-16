@@ -407,7 +407,10 @@ class Game {
 	};
 
 	_handleByteMessage(msg) {
-		console.log(msg);
+		if(msg[0] === 1) {
+			const data = this._handleByteCellList(msg);
+			this._onMapUpdate(data);
+		}
 	}
 
 	_onPlayerData = (msg) => {
@@ -421,6 +424,37 @@ class Game {
 		this.height = data.height;
 		this.simulation = new Simulation(this.width, this.height, this.playerData, this.cellSize, this.rectRenderFunction);
 	};
+
+	_handleByteCellList = (data) => {
+		console.log(data);
+
+		const bytesPerCell = 17;
+		const cellCount = (data.length - 1) / 17;
+		const cells = [];
+		let offset = 1;
+		for(let i = 0; i < cellCount; i++) {
+			const x = this._convertBytesToInt(data.slice(offset, offset + 4));
+			const y = this._convertBytesToInt(data.slice(offset + 4, offset + 8));
+			const alive = this._convertByteToBoolean(data[offset + 8]);
+			const ownerId = this._convertBytesToInt(data.slice(offset + 9, offset + 17));
+			cells.push({
+				x, y, alive, ownerId
+			});
+			offset += 17;
+		}
+
+		return {cells};
+	};
+
+	_convertBytesToInt(bytes) {
+		return new DataView(bytes.buffer).getInt32(0, false);
+	}
+
+
+
+	_convertByteToBoolean(byte) {
+		return byte === 1;
+	}
 
 	_onMapUpdate = (data) => {
 		let newCells = data.cells;
@@ -452,9 +486,9 @@ class Game {
 
 	_onTickData = (data) => {
 		if (this.simulationSteps === -1) {
-			this.simulationSteps = data.simulationSteps;
+			this.simulationSteps = data.iterations;
 		}
-		let tick = data.simulationSteps;
+		let tick = data.iterations;
 		let difference = tick - this.simulationSteps;
 		console.log("Sent tick " + tick + ". Client side ticks " + this.simulationSteps);
 		this._advanceSimulation();

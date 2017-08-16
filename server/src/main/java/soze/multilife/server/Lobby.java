@@ -149,7 +149,7 @@ public class Lobby implements Runnable {
 			players.forEach(p -> {
 				p.send(game.getPlayerData());
 				p.send(new MapData(game.getWidth(), game.getHeight()));
-				p.send(getAllAliveCellData(game));
+				p.send(MessageConverter.convertMessage(getAllAliveCellData(game)));
 			});
 		}
 	}
