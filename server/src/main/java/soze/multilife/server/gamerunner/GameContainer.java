@@ -59,51 +59,13 @@ public class GameContainer implements Runnable {
 		queuedMessages.add(new MessageQueueNode(message, playerId, gameId));
 	}
 
-	private void handleMessages() {
-		MessageQueueNode node;
-		while ((node = queuedMessages.poll()) != null) {
-			IncomingMessage message = node.getIncomingMessage();
-			int id = node.getPlayerId();
-			Game game = games.get(node.getGameId());
-			if(game != null) {
-				try {
-					game.acceptMessage(message, id);
-				} catch (PlayerNotInGameException e) {
-					LOG.warn("Trying to pass a message to a player who is not in game. ");
-				}
-			}
-
-		}
-	}
-
-	private void sendClickedData(Game game) {
-		game.getPlayers().values().forEach(p -> {
-			CellList cellList = constructCellList(game.getClickedCells());
-			p.send(cellList);
-		});
-	}
-
-	/**
-	 * Assembles {@link CellList} from a given list of cells.
-	 *
-	 * @param cells cells
-	 * @return CellList
-	 */
-	private CellList constructCellList(Collection<Cell> cells) {
-		List<CellData> cellData = new ArrayList<>();
-		for (Cell cell : cells) {
-			cellData.add(new CellData(cell));
-		}
-		return new CellList(cellData);
-	}
-
 	private void sendRemainingMessages(Game game) {
 		TickData tickData = new TickData(game.getIterations());
 		game.sendMessage(tickData);
 		TimeRemainingMessage timeRemainingMessage = new TimeRemainingMessage(game.getRemainingTime());
 		game.sendMessage(timeRemainingMessage);
-		CellList cellList = constructCellList(game.getClickedCells());
-		game.sendMessage(cellList);
+		PlayerData playerData = game.getPlayerData();
+		game.sendMessage(playerData);
 	}
 
 	public void run() {
@@ -143,4 +105,43 @@ public class GameContainer implements Runnable {
 			}
 		}
 	}
+
+	private void handleMessages() {
+		MessageQueueNode node;
+		while ((node = queuedMessages.poll()) != null) {
+			IncomingMessage message = node.getIncomingMessage();
+			int id = node.getPlayerId();
+			Game game = games.get(node.getGameId());
+			if(game != null) {
+				try {
+					game.acceptMessage(message, id);
+				} catch (PlayerNotInGameException e) {
+					LOG.warn("Trying to pass a message to a player who is not in game. ");
+				}
+			}
+
+		}
+	}
+
+	private void sendClickedData(Game game) {
+		game.getPlayers().values().forEach(p -> {
+			CellList cellList = constructCellList(game.getClickedCells());
+			p.send(cellList);
+		});
+	}
+
+	/**
+	 * Assembles {@link CellList} from a given list of cells.
+	 *
+	 * @param cells cells
+	 * @return CellList
+	 */
+	private CellList constructCellList(Collection<Cell> cells) {
+		List<CellData> cellData = new ArrayList<>();
+		for (Cell cell : cells) {
+			cellData.add(new CellData(cell));
+		}
+		return new CellList(cellData);
+	}
+
 }
