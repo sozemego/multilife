@@ -39,7 +39,7 @@ public class MetricsService implements Runnable {
 	private int maxPlayersBeforeSave = 0;
 
 	private final Map<String, Long> typeCountMap = new ConcurrentHashMap<>();
-	private final Map<Long, Long> playerMap = new ConcurrentHashMap<>();
+	private final Map<Integer, Integer> playerMap = new ConcurrentHashMap<>();
 
 	public MetricsService(MetricsRepository repository, MetricsConfiguration configuration) {
 		this.repository = repository;
@@ -79,8 +79,8 @@ public class MetricsService implements Runnable {
 	}
 
 	private void process(PlayerLoggedEvent playerEvent) {
-		long playerId = playerEvent.getPlayerId();
-		long instanceId = playerEvent.getInstanceId();
+		int playerId = playerEvent.getPlayerId();
+		int instanceId = playerEvent.getInstanceId();
 		playerMap.put(playerId, instanceId);
 	}
 
@@ -176,7 +176,7 @@ public class MetricsService implements Runnable {
 		return typeCountMap;
 	}
 
-	public Map<Long, Long> getPlayerMap() {
+	public Map<Integer, Integer> getPlayerMap() {
 		return playerMap;
 	}
 }

@@ -90,7 +90,7 @@ public class MetricsWebSocketHandlerImpl implements MetricsWebSocketHandler {
 		long messagesSent = metricsService.getTotalMessagesSent();
 		double averageBytesSent = metricsService.getAverageBytesSent();
 		Map<String, Long> typeCountMap = metricsService.getTypeCountMap();
-		Map<Long, Long> playerMap = metricsService.getPlayerMap();
+		Map<Integer, Integer> playerMap = metricsService.getPlayerMap();
 
 		return new MetricsMessage(
 			averageKbs,

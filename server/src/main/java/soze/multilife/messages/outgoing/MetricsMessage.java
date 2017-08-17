@@ -10,7 +10,7 @@ public class MetricsMessage extends OutgoingMessage {
 	private final double averageBytesPerMessage;
 	private final long totalMessagesSent;
 	private final Map<String, Long> typeCount;
-	private final Map<Long, Long> instancePlayerMap;
+	private final Map<Integer, Integer> instancePlayerMap;
 
 	public MetricsMessage(
 		double averageKbs,
@@ -18,7 +18,7 @@ public class MetricsMessage extends OutgoingMessage {
 		double averageBytesPerMessage,
 		long totalMessagesSent,
 		Map<String, Long> typeCount,
-		Map<Long, Long> instancePlayerMap
+		Map<Integer, Integer> instancePlayerMap
 	) {
 		setType(OutgoingType.METRICS);
 		this.averageKbs = averageKbs;
@@ -49,7 +49,7 @@ public class MetricsMessage extends OutgoingMessage {
 		return typeCount;
 	}
 
-	public Map<Long, Long> getInstancePlayerMap() {
+	public Map<Integer, Integer> getInstancePlayerMap() {
 		return instancePlayerMap;
 	}
 }

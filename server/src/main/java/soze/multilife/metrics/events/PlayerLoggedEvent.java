@@ -2,19 +2,19 @@ package soze.multilife.metrics.events;
 
 public class PlayerLoggedEvent {
 
-	private final long playerId;
-	private final long instanceId;
+	private final int playerId;
+	private final int instanceId;
 
-	public PlayerLoggedEvent(long playerId, long instanceId) {
+	public PlayerLoggedEvent(int playerId, int instanceId) {
 		this.playerId = playerId;
 		this.instanceId = instanceId;
 	}
 
-	public long getPlayerId() {
+	public int getPlayerId() {
 		return playerId;
 	}
 
-	public long getInstanceId() {
+	public int getInstanceId() {
 		return instanceId;
 	}
 }
