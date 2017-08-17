@@ -65,4 +65,15 @@ public class MessageConverter {
 		return message;
 	}
 
+	public static byte[] convertMessage(TimeRemainingMessage timeRemainingMessage) {
+		byte[] message = new byte[5];
+		message[0] = OutgoingType.TIME_REMAINING.getTypeMarker();
+
+		ByteBuffer buffer = ByteBuffer.allocate(4);
+		buffer.putFloat(timeRemainingMessage.remainingTime);
+
+		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
+		return message;
+	}
+
 }

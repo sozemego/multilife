@@ -422,6 +422,10 @@ class Game {
 			const data = this._handleByteTickData(msg);
 			this._onTickData(data);
 		}
+		if(msg[0] === 7) {
+			const data = this._handleByteTimeRemaining(msg);
+			this._onRemainingTime(data);
+		}
 	}
 
 	_onPlayerData = (msg) => {
@@ -465,6 +469,10 @@ class Game {
 
 	_convertBytesToInt(bytes) { //TODO make static util functions
 		return new DataView(bytes.buffer).getInt32(0, false);
+	}
+
+	_convertBytesToFloat(bytes) { //TODO make static util functions
+		return new DataView(bytes.buffer).getFloat32(0, false);
 	}
 
 	_convertByteToBoolean(byte) { //TODO make static util functions
@@ -600,6 +608,12 @@ class Game {
 			x: x + this.offsets.x,
 			y: y + this.offsets.y
 		};
+	};
+
+	_handleByteTimeRemaining = (msg) => {
+		return {
+			remainingTime: this._convertBytesToFloat(msg.slice(1))
+		}
 	};
 
 	/**

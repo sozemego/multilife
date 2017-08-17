@@ -44,8 +44,9 @@ public class BaseConnection implements Connection {
 			this.send(MessageConverter.convertMessage((MapData) message));
 		} else if (message instanceof PlayerIdentity) {
 			this.send(MessageConverter.convertMessage((PlayerIdentity) message));
-		}
-		else {
+		} else if (message instanceof TimeRemainingMessage) {
+			this.send(MessageConverter.convertMessage((TimeRemainingMessage) message));
+		} else {
 			try {
 				String json = JsonUtils.stringify(message);
 				this.session.getRemote().sendStringByFuture(json);

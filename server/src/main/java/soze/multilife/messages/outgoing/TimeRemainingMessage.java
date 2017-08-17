@@ -2,18 +2,18 @@ package soze.multilife.messages.outgoing;
 
 public class TimeRemainingMessage extends OutgoingMessage {
 
-	public long remainingTime;
+	public float remainingTime;
 
-	public TimeRemainingMessage(long remainingTime) {
+	public TimeRemainingMessage(float remainingTime) {
 		setType(OutgoingType.TIME_REMAINING);
 		this.remainingTime = remainingTime;
 	}
 
-	public long getRemainingTime() {
+	public float getRemainingTime() {
 		return remainingTime;
 	}
 
-	public void setRemainingTime(long remainingTime) {
+	public void setRemainingTime(float remainingTime) {
 		this.remainingTime = remainingTime;
 	}
 }
