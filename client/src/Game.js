@@ -411,6 +411,10 @@ class Game {
 			const data = this._handleByteCellList(msg);
 			this._onMapUpdate(data);
 		}
+		if(msg[0] === 5) {
+			const data = this._handleByteTickData(msg);
+			this._onTickData(data);
+		}
 	}
 
 	_onPlayerData = (msg) => {
@@ -426,17 +430,16 @@ class Game {
 	};
 
 	_handleByteCellList = (data) => {
-		console.log(data);
 
-		const bytesPerCell = 17;
-		const cellCount = (data.length - 1) / 17;
+		const bytesPerCell = 13;
+		const cellCount = (data.length - 1) / bytesPerCell;
 		const cells = [];
 		let offset = 1;
 		for(let i = 0; i < cellCount; i++) {
 			const x = this._convertBytesToInt(data.slice(offset, offset + 4));
 			const y = this._convertBytesToInt(data.slice(offset + 4, offset + 8));
 			const alive = this._convertByteToBoolean(data[offset + 8]);
-			const ownerId = this._convertBytesToInt(data.slice(offset + 9, offset + 17));
+			const ownerId = this._convertBytesToInt(data.slice(offset + 9, offset + 13));
 			cells.push({
 				x, y, alive, ownerId
 			});
@@ -446,13 +449,11 @@ class Game {
 		return {cells};
 	};
 
-	_convertBytesToInt(bytes) {
+	_convertBytesToInt(bytes) { //TODO make static util functions
 		return new DataView(bytes.buffer).getInt32(0, false);
 	}
 
-
-
-	_convertByteToBoolean(byte) {
+	_convertByteToBoolean(byte) { //TODO make static util functions
 		return byte === 1;
 	}
 
@@ -481,6 +482,12 @@ class Game {
 		if (this.firstMapData) {
 			this._advanceSimulation();
 			this.firstMapData = false;
+		}
+	};
+
+	_handleByteTickData = (msg) => {
+		return {
+			iterations: this._convertBytesToInt(msg.slice(1))
 		}
 	};
 
