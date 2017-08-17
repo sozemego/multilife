@@ -116,7 +116,7 @@ public class Lobby implements Runnable {
 	 */
 	void onMessage(IncomingMessage incMessage, long connectionId) {
 		if (incMessage.getType() == IncomingType.PING) {
-			connections.get(connectionId).send(MessageConverter.convertMessage(new PongMessage()));
+			connections.get(connectionId).send(new PongMessage());
 			return;
 		}
 
@@ -149,7 +149,7 @@ public class Lobby implements Runnable {
 			players.forEach(p -> {
 				p.send(game.getPlayerData());
 				p.send(new MapData(game.getWidth(), game.getHeight()));
-				p.send(MessageConverter.convertMessage(getAllAliveCellData(game)));
+				p.send(getAllAliveCellData(game));
 			});
 		}
 	}

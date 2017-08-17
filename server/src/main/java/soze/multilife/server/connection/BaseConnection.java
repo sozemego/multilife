@@ -3,7 +3,10 @@ package soze.multilife.server.connection;
 import org.eclipse.jetty.websocket.api.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import soze.multilife.messages.outgoing.CellList;
+import soze.multilife.messages.outgoing.MessageConverter;
 import soze.multilife.messages.outgoing.OutgoingMessage;
+import soze.multilife.messages.outgoing.PongMessage;
 import soze.multilife.utils.JsonUtils;
 
 import java.io.IOException;
@@ -34,11 +37,17 @@ public class BaseConnection implements Connection {
 	@Override
 	public void send(OutgoingMessage message) {
 		Objects.requireNonNull(message);
-		try {
-			String json = JsonUtils.stringify(message);
-			this.session.getRemote().sendStringByFuture(json);
-		} catch (IOException e) {
-			LOG.warn("Base connection could not send string.", e);
+		if(message instanceof PongMessage) {
+			this.send(MessageConverter.convertMessage((PongMessage) message));
+		} else if (message instanceof CellList) {
+			this.send(MessageConverter.convertMessage((CellList) message));
+		} else {
+			try {
+				String json = JsonUtils.stringify(message);
+				this.session.getRemote().sendStringByFuture(json);
+			} catch (IOException e) {
+				LOG.warn("Base connection could not send string.", e);
+			}
 		}
 	}
 

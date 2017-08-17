@@ -5,7 +5,6 @@ import java.util.List;
 
 public class MessageConverter {
 
-
 	public static byte[] convertMessage(PongMessage pong) {
 		return new byte[] {OutgoingType.PONG.getTypeMarker()};
 	}

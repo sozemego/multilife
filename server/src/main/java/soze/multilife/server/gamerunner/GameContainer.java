@@ -6,10 +6,7 @@ import soze.multilife.game.Cell;
 import soze.multilife.game.Game;
 import soze.multilife.game.exceptions.PlayerNotInGameException;
 import soze.multilife.messages.incoming.IncomingMessage;
-import soze.multilife.messages.outgoing.CellData;
-import soze.multilife.messages.outgoing.CellList;
-import soze.multilife.messages.outgoing.IterationData;
-import soze.multilife.messages.outgoing.TimeRemainingMessage;
+import soze.multilife.messages.outgoing.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
