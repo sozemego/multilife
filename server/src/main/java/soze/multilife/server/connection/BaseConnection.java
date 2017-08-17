@@ -42,7 +42,10 @@ public class BaseConnection implements Connection {
 			this.send(MessageConverter.convertMessage((TickData) message));
 		} else if (message instanceof MapData) {
 			this.send(MessageConverter.convertMessage((MapData) message));
-		} else {
+		} else if (message instanceof PlayerIdentity) {
+			this.send(MessageConverter.convertMessage((PlayerIdentity) message));
+		}
+		else {
 			try {
 				String json = JsonUtils.stringify(message);
 				this.session.getRemote().sendStringByFuture(json);

@@ -80,7 +80,7 @@ public class Lobby implements Runnable {
 	 * Creates a PersonIdentity object.
 	 * This object is sent back to the client.
 	 */
-	private PlayerIdentity getPlayerIdentity(long id) {
+	private PlayerIdentity getPlayerIdentity(int id) {
 		return new PlayerIdentity(id);
 	}
 

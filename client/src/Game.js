@@ -415,6 +415,9 @@ class Game {
 			const data = this._handleByteMapData(msg);
 			this._onMapData(data);
 		}
+		if(msg[0] === 3) {
+			this.myId = this._handleBytePlayerIdentity(msg);
+		}
 		if(msg[0] === 5) {
 			const data = this._handleByteTickData(msg);
 			this._onTickData(data);
@@ -514,6 +517,10 @@ class Game {
 			//advanceSimulation();
 			console.log("Tick difference of " + difference + ", advancing.");
 		}
+	};
+
+	_handleBytePlayerIdentity = (msg) => {
+		return this._convertBytesToInt(msg.slice(1));
 	};
 
 	getFPS = () => {

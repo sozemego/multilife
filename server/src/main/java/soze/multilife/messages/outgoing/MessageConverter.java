@@ -54,4 +54,15 @@ public class MessageConverter {
 		return message;
 	}
 
+	public static byte[] convertMessage(PlayerIdentity playerIdentity) {
+		byte[] message = new byte[5];
+		message[0] = OutgoingType.PLAYER_IDENTITY.getTypeMarker();
+
+		ByteBuffer buffer = ByteBuffer.allocate(4);
+		buffer.putInt(playerIdentity.playerId);
+
+		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
+		return message;
+	}
+
 }
