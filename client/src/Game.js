@@ -411,6 +411,10 @@ class Game {
 			const data = this._handleByteCellList(msg);
 			this._onMapUpdate(data);
 		}
+		if(msg[0] === 2) {
+			const data = this._handleByteMapData(msg);
+			this._onMapData(data);
+		}
 		if(msg[0] === 5) {
 			const data = this._handleByteTickData(msg);
 			this._onTickData(data);
@@ -421,6 +425,13 @@ class Game {
 		this.playerData = msg;
 		this.simulation.setPlayerData(msg);
 		this._renderPlayerPoints();
+	};
+
+	_handleByteMapData = (msg) => {
+		return {
+			width: this._convertBytesToInt(msg.slice(1, 5)),
+			height: this._convertBytesToInt(msg.slice(5))
+		}
 	};
 
 	_onMapData = (data) => {

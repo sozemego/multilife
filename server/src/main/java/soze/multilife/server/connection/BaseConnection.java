@@ -40,6 +40,8 @@ public class BaseConnection implements Connection {
 			this.send(MessageConverter.convertMessage((CellList) message));
 		} else if (message instanceof TickData) {
 			this.send(MessageConverter.convertMessage((TickData) message));
+		} else if (message instanceof MapData) {
+			this.send(MessageConverter.convertMessage((MapData) message));
 		} else {
 			try {
 				String json = JsonUtils.stringify(message);

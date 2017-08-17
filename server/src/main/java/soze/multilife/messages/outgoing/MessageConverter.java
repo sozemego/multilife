@@ -42,4 +42,16 @@ public class MessageConverter {
 		return message;
 	}
 
+	public static byte[] convertMessage(MapData mapData) {
+		byte[] message = new byte[9];
+		message[0] = OutgoingType.MAP_DATA.getTypeMarker();
+
+		ByteBuffer buffer = ByteBuffer.allocate(8);
+		buffer.putInt(mapData.width);
+		buffer.putInt(mapData.height);
+
+		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
+		return message;
+	}
+
 }
