@@ -2,13 +2,13 @@ package soze.multilife.metrics.events;
 
 public class PlayerDisconnectedEvent {
 
-	private final long playerId;
+	private final int playerId;
 
-	public PlayerDisconnectedEvent(long playerId) {
+	public PlayerDisconnectedEvent(int playerId) {
 		this.playerId = playerId;
 	}
 
-	public long getPlayerId() {
+	public int getPlayerId() {
 		return playerId;
 	}
 }

@@ -9,9 +9,9 @@ public class TypeMetricEvent {
 
 	private final long timestamp;
 	private final String type;
-	private final long connectionId;
+	private final int connectionId;
 
-	public TypeMetricEvent(long timestamp, String type, long connectionId) {
+	public TypeMetricEvent(long timestamp, String type, int connectionId) {
 		this.timestamp = timestamp;
 		this.type = type;
 		this.connectionId = connectionId;
@@ -25,7 +25,7 @@ public class TypeMetricEvent {
 		return type;
 	}
 
-	public long getConnectionId() {
+	public int getConnectionId() {
 		return connectionId;
 	}
 }

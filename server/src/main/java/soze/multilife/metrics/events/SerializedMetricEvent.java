@@ -6,10 +6,10 @@ package soze.multilife.metrics.events;
 public class SerializedMetricEvent {
 
 	private final long timeStamp;
-	private final long connectionId;
-	private final long bytesSent;
+	private final int connectionId;
+	private final int bytesSent;
 
-	public SerializedMetricEvent(long timeStamp, long connectionId, long bytesSent) {
+	public SerializedMetricEvent(long timeStamp, int connectionId, int bytesSent) {
 		this.timeStamp = timeStamp;
 		this.connectionId = connectionId;
 		this.bytesSent = bytesSent;
@@ -19,11 +19,11 @@ public class SerializedMetricEvent {
 		return timeStamp;
 	}
 
-	public long getConnectionId() {
+	public int getConnectionId() {
 		return connectionId;
 	}
 
-	public long getBytesSent() {
+	public int getBytesSent() {
 		return bytesSent;
 	}
 
