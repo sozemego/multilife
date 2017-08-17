@@ -21,11 +21,11 @@ public class ConnectionFactory {
 	 *
 	 * @return
 	 */
-	public Connection getConnection(long id, Session session) {
+	public Connection getConnection(int id, Session session) {
 		return getMetricsConnection(id, session);
 	}
 
-	private Connection getMetricsConnection(long id, Session session) {
+	private Connection getMetricsConnection(int id, Session session) {
 		return new MetricsConnection(id, session, eventBus);
 	}
 

@@ -22,7 +22,7 @@ class GameDecorator implements Game {
 		return game.addPlayer(player);
 	}
 
-	public void removePlayer(long id) throws PlayerNotInGameException {
+	public void removePlayer(int id) throws PlayerNotInGameException {
 		game.removePlayer(id);
 	}
 
@@ -30,7 +30,7 @@ class GameDecorator implements Game {
 		return game.getId();
 	}
 
-	public void acceptMessage(IncomingMessage message, long playerId) throws PlayerNotInGameException {
+	public void acceptMessage(IncomingMessage message, int playerId) throws PlayerNotInGameException {
 		game.acceptMessage(message, playerId);
 	}
 
@@ -46,7 +46,7 @@ class GameDecorator implements Game {
 		return game.getPlayerData();
 	}
 
-	public Map<Long, Player> getPlayers() {
+	public Map<Integer, Player> getPlayers() {
 		return game.getPlayers();
 	}
 

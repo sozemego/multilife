@@ -8,7 +8,7 @@ public class Cell {
 	private final int x;
 	private final int y;
 	private boolean alive = false;
-	private long ownerId = 0;
+	private int ownerId = 0;
 
 	public Cell(int x, int y) {
 		this.x = x;
@@ -35,11 +35,11 @@ public class Cell {
 		this.alive = alive;
 	}
 
-	public long getOwnerId() {
+	public int getOwnerId() {
 		return ownerId;
 	}
 
-	public void setOwnerId(long ownerId) {
+	public void setOwnerId(int ownerId) {
 		this.ownerId = ownerId;
 	}
 

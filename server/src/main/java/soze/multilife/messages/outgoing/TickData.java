@@ -3,11 +3,11 @@ package soze.multilife.messages.outgoing;
 /**
  * Contains information about the current simulation tick.
  */
-public class IterationData extends OutgoingMessage {
+public class TickData extends OutgoingMessage {
 
-	public long iterations;
+	public int iterations;
 
-	public IterationData(long iterations) {
+	public TickData(int iterations) {
 		setType(OutgoingType.TICK_DATA);
 		this.iterations = iterations;
 	}

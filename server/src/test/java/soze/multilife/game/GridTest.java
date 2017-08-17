@@ -3,16 +3,14 @@ package soze.multilife.game;
 import org.junit.Test;
 import soze.multilife.game.rule.RuleFactory;
 
-import java.awt.Point;
-import java.util.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -37,7 +35,7 @@ public class GridTest {
 		Grid grid = getDefaultGrid();
 		List<Point> pointsToSetAlive = Arrays.asList(new Point(0, 1), new Point(0, 5));
 
-		long playerId = 1L;
+		int playerId = 1;
 
 		for(Point p: pointsToSetAlive) {
 			grid.changeState(p.x, p.y, true, playerId);
@@ -63,7 +61,7 @@ public class GridTest {
 		Grid grid = getDefaultGrid();
 		List<Point> pointsToSetAlive = Arrays.asList(new Point(0, 1), new Point(0, 5));
 
-		long playerId = 1L;
+		int playerId = 1;
 
 		for(Point p: pointsToSetAlive) {
 			grid.changeState(p.x, p.y, true, playerId);
@@ -104,7 +102,7 @@ public class GridTest {
 		blinker.add(new Point(5, 6));
 		blinker.add(new Point(5, 7));
 		for(Point p: blinker) {
-			grid.changeState(p.x, p.y, true, 1L);
+			grid.changeState(p.x, p.y, true, 1);
 		}
 		grid.updateGrid();
 		grid.updateGrid();
@@ -119,7 +117,7 @@ public class GridTest {
 		Grid grid = getGrid(10, 10);
 		for(int i = 0; i < grid.getWidth(); i++) {
 			for(int j = 0; j < grid.getHeight(); j++) {
-				grid.changeState(i, j, true, 1L);
+				grid.changeState(i, j, true, 1);
 			}
 		}
 		grid.updateGrid();

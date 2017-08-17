@@ -17,7 +17,7 @@ import soze.multilife.server.connection.ConnectionFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A basic delegate which handles web socket events and passes them along
@@ -31,8 +31,8 @@ public class GameSocketHandler {
 	private final LoginService loginService;
 	private final Lobby lobby;
 	private final ConnectionFactory connectionFactory;
-	private final AtomicLong id = new AtomicLong(0L);
-	private final Map<Session, Long> sessionIdMap = new ConcurrentHashMap<>();
+	private final AtomicInteger id = new AtomicInteger(0);
+	private final Map<Session, Integer> sessionIdMap = new ConcurrentHashMap<>();
 	private final ObjectMapper mapper = new ObjectMapper();
 
 	public GameSocketHandler(Lobby lobby, LoginService loginService, ConnectionFactory connectionFactory) {
@@ -47,7 +47,7 @@ public class GameSocketHandler {
 	}
 
 	private void connect(Session session) {
-		long nextId = id.incrementAndGet();
+		int nextId = id.incrementAndGet();
 		LOG.info("User connected. ConnectionID [{}].", nextId);
 		sessionIdMap.put(session, nextId);
 		lobby.onConnect(getConnection(nextId, session));
@@ -59,7 +59,7 @@ public class GameSocketHandler {
 	}
 
 	private void disconnect(Session session, int statusCode, String reason) {
-		long userId = sessionIdMap.remove(session);
+		int userId = sessionIdMap.remove(session);
 		LOG.info("User disconnected. ConnectionID [{}]. Status code [{}]. Reason [{}]", userId, statusCode, reason);
 		lobby.onDisconnect(getConnection(userId, session));
 	}
@@ -79,7 +79,7 @@ public class GameSocketHandler {
 		lobby.onMessage(inc, sessionIdMap.get(session));
 	}
 
-	private Connection getConnection(long id, Session session) {
+	private Connection getConnection(int id, Session session) {
 		return connectionFactory.getConnection(id, session);
 	}
 

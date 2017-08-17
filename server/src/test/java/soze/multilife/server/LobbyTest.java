@@ -35,7 +35,7 @@ public class LobbyTest {
 		Lobby lobby = new Lobby(bus, gameManager, gameFactory);
 
 		Connection conn = Mockito.mock(Connection.class);
-		when(conn.getId()).thenReturn(1L);
+		when(conn.getId()).thenReturn(1);
 
 		lobby.onConnect(conn);
 		verify(conn, atLeastOnce()).getId();
@@ -68,7 +68,7 @@ public class LobbyTest {
 		Lobby lobby = new Lobby(bus, gameManager, gameFactory);
 
 		Connection conn = Mockito.mock(Connection.class);
-		when(conn.getId()).thenReturn(1L);
+		when(conn.getId()).thenReturn(1);
 
 		lobby.onDisconnect(conn);
 		verify(conn, atLeastOnce()).getId();
@@ -86,7 +86,7 @@ public class LobbyTest {
 		Lobby lobby = new Lobby(bus, gameManager, gameFactory);
 
 		Connection conn = Mockito.mock(Connection.class);
-		when(conn.getId()).thenReturn(1L);
+		when(conn.getId()).thenReturn(1);
 
 		lobby.onConnect(conn);
 		Player player = new Player(conn.getId(), conn, "Player", "BASIC");
@@ -109,7 +109,7 @@ public class LobbyTest {
 		Lobby lobby = new Lobby(bus, gameManager, gameFactory);
 
 		Connection conn = Mockito.mock(Connection.class);
-		when(conn.getId()).thenReturn(1L);
+		when(conn.getId()).thenReturn(1);
 
 		lobby.onConnect(conn);
 	}

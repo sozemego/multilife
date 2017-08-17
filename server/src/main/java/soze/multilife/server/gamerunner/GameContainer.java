@@ -55,7 +55,7 @@ public class GameContainer implements Runnable {
 		return isRunning;
 	}
 
-	public void acceptMessage(IncomingMessage message, long playerId, int gameId) {
+	public void acceptMessage(IncomingMessage message, int playerId, int gameId) {
 		queuedMessages.add(new MessageQueueNode(message, playerId, gameId));
 	}
 
@@ -63,7 +63,7 @@ public class GameContainer implements Runnable {
 		MessageQueueNode node;
 		while ((node = queuedMessages.poll()) != null) {
 			IncomingMessage message = node.getIncomingMessage();
-			long id = node.getPlayerId();
+			int id = node.getPlayerId();
 			Game game = games.get(node.getGameId());
 			if(game != null) {
 				try {
@@ -98,8 +98,8 @@ public class GameContainer implements Runnable {
 	}
 
 	private void sendRemainingMessages(Game game) {
-		IterationData iterationData = new IterationData(game.getIterations());
-		game.sendMessage(iterationData);
+		TickData tickData = new TickData(game.getIterations());
+		game.sendMessage(tickData);
 		TimeRemainingMessage timeRemainingMessage = new TimeRemainingMessage(game.getRemainingTime());
 		game.sendMessage(timeRemainingMessage);
 		CellList cellList = constructCellList(game.getClickedCells());

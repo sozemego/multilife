@@ -1,6 +1,5 @@
 package soze.multilife.game;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -20,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class BaseGameTest extends GameTest {
 
@@ -32,7 +30,7 @@ public class BaseGameTest extends GameTest {
 	@Test
 	public void testAddPlayer() throws Exception {
 		BaseGame game = createGameWithDefaultValues();
-		Player player = createPlayerMock(1L);
+		Player player = createPlayerMock(1);
 		boolean result = game.addPlayer(player);
 		assertTrue(result);
 		assertEquals(game.getPlayers().size(), 1);
@@ -44,11 +42,11 @@ public class BaseGameTest extends GameTest {
 			.withMaxPlayers(2)
 			.build();
 
-		Player player1 = createPlayerMock(1L);
+		Player player1 = createPlayerMock(1);
 
-		Player player2 = createPlayerMock(2L);
+		Player player2 = createPlayerMock(2);
 
-		Player player3 = createPlayerMock(3L);
+		Player player3 = createPlayerMock(3);
 
 		boolean result = game.addPlayer(player1);
 		assertTrue(result);
@@ -69,8 +67,8 @@ public class BaseGameTest extends GameTest {
 			.withMaxPlayers(2)
 			.build();
 
-		Player player1 = createPlayerMock(1L);
-		Player player2 = createPlayerMock(2L);
+		Player player1 = createPlayerMock(1);
+		Player player2 = createPlayerMock(2);
 
 		game.addPlayer(player1);
 		game.addPlayer(player2);
@@ -86,8 +84,8 @@ public class BaseGameTest extends GameTest {
 		BaseGame game = builder()
 				.withMaxPlayers(2)
 				.build();
-		Player player1 = createPlayerMock(1L);
-		Player player2 = createPlayerMock(2L);
+		Player player1 = createPlayerMock(1);
+		Player player2 = createPlayerMock(2);
 
 		game.addPlayer(player1);
 		game.addPlayer(player2);
@@ -100,8 +98,8 @@ public class BaseGameTest extends GameTest {
 			.withMaxPlayers(2)
 			.build();
 
-		Player player1 = createPlayerMock(1L);
-		Player player2 = createPlayerMock(2L);
+		Player player1 = createPlayerMock(1);
+		Player player2 = createPlayerMock(2);
 
 		game.addPlayer(player1);
 		game.addPlayer(player2);
@@ -119,7 +117,7 @@ public class BaseGameTest extends GameTest {
 			.withInitialDensity(0f)
 			.build();
 
-		Player player1 = createPlayerMock(1L);
+		Player player1 = createPlayerMock(1);
 		game.addPlayer(player1);
 
 		ClickMessage message = new ClickMessage();
@@ -146,7 +144,7 @@ public class BaseGameTest extends GameTest {
 		ClickMessage message = new ClickMessage();
 		message.setIndices(new int[]{0, 1, 2, 3, 4});
 
-		game.acceptMessage(message, 0L);
+		game.acceptMessage(message, 0);
 	}
 
 	@Test
@@ -156,7 +154,7 @@ public class BaseGameTest extends GameTest {
 				.withInitialDensity(0f)
 				.build();
 
-		Player player1 = createPlayerMock(1L);
+		Player player1 = createPlayerMock(1);
 		game.addPlayer(player1);
 
 		ClickMessage message = new ClickMessage();
@@ -178,14 +176,14 @@ public class BaseGameTest extends GameTest {
 				.withInitialDensity(0f)
 				.build();
 
-		Player player1 = createPlayerMock(1L);
+		Player player1 = createPlayerMock(1);
 		game.addPlayer(player1);
 
 		ClickMessage message = new ClickMessage();
 		message.setIndices(new int[]{0, 1, 2, 3, 4});
 		game.acceptMessage(message, player1.getId());
 
-		Player player2 = createPlayerMock(2L);
+		Player player2 = createPlayerMock(2);
 		game.addPlayer(player2);
 
 		ClickMessage anotherMessage = new ClickMessage();
@@ -256,8 +254,8 @@ public class BaseGameTest extends GameTest {
 				.withMaxPlayers(2)
 				.build();
 
-		Player player1 = createPlayerMock(1L);
-		Player player2 = createPlayerMock(2L);
+		Player player1 = createPlayerMock(1);
+		Player player2 = createPlayerMock(2);
 
 		game.addPlayer(player1);
 		game.addPlayer(player2);
@@ -274,8 +272,8 @@ public class BaseGameTest extends GameTest {
 				.withMaxPlayers(2)
 				.build();
 
-		Player player1 = createPlayerMock(1L);
-		Player player2 = createPlayerMock(2L);
+		Player player1 = createPlayerMock(1);
+		Player player2 = createPlayerMock(2);
 
 		game.addPlayer(player1);
 		game.addPlayer(player2);
@@ -313,7 +311,7 @@ public class BaseGameTest extends GameTest {
 	public void testGetOnePlayer() throws Exception {
 		BaseGame game = builder().build();
 
-		Player player1 = createPlayerMock(1L);
+		Player player1 = createPlayerMock(1);
 		game.addPlayer(player1);
 
 		PlayerData data = game.getPlayerData();

@@ -35,8 +35,8 @@ public class Lobby implements Runnable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Lobby.class);
 
-	private final Map<Long, Connection> connections = new ConcurrentHashMap<>();
-	private final Map<Long, Integer> playerToGame = new ConcurrentHashMap<>();
+	private final Map<Integer, Connection> connections = new ConcurrentHashMap<>();
+	private final Map<Integer, Integer> playerToGame = new ConcurrentHashMap<>();
 	private final Multimap<Integer, Player> gameToPlayers = Multimaps.synchronizedMultimap(ArrayListMultimap.create());
 
 	private final GameManager gameManager;
@@ -89,7 +89,7 @@ public class Lobby implements Runnable {
 	 */
 	void onDisconnect(Connection connection) {
 		Objects.requireNonNull(connection);
-		long id = connection.getId();
+		int id = connection.getId();
 		connections.remove(id);
 		Integer gameId = playerToGame.remove(id);
 		if(gameId == null) {
@@ -114,7 +114,7 @@ public class Lobby implements Runnable {
 	/**
 	 * Handles incoming messages. Id is the connection connectionId.
 	 */
-	void onMessage(IncomingMessage incMessage, long connectionId) {
+	void onMessage(IncomingMessage incMessage, int connectionId) {
 		if (incMessage.getType() == IncomingType.PING) {
 			connections.get(connectionId).send(new PongMessage());
 			return;

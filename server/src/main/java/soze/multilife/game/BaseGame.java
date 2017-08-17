@@ -43,14 +43,14 @@ public class BaseGame implements Game {
 	/**
 	 * Players already in-game.
 	 */
-	private final Map<Long, Player> players = new HashMap<>();
+	private final Map<Integer, Player> players = new HashMap<>();
 
 	private final int maxPlayers;
 
 	/**
 	 * Maps playerId to color (#hex) of their alive cells.
 	 */
-	private final Map<Long, String> playerColors = new HashMap<>();
+	private final Map<Integer, String> playerColors = new HashMap<>();
 
 	/**
 	 * Colors which are available for players.
@@ -78,7 +78,7 @@ public class BaseGame implements Game {
 	 * A set of playerIds who clicked cells this iteration.
 	 * For limiting purposes.
 	 */
-	private final Set<Long> clickedPlayers = new HashSet<>();
+	private final Set<Integer> clickedPlayers = new HashSet<>();
 
 	/**
 	 * A count for how many times this simulation advanced.
@@ -88,7 +88,7 @@ public class BaseGame implements Game {
 	/**
 	 * Map of playerId-playerPoints.
 	 */
-	private final Map<Long, Long> playerPoints = new HashMap<>();
+	private final Map<Integer, Integer> playerPoints = new HashMap<>();
 
 	BaseGame(int id, float initialDensity, int width, int height, int maxPlayers, long duration) {
 		this.id = id;
@@ -120,13 +120,13 @@ public class BaseGame implements Game {
 			if(strongestOwnerId == -1) {
 				return;
 			}
-			Long points = playerPoints.get(strongestOwnerId);
-			playerPoints.put(strongestOwnerId, points == null ? 1L : ++points);
+			Integer points = playerPoints.get(strongestOwnerId);
+			playerPoints.put(strongestOwnerId, points == null ? 1 : ++points);
 		});
 
 		grid.onCellBirth((cellOwner) -> {
-			Long points = playerPoints.get(cellOwner);
-			points = Math.max(points == null ? 0L : --points, 0L);
+			Integer points = playerPoints.get(cellOwner);
+			points = Math.max(points == null ? 0 : --points, 0);
 			playerPoints.put(cellOwner, points);
 		});
 	}
@@ -150,7 +150,7 @@ public class BaseGame implements Game {
 	 *
 	 * @param id id of the player to remove
 	 */
-	public void removePlayer(long id) throws PlayerNotInGameException {
+	public void removePlayer(int id) throws PlayerNotInGameException {
 		checkContainsPlayer(id);
 		grid.killAll(id);
 		players.remove(id);
@@ -166,7 +166,7 @@ public class BaseGame implements Game {
 	 * @param indices indices of cells to click
 	 * @param id      id of the player
 	 */
-	private void click(int[] indices, long id) {
+	private void click(int[] indices, int id) {
 		if (clickedPlayers.contains(id)) { //only one click per iteration
 			return;
 		}
@@ -203,16 +203,16 @@ public class BaseGame implements Game {
 	}
 
 	public PlayerData getPlayerData() {
-		Map<Long, Long> points = playerPoints;
-		Map<Long, String> names = new HashMap<>();
-		Map<Long, String> colors = new HashMap<>();
-		Map<Long, String> rules = new HashMap<>();
+		Map<Integer, Integer> points = playerPoints;
+		Map<Integer, String> names = new HashMap<>();
+		Map<Integer, String> colors = new HashMap<>();
+		Map<Integer, String> rules = new HashMap<>();
 
 		// data for the simulation
-		points.put(0L, 0L);
-		names.put(0L, "AI");
-		colors.put(0L, "#000000");
-		rules.put(0L, "BASIC");
+		points.put(0, 0);
+		names.put(0, "AI");
+		colors.put(0, "#000000");
+		rules.put(0, "BASIC");
 
 		for (Player player : players.values()) {
 			names.put(player.getId(), player.getName());
@@ -226,7 +226,7 @@ public class BaseGame implements Game {
 		return new HashMap<>(grid.getAllCells());
 	}
 
-	public void acceptMessage(IncomingMessage message, long playerId) throws PlayerNotInGameException {
+	public void acceptMessage(IncomingMessage message, int playerId) throws PlayerNotInGameException {
 		checkContainsPlayer(playerId);
 		if (message.getType() == IncomingType.CLICK) {
 			ClickMessage msg = (ClickMessage) message;
@@ -301,11 +301,11 @@ public class BaseGame implements Game {
 		return grid.getHeight();
 	}
 
-	public Map<Long, Player> getPlayers() {
+	public Map<Integer, Player> getPlayers() {
 		return new HashMap<>(players);
 	}
 
-	private void checkContainsPlayer(long playerId) throws PlayerNotInGameException {
+	private void checkContainsPlayer(int playerId) throws PlayerNotInGameException {
 		Player player = players.get(playerId);
 		if(player == null) {
 			throw new PlayerNotInGameException(playerId);

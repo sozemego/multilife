@@ -10,10 +10,10 @@ public class MessageConverter {
 	}
 
 	public static byte[] convertMessage(CellList list) {
-		byte[] message = new byte[1 + list.cells.size() * 17]; //each cell takes 17 bytes of data
+		byte[] message = new byte[1 + list.cells.size() * 13]; //each cell takes 13 bytes of data
 		message[0] = OutgoingType.CELL_LIST.getTypeMarker();
 
-		final int cellDataSize = 17;
+		final int cellDataSize = 13;
 		int offset = 1;
 		List<CellData> cells = list.cells;
 
@@ -22,13 +22,23 @@ public class MessageConverter {
 			buffer.putInt(data.x);
 			buffer.putInt(data.y);
 			buffer.put((byte) (data.alive ? 1 : 0));
-			buffer.putLong(data.ownerId);
+			buffer.putInt(data.ownerId);
 
 			System.arraycopy(buffer.array(), 0, message, offset, buffer.array().length);
 
 			offset += cellDataSize;
 		}
 
+		return message;
+	}
+
+	public static byte[] convertMessage(TickData tickData) {
+		byte[] message = new byte[5];
+		message[0] = OutgoingType.TICK_DATA.getTypeMarker();
+		ByteBuffer buffer = ByteBuffer.allocate(4);
+		buffer.putInt(tickData.iterations);
+
+		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
 		return message;
 	}
 

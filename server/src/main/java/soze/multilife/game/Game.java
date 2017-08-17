@@ -22,7 +22,7 @@ public interface Game {
 	 * PlayerId denotes id of the player who sent the message.
 	 * @throws PlayerNotInGameException if player with given id is not in game
 	 */
-	void acceptMessage(IncomingMessage message, long playerId) throws PlayerNotInGameException;
+	void acceptMessage(IncomingMessage message, int playerId) throws PlayerNotInGameException;
 
 	/**
 	 * Adds a player to the game.
@@ -35,7 +35,7 @@ public interface Game {
 	 * Removes a player with given id from the game.
 	 * @throws PlayerNotInGameException if a player with given id is not in game
 	 */
-	void removePlayer(long playerId) throws PlayerNotInGameException;
+	void removePlayer(int playerId) throws PlayerNotInGameException;
 
 	/**
 	 * Ends the game. Disconnects all players and schedules this game for removal.
@@ -55,7 +55,7 @@ public interface Game {
 	/**
 	 * Returns a map of playerId-player pairs connected to the game.
 	 */
-	Map<Long, Player> getPlayers();
+	Map<Integer, Player> getPlayers();
 
 	int getWidth();
 	int getHeight();

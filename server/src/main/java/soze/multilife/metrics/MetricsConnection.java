@@ -22,7 +22,7 @@ public class MetricsConnection extends BaseConnection {
 	private final EventBus eventBus;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	public MetricsConnection(long id, Session session, EventBus eventBus) {
+	public MetricsConnection(int id, Session session, EventBus eventBus) {
 		super(id, session);
 		this.eventBus = Objects.requireNonNull(eventBus);
 	}

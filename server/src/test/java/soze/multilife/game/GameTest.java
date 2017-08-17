@@ -21,7 +21,7 @@ class GameTest {
 		return new BaseGameBuilder();
 	}
 
-	protected Player createPlayerMock(long id) {
+	protected Player createPlayerMock(int id) {
 		Player player = mock(Player.class);
 		when(player.getRule()).thenReturn("BASIC");
 		when(player.getId()).thenReturn(id);

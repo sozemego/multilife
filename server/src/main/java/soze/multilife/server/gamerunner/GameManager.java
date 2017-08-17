@@ -56,7 +56,7 @@ public class GameManager {
 		}
 	}
 
-	public void acceptMessage(IncomingMessage message, long playerId, int gameId) {
+	public void acceptMessage(IncomingMessage message, int playerId, int gameId) {
 		GameContainer container = gamesToContainers.get(gameId);
 		if(container != null) {
 			container.acceptMessage(message, playerId, gameId);

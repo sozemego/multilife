@@ -10,7 +10,7 @@ public class CellData {
 	public final int x;
 	public final int y;
 	public final boolean alive;
-	public final long ownerId;
+	public final int ownerId;
 
 	public CellData(Cell cell) {
 		this.x = cell.getX();

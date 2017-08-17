@@ -36,8 +36,8 @@ public class Grid {
 	private final int width;
 	private final int height;
 
-	private Consumer<Long> onCellDeath = (var) -> {};
-	private Consumer<Long> onCellBirth = (var) -> {};
+	private Consumer<Integer> onCellDeath = (var) -> {};
+	private Consumer<Integer> onCellBirth = (var) -> {};
 
 	Grid(int width, int height, Rule rule) {
 		if(width <= 0 || height <= 0) throw new IllegalArgumentException("Invalid height or width, cannot be below 1.");
@@ -58,11 +58,11 @@ public class Grid {
 		}
 	}
 
-	void onCellDeath(Consumer<Long> onCellDeath) {
+	void onCellDeath(Consumer<Integer> onCellDeath) {
 		this.onCellDeath = onCellDeath;
 	}
 
-	void onCellBirth(Consumer<Long> onCellBirth) {
+	void onCellBirth(Consumer<Integer> onCellBirth) {
 		this.onCellBirth = onCellBirth;
 	}
 
@@ -89,7 +89,7 @@ public class Grid {
 	 * @param state   state of the cell
 	 * @param ownerId owner of the cell
 	 */
-	void changeState(int x, int y, boolean state, long ownerId) {
+	void changeState(int x, int y, boolean state, int ownerId) {
 		Point p = getPoint(x, y);
 		changeState(p, state, ownerId);
 	}
@@ -111,7 +111,7 @@ public class Grid {
 	 * @param ownerId id of the player who clicked
 	 * @return a list of all clickable (by this player) \s
 	 */
-	List<Cell> findClickableCells(int[] indices, long ownerId) {
+	List<Cell> findClickableCells(int[] indices, int ownerId) {
 		List<Cell> clickableCells = new ArrayList<>();
 		for (int i : indices) {
 			Point p = getPoint(i);
@@ -133,7 +133,7 @@ public class Grid {
 	 * @param state   alive/dead
 	 * @param ownerId id of the owner
 	 */
-	private void changeState(Point p, boolean state, long ownerId) {
+	private void changeState(Point p, boolean state, int ownerId) {
 		Cell cell = nextCells.get(p);
 		if (cell == null) {
 			cell = new Cell(p.x, p.y);
@@ -189,8 +189,8 @@ public class Grid {
 			List<Cell> aliveNeighbours = getAliveNeighbourCells(x, y);
 			int state = rule.apply(aliveNeighbours.size(), cell.isAlive());
 			if (state != 0) {
-				long ownerId = cell.getOwnerId();
-				long strongestOwnerId = getStrongestOwnerId(aliveNeighbours);
+				int ownerId = cell.getOwnerId();
+				int strongestOwnerId = getStrongestOwnerId(aliveNeighbours);
 				// 0 -> 1 | point to strongest owner
 				// 1 -> 0 | point from cell owner
 				if (state == -1) {
@@ -223,18 +223,18 @@ public class Grid {
 	 * Finds the most frequently (mode) occuring ownerId among given cells.
 	 * If there are no cells, returns -1.
 	 */
-	private long getStrongestOwnerId(List<Cell> cells) {
+	private int getStrongestOwnerId(List<Cell> cells) {
 		if (cells.isEmpty()) {
 			return -1;
 		}
-		List<Long> ownerIds = cells.stream()
+		List<Integer> ownerIds = cells.stream()
 			.map(Cell::getOwnerId)
 			.collect(Collectors.toList());
 		return mode(ownerIds);
 	}
 
-	private long mode(List<Long> list) {
-		long maxValue = 0, maxCount = 0;
+	private int mode(List<Integer> list) {
+		int maxValue = 0, maxCount = 0;
 
 		for (int i = 0; i < list.size(); ++i) {
 			int count = 0;
@@ -271,7 +271,7 @@ public class Grid {
 	void killAll(long playerId) {
 		for (Cell cell : cells.values()) {
 			if (cell.getOwnerId() == playerId) {
-				cell.setOwnerId(0L);
+				cell.setOwnerId(0);
 				cell.setAlive(false);
 			}
 		}

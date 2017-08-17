@@ -1,17 +1,15 @@
 package soze.multilife.server;
 
 import org.eclipse.jetty.websocket.api.Session;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import soze.multilife.messages.incoming.ClickMessage;
-import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.LoginMessage;
 import soze.multilife.server.connection.Connection;
 import soze.multilife.server.connection.ConnectionFactory;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -53,7 +51,7 @@ public class GameSocketHandlerTest {
         gameSocketHandler.onOpen(session);
 
         gameSocketHandler.onMessage(session, "{\"name\": \"Player\", \"type\":\"LOGIN\"}");
-        verify(lobby, times(0)).onMessage(any(LoginMessage.class), eq(1L));
+        verify(lobby, times(0)).onMessage(any(LoginMessage.class), eq(1));
     }
 
     @Test
@@ -67,7 +65,7 @@ public class GameSocketHandlerTest {
         gameSocketHandler.onOpen(session);
 
         gameSocketHandler.onMessage(session, "{\"indices\": [1, 2, 3], \"type\":\"CLICK\"}");
-        verify(lobby, times(1)).onMessage(any(ClickMessage.class), eq(1L));
+        verify(lobby, times(1)).onMessage(any(ClickMessage.class), eq(1));
     }
 
 

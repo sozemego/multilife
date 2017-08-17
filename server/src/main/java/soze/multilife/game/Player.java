@@ -7,19 +7,19 @@ import java.util.Objects;
 
 public class Player {
 
-	private final long id;
+	private final int id;
 	private final Connection connection;
 	private final String name;
 	private final String rule;
 
-	public Player(long id, Connection connection, String name, String rule) {
+	public Player(int id, Connection connection, String name, String rule) {
 		this.id = id;
 		this.connection = Objects.requireNonNull(connection);
 		this.name = Objects.requireNonNull(name);
 		this.rule = Objects.requireNonNull(rule);
 	}
 
-	public long getId() {
+	public int getId() {
 		return id;
 	}
 
@@ -59,6 +59,6 @@ public class Player {
 
 	@Override
 	public int hashCode() {
-		return (int) (id ^ (id >>> 32));
+		return (id ^ (id >>> 32));
 	}
 }

@@ -10,7 +10,7 @@ public interface Connection {
 	/**
 	 * Returns id of this connection. Ids have to be unique.
 	 */
-	public long getId();
+	public int getId();
 
 	/**
 	 * Sends a message to the client connected to this connection.

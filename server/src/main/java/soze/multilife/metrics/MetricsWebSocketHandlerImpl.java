@@ -14,7 +14,7 @@ import soze.multilife.server.connection.ConnectionFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A metrics endpoint handler for live data.
@@ -29,9 +29,9 @@ public class MetricsWebSocketHandlerImpl implements MetricsWebSocketHandler {
 	private final MetricsService metricsService;
 	private final ConnectionFactory connectionFactory;
 
-	private final AtomicLong nextId = new AtomicLong();
-	private final Map<Session, Long> sessionIdMap = new ConcurrentHashMap<>();
-	private final Map<Long, Connection> connections = new ConcurrentHashMap<>();
+	private final AtomicInteger nextId = new AtomicInteger();
+	private final Map<Session, Integer> sessionIdMap = new ConcurrentHashMap<>();
+	private final Map<Integer, Connection> connections = new ConcurrentHashMap<>();
 
 	public MetricsWebSocketHandlerImpl(MetricsConfiguration configuration, MetricsService metricsService, ConnectionFactory connectionFactory) {
 		this.configuration = configuration;
