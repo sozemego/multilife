@@ -88,7 +88,7 @@ public class GameContainer implements Runnable {
 					.filter(Game::isOutOfTime)
 					.forEach(Game::end);
 
-			games.values().removeIf(Game::isScheduledForRemoval);
+			games.values().removeIf(game -> game.isScheduledForRemoval() && game.getPlayers().isEmpty());
 			games.values().forEach(this::sendClickedData);
 			games.values().forEach(Game::run);
 			games.values().forEach(this::sendRemainingMessages);

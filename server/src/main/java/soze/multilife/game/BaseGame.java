@@ -273,7 +273,8 @@ public class BaseGame implements Game {
 	 */
 	public void end() {
 		synchronized (players) {
-			for (Player player : players.values()) {
+			List<Player> playersCopy = new ArrayList<>(players.values());
+			for (Player player : playersCopy) {
 				player.disconnect();
 			}
 		}

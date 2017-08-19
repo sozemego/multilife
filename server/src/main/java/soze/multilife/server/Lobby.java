@@ -98,7 +98,6 @@ public class Lobby implements Runnable {
 		}
 
 		gameToPlayers.removeAll(gameId);
-
 		Optional<Game> game = gameManager.getGameById(gameId);
 		if(game.isPresent()) {
 			try {
