@@ -105,11 +105,9 @@ public class Lobby implements Runnable {
 				game.get().removePlayer(id);
 			} catch (PlayerNotInGameException e) {
 				LOG.warn("Trying to remove a player with id [{}] that is not in-game.", e.getPlayerId());
-				return;
 			} finally {
 				eventBus.post(new PlayerDisconnectedEvent(id));
 			}
-			LOG.trace("SENDING PLAYER DISCONNECTED_EVENT");
 		}
 	}
 

@@ -56,7 +56,6 @@ public class MetricsService implements Runnable {
 					process((PlayerLoggedEvent) event);
 				}
 				if (event instanceof PlayerDisconnectedEvent) {
-					LOG.trace("RECEIVED PLAYER_DC_EVENT");
 					process((PlayerDisconnectedEvent) event);
 				}
 				if (event instanceof SerializedMetricEvent) {
