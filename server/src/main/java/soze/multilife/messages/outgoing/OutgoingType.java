@@ -8,11 +8,13 @@ public enum OutgoingType {
 	CELL_LIST((byte) 1),
 	MAP_DATA((byte) 2),
 	PLAYER_IDENTITY((byte) 3),
-	PLAYER_DATA((byte) 4),
 	TICK_DATA((byte) 5),
 	PONG((byte) 6),
 	TIME_REMAINING((byte) 7),
-	METRICS((byte) 8);
+	METRICS((byte) 8),
+	PLAYER_ADDED((byte) 9),
+	PLAYER_REMOVED((byte) 10),
+	PLAYER_POINTS((byte) 11);
 
 	private final byte typeMarker;
 

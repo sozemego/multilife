@@ -6,7 +6,10 @@ import soze.multilife.game.Cell;
 import soze.multilife.game.Game;
 import soze.multilife.game.exceptions.PlayerNotInGameException;
 import soze.multilife.messages.incoming.IncomingMessage;
-import soze.multilife.messages.outgoing.*;
+import soze.multilife.messages.outgoing.CellList;
+import soze.multilife.messages.outgoing.PlayerPoints;
+import soze.multilife.messages.outgoing.TickData;
+import soze.multilife.messages.outgoing.TimeRemainingMessage;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,8 +67,9 @@ public class GameContainer implements Runnable {
 		game.sendMessage(tickData);
 		TimeRemainingMessage timeRemainingMessage = new TimeRemainingMessage(game.getRemainingTime());
 		game.sendMessage(timeRemainingMessage);
-		PlayerData playerData = game.getPlayerData();
-		game.sendMessage(playerData);
+
+		Map<Integer, Integer> playerPoints = game.getPlayerPoints();
+		playerPoints.forEach((id, points) -> game.sendMessage(new PlayerPoints(id, points)));
 	}
 
 	public void run() {
@@ -137,9 +141,9 @@ public class GameContainer implements Runnable {
 	 * @return CellList
 	 */
 	private CellList constructCellList(Collection<Cell> cells) {
-		List<CellData> cellData = new ArrayList<>();
+		List<CellList.CellData> cellData = new ArrayList<>();
 		for (Cell cell : cells) {
-			cellData.add(new CellData(cell));
+			cellData.add(new CellList.CellData(cell));
 		}
 		return new CellList(cellData);
 	}

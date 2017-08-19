@@ -12,12 +12,11 @@ public class PlayerData extends OutgoingMessage {
 	public Map<Integer, String> names;
 	public Map<Integer, String> colors;
 
-	public PlayerData(
+	private PlayerData(
 			Map<Integer, Integer> points,
 			Map<Integer, String> names,
 			Map<Integer, String> colors
 	) {
-		setType(OutgoingType.PLAYER_DATA);
 		this.points = Objects.requireNonNull(points);
 		this.names = Objects.requireNonNull(names);
 		this.colors = Objects.requireNonNull(colors);

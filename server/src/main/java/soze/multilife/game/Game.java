@@ -4,7 +4,6 @@ import soze.multilife.game.exceptions.PlayerAlreadyInGameException;
 import soze.multilife.game.exceptions.PlayerNotInGameException;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.outgoing.OutgoingMessage;
-import soze.multilife.messages.outgoing.PlayerData;
 
 import java.awt.*;
 import java.util.Collection;
@@ -44,18 +43,14 @@ public interface Game {
 
 	int getMaxPlayers();
 
-	/**
-	 * Creates {@link PlayerData} object.
-	 * This object contains information about player points, names, colors and rules.
-	 *
-	 * @return PlayerData
-	 */
-	PlayerData getPlayerData();
+	Map<Integer, Integer> getPlayerPoints();
 
 	/**
 	 * Returns a map of playerId-player pairs connected to the game.
 	 */
 	Map<Integer, Player> getPlayers();
+
+	String getPlayerColor(int playerId);
 
 	int getWidth();
 	int getHeight();

@@ -237,18 +237,18 @@ class Game {
 		let dom = document.getElementById("player-points");
 		dom.innerHTML = "";
 
-		for (let o in this.playerData.colors) {
-			if (this.playerData.colors.hasOwnProperty(o)) {
-				let color = this.playerData.colors[o];
-				let name = this.playerData.names[o];
-				let points = this.playerData.points[o];
+		for(let playerId in this.playerData) {
+			if (this.playerData.hasOwnProperty(playerId)) {
+				let color = this.playerData[playerId].color;
+				let name = this.playerData[playerId].name;
+				let points = this.playerData[playerId].points;
 
 				let listElement = document.createElement("div");
 				listElement.classList.add("player-points-element");
 
 				let playerColorElement = document.createElement("span");
 				playerColorElement.classList.add("player-points-color");
-				playerColorElement.style.backgroundColor = color;
+				playerColorElement.style.backgroundColor = this._convertIntToHexColor(color);
 
 				listElement.appendChild(playerColorElement);
 
@@ -271,8 +271,8 @@ class Game {
 				dom.appendChild(listElement);
 			}
 		}
-	};
 
+	};
 
 	/**
 	 Updates the simulation.
@@ -297,6 +297,7 @@ class Game {
 	 Renders cells.
 	 */
 	_render = () => {
+		this._renderPlayerPoints();
 		this._renderSelectedShape();
 		this.simulation.render(this._getViewport());
 	};
@@ -425,6 +426,15 @@ class Game {
 			const data = this._handleByteTimeRemaining(msg);
 			this._onRemainingTime(data);
 		}
+		if(msg[0] === 9) {
+			this._handleBytePlayerAdded(msg);
+		}
+		if(msg[0] === 10) {
+			this._handleBytePlayerRemoved(msg);
+		}
+		if(msg[0] === 11) {
+			this._handleBytePlayerPoints(msg);
+		}
 	}
 
 	_onPlayerData = (msg) => {
@@ -435,8 +445,8 @@ class Game {
 
 	_handleByteMapData = (msg) => {
 		return {
-			width: this._convertBytesToInt(msg.slice(1, 5)),
-			height: this._convertBytesToInt(msg.slice(5))
+			width: this._convertBytesToInt32(msg.slice(1, 5)),
+			height: this._convertBytesToInt32(msg.slice(5))
 		}
 	};
 
@@ -453,10 +463,10 @@ class Game {
 		const cells = [];
 		let offset = 1;
 		for(let i = 0; i < cellCount; i++) {
-			const x = this._convertBytesToInt(data.slice(offset, offset + 4));
-			const y = this._convertBytesToInt(data.slice(offset + 4, offset + 8));
+			const x = this._convertBytesToInt32(data.slice(offset, offset + 4));
+			const y = this._convertBytesToInt32(data.slice(offset + 4, offset + 8));
 			const alive = this._convertByteToBoolean(data[offset + 8]);
-			const ownerId = this._convertBytesToInt(data.slice(offset + 9, offset + 13));
+			const ownerId = this._convertBytesToInt32(data.slice(offset + 9, offset + 13));
 			cells.push({
 				x, y, alive, ownerId
 			});
@@ -466,16 +476,37 @@ class Game {
 		return {cells};
 	};
 
-	_convertBytesToInt(bytes) { //TODO make static util functions
+	_convertBytesToInt32 = (bytes) => { //TODO make static util functions
 		return new DataView(bytes.buffer).getInt32(0, false);
-	}
+	};
 
-	_convertBytesToFloat(bytes) { //TODO make static util functions
+	_convertBytesToInt16 = (bytes) => { //TODO make static util functions
+		return new DataView(bytes.buffer).getInt16(0, false);
+	};
+
+	_convertBytesToFloat = (bytes) => { //TODO make static util functions
 		return new DataView(bytes.buffer).getFloat32(0, false);
-	}
+	};
 
-	_convertByteToBoolean(byte) { //TODO make static util functions
+	_convertByteToBoolean = (byte) => { //TODO make static util functions
 		return byte === 1;
+	};
+
+	_convertIntToHexColor = (int) => {
+		int >>>= 0;
+		const b = int & 0xFF,
+			g = (int & 0xFF00) >>> 8,
+			r = (int & 0xFF0000) >>> 16;
+		return "rgb(" + [r, g, b].join(",") + ")";
+	};
+
+	_convertBytesToString(bytes) { //TODO make static util functions
+		let result = "";
+		for(let i = 0; i < bytes.length; i += 2) {
+			const charBytes = bytes.slice(i, i + 2);
+			result += String.fromCharCode(this._convertBytesToInt16(charBytes));
+		}
+		return result;
 	}
 
 	_onMapUpdate = (data) => {
@@ -508,7 +539,7 @@ class Game {
 
 	_handleByteTickData = (msg) => {
 		return {
-			iterations: this._convertBytesToInt(msg.slice(1))
+			iterations: this._convertBytesToInt32(msg.slice(1))
 		}
 	};
 
@@ -527,7 +558,7 @@ class Game {
 	};
 
 	_handleBytePlayerIdentity = (msg) => {
-		return this._convertBytesToInt(msg.slice(1));
+		return this._convertBytesToInt32(msg.slice(1));
 	};
 
 	getFPS = () => {
@@ -650,6 +681,29 @@ class Game {
 		minute = ("00" + minute).substr(minute.length);
 
 		return minute + ":" + second;
+	};
+
+	_handleBytePlayerAdded = (msg) => {
+		const {playerData} = this;
+		const playerId = this._convertBytesToInt32(msg.slice(1, 5));
+		const playerColorInt = this._convertBytesToInt32(msg.slice(5, 9));
+		const playerName = this._convertBytesToString(msg.slice(9));
+		const obj = {};
+		obj.color = playerColorInt;
+		obj.name = playerName;
+		playerData[playerId] = obj;
+	};
+
+	_handleBytePlayerRemoved = (msg) => {
+		const {playerData} = this;
+		const playerId = this._convertBytesToInt32(msg.slice(1, 5));
+		delete playerData[playerId];
+	};
+
+	_handleBytePlayerPoints = (msg) => {
+		const {playerData} = this;
+		const playerId = this._convertBytesToInt32(msg.slice(1, 5));
+		playerData[playerId].points = this._convertBytesToInt32(msg.slice(5));
 	};
 
 	_sendPingMessage = () => {
