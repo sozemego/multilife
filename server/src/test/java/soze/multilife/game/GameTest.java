@@ -23,7 +23,6 @@ class GameTest {
 
 	protected Player createPlayerMock(int id) {
 		Player player = mock(Player.class);
-		when(player.getRule()).thenReturn("BASIC");
 		when(player.getId()).thenReturn(id);
 		doNothing().when(player).disconnect();
 		return player;

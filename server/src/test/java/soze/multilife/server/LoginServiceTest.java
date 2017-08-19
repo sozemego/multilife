@@ -29,7 +29,6 @@ public class LoginServiceTest {
 		Player player = loginService.login(loginMessage, connection);
 
 		assertTrue(player.getName().equals("Player"));
-		assertTrue(player.getRule().equals("BASIC"));
 		assertTrue(player.getId() == 1L);
 	}
 

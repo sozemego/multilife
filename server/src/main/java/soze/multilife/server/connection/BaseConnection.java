@@ -31,6 +31,16 @@ public class BaseConnection implements Connection {
 		return id;
 	}
 
+//	@Override
+//	public void send(OutgoingMessage message) {
+//		try {
+//			String json = JsonUtils.stringify(message);
+//			this.session.getRemote().sendStringByFuture(json);
+//		} catch (IOException e) {
+//			LOG.warn("Base connection could not send string.", e);
+//		}
+//	}
+
 	@Override
 	public void send(OutgoingMessage message) {
 		Objects.requireNonNull(message);

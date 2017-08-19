@@ -206,20 +206,17 @@ public class BaseGame implements Game {
 		Map<Integer, Integer> points = playerPoints;
 		Map<Integer, String> names = new HashMap<>();
 		Map<Integer, String> colors = new HashMap<>();
-		Map<Integer, String> rules = new HashMap<>();
 
-		// data for the simulation
+		// data for the 'AI' player
 		points.put(0, 0);
 		names.put(0, "AI");
 		colors.put(0, "#000000");
-		rules.put(0, "BASIC");
 
 		for (Player player : players.values()) {
 			names.put(player.getId(), player.getName());
 			colors.put(player.getId(), playerColors.get(player.getId()));
-			rules.put(player.getId(), player.getRule());
 		}
-		return new PlayerData(points, names, colors, rules);
+		return new PlayerData(points, names, colors);
 	}
 
 	public Map<Point, Cell> getAllCells() {

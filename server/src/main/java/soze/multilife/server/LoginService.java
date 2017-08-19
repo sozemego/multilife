@@ -15,7 +15,7 @@ public class LoginService {
 	public Player login(LoginMessage message, Connection connection) {
 		Objects.requireNonNull(message);
 		Objects.requireNonNull(connection);
-		return new Player(connection.getId(), connection, message.getName(), "BASIC");
+		return new Player(connection.getId(), connection, message.getName());
 	}
 
 }

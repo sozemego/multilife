@@ -27,7 +27,7 @@ let loginNew = function(players) {
 	};
 
 	ws.onmessage = function(msg) {
-		handleMessage(JSON.parse(msg.data));
+		// handleMessage(JSON.parse(msg.data));
 	};
 
 	function getLoginObject(name) {

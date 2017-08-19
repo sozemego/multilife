@@ -10,13 +10,11 @@ public class Player {
 	private final int id;
 	private final Connection connection;
 	private final String name;
-	private final String rule;
 
-	public Player(int id, Connection connection, String name, String rule) {
+	public Player(int id, Connection connection, String name) {
 		this.id = id;
 		this.connection = Objects.requireNonNull(connection);
 		this.name = Objects.requireNonNull(name);
-		this.rule = Objects.requireNonNull(rule);
 	}
 
 	public int getId() {
@@ -41,10 +39,6 @@ public class Player {
 
 	public String getName() {
 		return name;
-	}
-
-	public String getRule() {
-		return rule;
 	}
 
 	@Override

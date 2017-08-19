@@ -260,7 +260,7 @@ public class BaseGameTest extends GameTest {
 		game.addPlayer(player1);
 		game.addPlayer(player2);
 
-		PlayerData data = new PlayerData(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
+		PlayerData data = new PlayerData(new HashMap<>(), new HashMap<>(), new HashMap<>());
 		game.sendMessage(data);
 		verify(player1, times(1)).send(any(OutgoingMessage.class));
 		verify(player2, times(1)).send(any(OutgoingMessage.class));
@@ -304,7 +304,6 @@ public class BaseGameTest extends GameTest {
 		assertEquals(data.colors.size(), 1);
 		assertEquals(data.names.size(), 1);
 		assertEquals(data.points.size(), 1);
-		assertEquals(data.rules.size(), 1);
 	}
 
 	@Test
@@ -318,7 +317,6 @@ public class BaseGameTest extends GameTest {
 		assertEquals(data.colors.size(), 2);
 		assertEquals(data.names.size(), 2);
 		assertEquals(data.points.size(), 1);
-		assertEquals(data.rules.size(), 2);
 	}
 
 }

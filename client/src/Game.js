@@ -31,7 +31,6 @@ class Game {
 		this.height = 0;
 		this.webSocket = undefined;
 		this.myId = 0;
-		this.rules = ["BASIC"];
 		this.connected = false;
 		this.recentlyClicked = false;
 		this.playerData = {};
@@ -115,7 +114,7 @@ class Game {
 
 		this.webSocket = new WebSocket("ws://127.0.0.1:8000/game");
 		this.webSocket.onopen = () => {
-			this.webSocket.send(JSON.stringify({type: "LOGIN", name: name, rule: "BASIC"}));
+			this.webSocket.send(JSON.stringify({type: "LOGIN", name: name}));
 			document.getElementById("login-container").classList.add("logged");
 			this.connected = true;
 			this._renderAvailableShapes();

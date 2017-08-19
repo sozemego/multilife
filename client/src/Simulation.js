@@ -1,5 +1,5 @@
 import Cell from "./Cell";
-import Rules from "./Rules";
+import { basicRule } from "./Rules";
 
 /**
  * Class responsible for the simulation of game of life.
@@ -14,7 +14,6 @@ export default class Simulation {
 		this.nextCells = {};
 		this.playerData = playerData;
 		this.cellSize = cellSize;
-		this.rules = new Rules();
 		this.defaultOwnerId = 0;
 		this.renderFunction = renderFunction;
 		this._init();
@@ -85,9 +84,8 @@ export default class Simulation {
 				let cell = this.activeCells[pos];
 				let {x, y} = cell;
 				let aliveNeighbours = this._getAliveNeighbourCells(x, y);
-				let ownerId = cell.getOwnerId();
-				let state = this.rules.getRule(this.playerData.rules[ownerId])(aliveNeighbours.length, cell.isAlive());
-				if (state != 0) {
+				let state = basicRule(aliveNeighbours.length, cell.isAlive());
+				if (state !== 0) {
 					let strongestOwnerId = this._getStrongestOwnerId(aliveNeighbours);
 					this.setCellState({
 						x: x,
@@ -199,8 +197,8 @@ export default class Simulation {
 	 */
 	_removeDisconnectedPlayers = (newPlayerData) => {
 		let oldData = this.playerData;
-		let oldPlayerIds = this._getPlayerIds(oldData.rules);
-		let newPlayerIds = this._getPlayerIds(newPlayerData.rules);
+		let oldPlayerIds = this._getPlayerIds(oldData.colors);
+		let newPlayerIds = this._getPlayerIds(newPlayerData.colors);
 		let disconnectedPlayers = this._findDisconnectedPlayers(oldPlayerIds, newPlayerIds);
 		for (let i = 0; i < disconnectedPlayers.length; i++) {
 			let id = disconnectedPlayers[i];

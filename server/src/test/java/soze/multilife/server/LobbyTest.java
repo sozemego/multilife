@@ -89,7 +89,7 @@ public class LobbyTest {
 		when(conn.getId()).thenReturn(1);
 
 		lobby.onConnect(conn);
-		Player player = new Player(conn.getId(), conn, "Player", "BASIC");
+		Player player = new Player(conn.getId(), conn, "Player");
 		lobby.addPlayer(player);
 
 		lobby.onDisconnect(conn);
