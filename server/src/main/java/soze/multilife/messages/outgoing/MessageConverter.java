@@ -24,8 +24,7 @@ public class MessageConverter {
 			buffer.put((byte) (data.alive ? 1 : 0));
 			buffer.putInt(data.ownerId);
 
-			System.arraycopy(buffer.array(), 0, message, offset, buffer.array().length);
-
+			copy(buffer, message, offset);
 			offset += cellDataSize;
 		}
 
@@ -38,8 +37,7 @@ public class MessageConverter {
 		ByteBuffer buffer = ByteBuffer.allocate(4);
 		buffer.putInt(tickData.iterations);
 
-		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
-		return message;
+		return copy(buffer, message);
 	}
 
 	public static byte[] convertMessage(MapData mapData) {
@@ -50,8 +48,7 @@ public class MessageConverter {
 		buffer.putInt(mapData.width);
 		buffer.putInt(mapData.height);
 
-		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
-		return message;
+		return copy(buffer, message);
 	}
 
 	public static byte[] convertMessage(PlayerIdentity playerIdentity) {
@@ -61,8 +58,7 @@ public class MessageConverter {
 		ByteBuffer buffer = ByteBuffer.allocate(4);
 		buffer.putInt(playerIdentity.playerId);
 
-		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
-		return message;
+		return copy(buffer, message);
 	}
 
 	public static byte[] convertMessage(TimeRemainingMessage timeRemainingMessage) {
@@ -72,8 +68,7 @@ public class MessageConverter {
 		ByteBuffer buffer = ByteBuffer.allocate(4);
 		buffer.putFloat(timeRemainingMessage.remainingTime);
 
-		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
-		return message;
+		return copy(buffer, message);
 	}
 
 	public static byte[] convertMessage(PlayerAdded playerAdded) {
@@ -88,8 +83,7 @@ public class MessageConverter {
 			buffer.putChar(c);
 		}
 
-		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
-		return message;
+		return copy(buffer, message);
 	}
 
 	public static byte[] convertMessage(PlayerRemoved playerRemoved) {
@@ -99,8 +93,7 @@ public class MessageConverter {
 		ByteBuffer buffer = ByteBuffer.allocate(4);
 		buffer.putInt(playerRemoved.getPlayerId());
 
-		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
-		return message;
+		return copy(buffer, message);
 	}
 
 	public static byte[] convertMessage(PlayerPoints playerPoints) {
@@ -111,8 +104,24 @@ public class MessageConverter {
 		buffer.putInt(playerPoints.getPlayerId());
 		buffer.putInt(playerPoints.getPlayerPoints());
 
-		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
-		return message;
+		return copy(buffer, message);
+	}
+
+	private static byte[] copy(ByteBuffer buffer, byte[] to) {
+		return copy(buffer.array(), to, buffer.array().length);
+	}
+
+	private static byte[] copy(ByteBuffer buffer, byte[] to, int offset) {
+		return copy(buffer.array(), to, offset, buffer.array().length);
+	}
+
+	private static byte[] copy(byte[] from, byte[] to, int length) {
+		return copy(from, to, 1, length);
+	}
+
+	private static byte[] copy(byte[] from, byte[] to, int offset, int length) {
+		System.arraycopy(from, 0, to, offset, length);
+		return to;
 	}
 
 }
