@@ -43,8 +43,9 @@ public class BaseConnection implements Connection {
 
 	@Override
 	public void send(OutgoingMessage message) {
+		LOG.trace("Sending [{}]", message);
 		Objects.requireNonNull(message);
-		if(message instanceof PongMessage) {
+		if (message instanceof PongMessage) {
 			this.send(MessageConverter.convertMessage((PongMessage) message));
 		} else if (message instanceof CellList) {
 			this.send(MessageConverter.convertMessage((CellList) message));
@@ -56,6 +57,12 @@ public class BaseConnection implements Connection {
 			this.send(MessageConverter.convertMessage((PlayerIdentity) message));
 		} else if (message instanceof TimeRemainingMessage) {
 			this.send(MessageConverter.convertMessage((TimeRemainingMessage) message));
+		} else if (message instanceof PlayerAdded) {
+			this.send(MessageConverter.convertMessage((PlayerAdded) message));
+		} else if (message instanceof PlayerRemoved) {
+			this.send(MessageConverter.convertMessage((PlayerRemoved) message));
+		} else if (message instanceof PlayerPoints) {
+			this.send(MessageConverter.convertMessage((PlayerPoints) message));
 		} else {
 			try {
 				String json = JsonUtils.stringify(message);
@@ -68,7 +75,11 @@ public class BaseConnection implements Connection {
 
 	@Override
 	public void send(byte[] bytes) {
-		this.session.getRemote().sendBytesByFuture(ByteBuffer.wrap(bytes));
+		try {
+			this.session.getRemote().sendBytesByFuture(ByteBuffer.wrap(bytes));
+		} catch (Exception e) {
+			LOG.warn("Base connection could not send bytes. ", e);
+		}
 	}
 
 	@Override
@@ -76,4 +87,10 @@ public class BaseConnection implements Connection {
 		session.close();
 	}
 
+	@Override
+	public String toString() {
+		return "BaseConnection{" +
+				"id=" + id +
+				'}';
+	}
 }

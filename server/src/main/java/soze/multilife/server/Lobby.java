@@ -103,11 +103,13 @@ public class Lobby implements Runnable {
 		if(game.isPresent()) {
 			try {
 				game.get().removePlayer(id);
+				game.get().sendMessage(new PlayerRemoved(id));
 			} catch (PlayerNotInGameException e) {
 				LOG.warn("Trying to remove a player with id [{}] that is not in-game.", e.getPlayerId());
 				return;
+			} finally {
+				eventBus.post(new PlayerDisconnectedEvent(id));
 			}
-			eventBus.post(new PlayerDisconnectedEvent(id));
 		}
 	}
 
@@ -147,10 +149,13 @@ public class Lobby implements Runnable {
 
 			Collection<Player> players = gameToPlayers.get(game.getId());
 			players.forEach(p -> {
-				p.send(game.getPlayerData());
+				player.send(new PlayerAdded(p.getId(), game.getPlayerColor(p.getId()), p.getName()));
+				p.send(new PlayerAdded(player.getId(), game.getPlayerColor(player.getId()), player.getName()));
 				p.send(new MapData(game.getWidth(), game.getHeight()));
 				p.send(getAllAliveCellData(game));
 			});
+			// send data about AI
+			player.send(new PlayerAdded(0, "#000000", "AI"));
 		}
 	}
 
@@ -173,9 +178,9 @@ public class Lobby implements Runnable {
 	 * @return CellList
 	 */
 	private CellList constructCellList(Collection<Cell> cells) {
-		List<CellData> cellData = new ArrayList<>();
+		List<CellList.CellData> cellData = new ArrayList<>();
 		for (Cell cell : cells) {
-			cellData.add(new CellData(cell));
+			cellData.add(new CellList.CellData(cell));
 		}
 		return new CellList(cellData);
 	}

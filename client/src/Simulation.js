@@ -75,7 +75,19 @@ export default class Simulation {
 	};
 
 	_getColor = (ownerId) => {
-		return this.playerData.colors[ownerId] || "#000000";
+		if(this.playerData[ownerId]) {
+			const color = this.playerData[ownerId].color;
+			return color ? this._convertIntToHexColor(color) : "#000000";
+		}
+		return "#000000";
+	};
+
+	_convertIntToHexColor = (int) => {
+		int >>>= 0;
+		const b = int & 0xFF,
+			g = (int & 0xFF00) >>> 8,
+			r = (int & 0xFF0000) >>> 16;
+		return "rgb(" + [r, g, b].join(",") + ")";
 	};
 
 	update = () => {
@@ -185,55 +197,7 @@ export default class Simulation {
 	};
 
 	setPlayerData = (playerData) => {
-		this._removeDisconnectedPlayers(playerData);
 		Object.assign(this.playerData, playerData);
 	};
-
-	/**
-	 * Analyzes new player data and removes players from current player data that are no longer
-	 * active (they disconnected). All cells belonging to disconnected players are killed.
-	 * @param newPlayerData
-	 * @private
-	 */
-	_removeDisconnectedPlayers = (newPlayerData) => {
-		let oldData = this.playerData;
-		let oldPlayerIds = this._getPlayerIds(oldData.colors);
-		let newPlayerIds = this._getPlayerIds(newPlayerData.colors);
-		let disconnectedPlayers = this._findDisconnectedPlayers(oldPlayerIds, newPlayerIds);
-		for (let i = 0; i < disconnectedPlayers.length; i++) {
-			let id = disconnectedPlayers[i];
-			for (let pos in this.cells) {
-				if (this.cells.hasOwnProperty(pos)) {
-					let cell = this.cells[pos];
-					if (cell.ownerId == id) {
-						cell.setAlive(false);
-						cell.setOwnerId(0);
-					}
-				}
-			}
-		}
-	};
-
-	_getPlayerIds = (playerData) => {
-		let arr = [];
-		for (let id in playerData) {
-			if (playerData.hasOwnProperty(id)) {
-				arr.push(id);
-			}
-		}
-		return arr;
-	};
-
-	_findDisconnectedPlayers = (oldPlayerIds, newPlayerIds) => {
-		let disconnectedPlayers = [];
-		for (let i = 0; i < oldPlayerIds.length; i++) {
-			let oldPlayerId = oldPlayerIds[i];
-			let index = newPlayerIds.findIndex((i) => i === oldPlayerId);
-			if (index === -1) {
-				disconnectedPlayers.push(oldPlayerId);
-			}
-		}
-		return disconnectedPlayers;
-	}
 
 }

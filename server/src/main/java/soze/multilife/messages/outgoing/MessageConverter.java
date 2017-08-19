@@ -15,9 +15,9 @@ public class MessageConverter {
 
 		final int cellDataSize = 13;
 		int offset = 1;
-		List<CellData> cells = list.cells;
+		List<CellList.CellData> cells = list.cells;
 
-		for (CellData data : cells) {
+		for (CellList.CellData data : cells) {
 			ByteBuffer buffer = ByteBuffer.allocate(cellDataSize);
 			buffer.putInt(data.x);
 			buffer.putInt(data.y);
@@ -71,6 +71,45 @@ public class MessageConverter {
 
 		ByteBuffer buffer = ByteBuffer.allocate(4);
 		buffer.putFloat(timeRemainingMessage.remainingTime);
+
+		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
+		return message;
+	}
+
+	public static byte[] convertMessage(PlayerAdded playerAdded) {
+		final int messageLength = 9 + (playerAdded.getPlayerName().length() * 2);
+		byte[] message = new byte[messageLength];
+		message[0] = OutgoingType.PLAYER_ADDED.getTypeMarker();
+
+		ByteBuffer buffer = ByteBuffer.allocate(messageLength - 1);
+		buffer.putInt(playerAdded.getPlayerId());
+		buffer.putInt(playerAdded.getPlayerColor());
+		for(char c: playerAdded.getPlayerName().toCharArray()) {
+			buffer.putChar(c);
+		}
+
+		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
+		return message;
+	}
+
+	public static byte[] convertMessage(PlayerRemoved playerRemoved) {
+		byte[] message = new byte[5];
+		message[0] = OutgoingType.PLAYER_REMOVED.getTypeMarker();
+
+		ByteBuffer buffer = ByteBuffer.allocate(4);
+		buffer.putInt(playerRemoved.getPlayerId());
+
+		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
+		return message;
+	}
+
+	public static byte[] convertMessage(PlayerPoints playerPoints) {
+		byte[] message = new byte[9];
+		message[0] = OutgoingType.PLAYER_POINTS.getTypeMarker();
+
+		ByteBuffer buffer = ByteBuffer.allocate(8);
+		buffer.putInt(playerPoints.getPlayerId());
+		buffer.putInt(playerPoints.getPlayerPoints());
 
 		System.arraycopy(buffer.array(), 0, message, 1, buffer.array().length);
 		return message;

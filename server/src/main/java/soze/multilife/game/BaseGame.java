@@ -8,7 +8,6 @@ import soze.multilife.messages.incoming.ClickMessage;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingType;
 import soze.multilife.messages.outgoing.OutgoingMessage;
-import soze.multilife.messages.outgoing.PlayerData;
 
 import java.awt.*;
 import java.security.SecureRandom;
@@ -202,21 +201,12 @@ public class BaseGame implements Game {
 		}
 	}
 
-	public PlayerData getPlayerData() {
-		Map<Integer, Integer> points = playerPoints;
-		Map<Integer, String> names = new HashMap<>();
-		Map<Integer, String> colors = new HashMap<>();
+	public Map<Integer, Integer> getPlayerPoints() {
+		return new HashMap<>(playerPoints);
+	}
 
-		// data for the 'AI' player
-		points.put(0, 0);
-		names.put(0, "AI");
-		colors.put(0, "#000000");
-
-		for (Player player : players.values()) {
-			names.put(player.getId(), player.getName());
-			colors.put(player.getId(), playerColors.get(player.getId()));
-		}
-		return new PlayerData(points, names, colors);
+	public String getPlayerColor(int playerId) {
+		return playerColors.get(playerId);
 	}
 
 	public Map<Point, Cell> getAllCells() {
