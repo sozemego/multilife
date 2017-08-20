@@ -31,7 +31,7 @@ let loginNew = function(players) {
 	};
 
 	function getLoginObject(name) {
-	    return {type: "LOGIN", name: name, rule: "BASIC"};
+	    return {type: "LOGIN", name: name};
 	}
 
 	function handleMessage(msg) {
@@ -71,7 +71,8 @@ let loginNew = function(players) {
 			indices.push(randomIndex);
 		}
 
-		const message = JSON.stringify({type:"CLICK", indices: indices});
+		// const message = JSON.stringify({type:"CLICK", indices: indices});
+		const message = _getBytesClickMessage(indices);
 
 		try {
 			ws.send(message);
@@ -79,6 +80,16 @@ let loginNew = function(players) {
 			console.log(e);
 			connected = false;
 		}
+	}
+
+	function _getBytesClickMessage(indices) {
+		const buffer = new ArrayBuffer((indices.length * 4) + 4);
+		const bufferView = new Uint32Array(buffer);
+		bufferView[0] = 1;
+		for(let i = 0; i < indices.length; i++) {
+			bufferView[i + 1] = indices[i];
+		}
+		return buffer;
 	}
 
 	let pings = [];

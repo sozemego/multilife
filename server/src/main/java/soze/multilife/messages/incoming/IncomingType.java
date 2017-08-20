@@ -5,6 +5,28 @@ package soze.multilife.messages.incoming;
  */
 public enum IncomingType {
 
-	LOGIN, CLICK, PING;
+	LOGIN((byte) 1),
+	CLICK((byte) 2),
+	PING((byte) 3);
+
+	private final byte typeMarker;
+
+	public byte getTypeMarker() {
+		return typeMarker;
+	}
+
+	public static IncomingType getType(byte typeMarker) {
+		for(IncomingType type: values()) {
+			if(type.getTypeMarker() == typeMarker) {
+				return type;
+			}
+		}
+
+		throw new IllegalStateException("Invalid type marker " + typeMarker);
+	}
+
+	IncomingType(byte typeMarker) {
+		this.typeMarker = typeMarker;
+	}
 
 }

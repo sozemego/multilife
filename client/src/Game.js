@@ -41,6 +41,7 @@ class Game {
 		this.onWindowResize(window.innerWidth, window.innerHeight);
 		this._initShapes();
 		this._createLoginView();
+		this._pingMessage = new Uint8Array([3]).buffer;
 	}
 
 	/**
@@ -114,7 +115,7 @@ class Game {
 
 		this.webSocket = new WebSocket("ws://127.0.0.1:8000/game");
 		this.webSocket.onopen = () => {
-			this.webSocket.send(JSON.stringify({type: "LOGIN", name: name}));
+			this.webSocket.send(JSON.stringify({name, type: "LOGIN"}));
 			document.getElementById("login-container").classList.add("logged");
 			this.connected = true;
 			this._renderAvailableShapes();
@@ -494,9 +495,9 @@ class Game {
 
 	_convertIntToHexColor = (int) => {
 		int >>>= 0;
-		const b = int & 0xFF,
-			g = (int & 0xFF00) >>> 8,
-			r = (int & 0xFF0000) >>> 16;
+		const b = int & 0xFF;
+		const g = (int & 0xFF00) >>> 8;
+		const r = (int & 0xFF0000) >>> 16;
 		return "rgb(" + [r, g, b].join(",") + ")";
 	};
 
@@ -609,9 +610,19 @@ class Game {
 			}
 		}
 		this._untranslateMouse();
-		this.webSocket.send(JSON.stringify({type: "CLICK", indices: indices}));
+		// this.webSocket.send(JSON.stringify({type: "CLICK", indices: indices}));
+		this.webSocket.send(this._getBytesClickMessage(indices));
 	};
 
+	_getBytesClickMessage = (indices) => {
+		const buffer = new ArrayBuffer((indices.length * 4) + 4);
+		const bufferView = new Uint32Array(buffer);
+		bufferView[0] = 1;
+		for(let i = 0; i < indices.length; i++) {
+			bufferView[i + 1] = indices[i];
+		}
+		return buffer;
+	};
 
 	/**
 	 * Called when a window is resized. Used to calculate stuff based on window size
@@ -707,7 +718,7 @@ class Game {
 	};
 
 	_sendPingMessage = () => {
-		this.webSocket.send(JSON.stringify({type: "PING"}));
+		this.webSocket.send(this._pingMessage);
 	};
 
 }
