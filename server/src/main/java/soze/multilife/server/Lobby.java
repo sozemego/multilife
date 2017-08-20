@@ -144,16 +144,20 @@ public class Lobby implements Runnable {
 			eventBus.post(new PlayerLoggedEvent(player.getId(), game.getId()));
 			gameToPlayers.put(game.getId(), player);
 
-			Collection<Player> players = gameToPlayers.get(game.getId());
-			players.forEach(p -> {
-				player.send(new PlayerAdded(p.getId(), game.getPlayerColor(p.getId()), p.getName()));
-				p.send(new PlayerAdded(player.getId(), game.getPlayerColor(player.getId()), player.getName()));
-				p.send(new MapData(game.getWidth(), game.getHeight()));
-				p.send(getAllAliveCellData(game));
-			});
-			// send data about AI
-			player.send(new PlayerAdded(0, "#000000", "AI"));
+			sendDataToPlayers(player, game);
 		}
+	}
+
+	private void sendDataToPlayers(Player player, Game game) {
+		Collection<Player> players = gameToPlayers.get(game.getId());
+		players.forEach(p -> {
+			player.send(new PlayerAdded(p.getId(), game.getPlayerColor(p.getId()), p.getName()));
+			p.send(new PlayerAdded(player.getId(), game.getPlayerColor(player.getId()), player.getName()));
+			p.send(new MapData(game.getWidth(), game.getHeight()));
+			p.send(getAllAliveCellData(game));
+		});
+		// send data about AI
+		player.send(new PlayerAdded(0, "#000000", "AI"));
 	}
 
 	/**
