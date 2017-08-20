@@ -46,23 +46,23 @@ public class BaseConnection implements Connection {
 		LOG.trace("Sending [{}]", message);
 		Objects.requireNonNull(message);
 		if (message instanceof PongMessage) {
-			this.send(MessageConverter.convertMessage((PongMessage) message));
+			this.send(OutgoingMessageConverter.convertMessage((PongMessage) message));
 		} else if (message instanceof CellList) {
-			this.send(MessageConverter.convertMessage((CellList) message));
+			this.send(OutgoingMessageConverter.convertMessage((CellList) message));
 		} else if (message instanceof TickData) {
-			this.send(MessageConverter.convertMessage((TickData) message));
+			this.send(OutgoingMessageConverter.convertMessage((TickData) message));
 		} else if (message instanceof MapData) {
-			this.send(MessageConverter.convertMessage((MapData) message));
+			this.send(OutgoingMessageConverter.convertMessage((MapData) message));
 		} else if (message instanceof PlayerIdentity) {
-			this.send(MessageConverter.convertMessage((PlayerIdentity) message));
+			this.send(OutgoingMessageConverter.convertMessage((PlayerIdentity) message));
 		} else if (message instanceof TimeRemainingMessage) {
-			this.send(MessageConverter.convertMessage((TimeRemainingMessage) message));
+			this.send(OutgoingMessageConverter.convertMessage((TimeRemainingMessage) message));
 		} else if (message instanceof PlayerAdded) {
-			this.send(MessageConverter.convertMessage((PlayerAdded) message));
+			this.send(OutgoingMessageConverter.convertMessage((PlayerAdded) message));
 		} else if (message instanceof PlayerRemoved) {
-			this.send(MessageConverter.convertMessage((PlayerRemoved) message));
+			this.send(OutgoingMessageConverter.convertMessage((PlayerRemoved) message));
 		} else if (message instanceof PlayerPoints) {
-			this.send(MessageConverter.convertMessage((PlayerPoints) message));
+			this.send(OutgoingMessageConverter.convertMessage((PlayerPoints) message));
 		} else {
 			try {
 				String json = JsonUtils.stringify(message);

@@ -3,10 +3,12 @@ package soze.multilife.messages.outgoing;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-public class MessageConverter {
+public class OutgoingMessageConverter {
+
+	private static final byte[] PONG_MESSAGE = new byte[] {OutgoingType.PONG.getTypeMarker()};
 
 	public static byte[] convertMessage(PongMessage pong) {
-		return new byte[] {OutgoingType.PONG.getTypeMarker()};
+		return PONG_MESSAGE;
 	}
 
 	public static byte[] convertMessage(CellList list) {

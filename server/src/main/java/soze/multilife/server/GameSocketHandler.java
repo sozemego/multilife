@@ -2,10 +2,8 @@ package soze.multilife.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.eclipse.jetty.websocket.api.annotations.*;
+import org.eclipse.jetty.websocket.api.extensions.Frame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soze.multilife.game.Player;
@@ -67,7 +65,15 @@ public class GameSocketHandler {
 	@OnWebSocketMessage
 	public void onMessage(Session session, String msg) throws Exception {
 		sendMessage(session, msg);
+		LOG.trace("GOT MESSAGE STRING [{}]", msg);
 	}
+
+	@OnWebSocketFrame
+	public void onBinaryMessage(Session session, Frame frame) {
+		LOG.trace("GOT FRAME [{}]", frame);
+		LOG.trace("PAYLOAD [{}]", frame.getPayload().array());
+	}
+
 
 	private void sendMessage(Session session, String msg) throws java.io.IOException {
 		IncomingMessage inc = mapper.readValue(msg, IncomingMessage.class);
