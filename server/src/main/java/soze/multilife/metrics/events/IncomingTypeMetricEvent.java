@@ -1,17 +1,15 @@
 package soze.multilife.metrics.events;
 
 /**
- * Event constructed based on the instance of outgoing data.
- *
- * @see soze.multilife.messages.outgoing.OutgoingMessage
+ * Information about type of an incoming message.
  */
-public class TypeMetricEvent {
+public class IncomingTypeMetricEvent implements MetricEvent {
 
 	private final long timestamp;
 	private final String type;
 	private final int connectionId;
 
-	public TypeMetricEvent(long timestamp, String type, int connectionId) {
+	public IncomingTypeMetricEvent(long timestamp, String type, int connectionId) {
 		this.timestamp = timestamp;
 		this.type = type;
 		this.connectionId = connectionId;
@@ -28,4 +26,5 @@ public class TypeMetricEvent {
 	public int getConnectionId() {
 		return connectionId;
 	}
+
 }

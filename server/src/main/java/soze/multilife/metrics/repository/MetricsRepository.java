@@ -5,7 +5,10 @@ package soze.multilife.metrics.repository;
  */
 public interface MetricsRepository {
 
-	void saveKilobytesPerSecond(double kbs, long timestamp);
+	void saveOutgoingKilobytesPerSecond(double kbs, long timestamp);
+
+	void saveIncomingKilobytesPerSecond(double kbs, long timestamp);
+
 	void saveMaxPlayers(int players, long timestamp);
 
 }

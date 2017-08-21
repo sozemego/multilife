@@ -18,11 +18,19 @@ public class MongoMetricsRepository implements MetricsRepository {
 		this.db = Objects.requireNonNull(db);
 	}
 
-	public void saveKilobytesPerSecond(double kbs, long timestamp) {
-		MongoCollection<Document> kbsCollection = db.getCollection("kbs");
+	public void saveOutgoingKilobytesPerSecond(double kbs, long timestamp) {
+		MongoCollection<Document> kbsCollection = db.getCollection("outgoing_kbs");
 		Document document = new Document("_id", UUID.randomUUID().toString())
 			.append("kbs", kbs)
 			.append("timestamp", timestamp);
+		kbsCollection.insertOne(document);
+	}
+
+	public void saveIncomingKilobytesPerSecond(double kbs, long timestamp) {
+		MongoCollection<Document> kbsCollection = db.getCollection("incoming_kbs");
+		Document document = new Document("_id", UUID.randomUUID().toString())
+				.append("kbs", kbs)
+				.append("timestamp", timestamp);
 		kbsCollection.insertOne(document);
 	}
 

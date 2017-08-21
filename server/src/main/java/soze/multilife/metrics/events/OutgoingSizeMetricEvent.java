@@ -3,13 +3,13 @@ package soze.multilife.metrics.events;
 /**
  * Event based on outgoing serialized data.
  */
-public class SerializedMetricEvent {
+public class OutgoingSizeMetricEvent implements MetricEvent {
 
 	private final long timeStamp;
 	private final int connectionId;
 	private final int bytesSent;
 
-	public SerializedMetricEvent(long timeStamp, int connectionId, int bytesSent) {
+	public OutgoingSizeMetricEvent(long timeStamp, int connectionId, int bytesSent) {
 		this.timeStamp = timeStamp;
 		this.connectionId = connectionId;
 		this.bytesSent = bytesSent;

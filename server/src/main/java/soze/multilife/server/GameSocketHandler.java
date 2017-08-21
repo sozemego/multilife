@@ -8,11 +8,14 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import soze.multilife.events.EventBus;
 import soze.multilife.game.Player;
 import soze.multilife.messages.incoming.IncomingMessage;
 import soze.multilife.messages.incoming.IncomingMessageConverter;
 import soze.multilife.messages.incoming.IncomingType;
 import soze.multilife.messages.incoming.LoginMessage;
+import soze.multilife.metrics.events.IncomingSizeMetricEvent;
+import soze.multilife.metrics.events.IncomingTypeMetricEvent;
 import soze.multilife.server.connection.Connection;
 import soze.multilife.server.connection.ConnectionFactory;
 import spark.utils.IOUtils;
@@ -20,30 +23,39 @@ import spark.utils.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A basic delegate which handles web socket events and passes them along
- * to the simulation. Incoming messages are deserialized.
+ * to the game. Incoming messages are deserialized.
  */
 @WebSocket
-public class GameSocketHandler {
+public class GameSocketHandler { //TODO decorate this for metric events?
 
 	private static final Logger LOG = LoggerFactory.getLogger(GameSocketHandler.class);
 
 	private final LoginService loginService;
 	private final Lobby lobby;
 	private final ConnectionFactory connectionFactory;
+	private final EventBus eventBus;
+
 	private final AtomicInteger id = new AtomicInteger(0);
 	private final Map<Session, Integer> sessionIdMap = new ConcurrentHashMap<>();
 	private final ObjectMapper mapper = new ObjectMapper();
 
-	public GameSocketHandler(Lobby lobby, LoginService loginService, ConnectionFactory connectionFactory) {
-		this.lobby = lobby;
-		this.loginService = loginService;
-		this.connectionFactory = connectionFactory;
+	public GameSocketHandler(
+			Lobby lobby,
+			LoginService loginService,
+			ConnectionFactory connectionFactory,
+			EventBus eventBus
+	) {
+		this.lobby = Objects.requireNonNull(lobby);
+		this.loginService = Objects.requireNonNull(loginService);
+		this.connectionFactory = Objects.requireNonNull(connectionFactory);
+		this.eventBus = Objects.requireNonNull(eventBus);
 	}
 
 	@OnWebSocketConnect
@@ -79,6 +91,8 @@ public class GameSocketHandler {
 		byte[] payload = toByteArray(stream);
 		Optional<IncomingMessage> message = IncomingMessageConverter.convert(payload);
 		message.ifPresent(m -> {
+			sendMetricEvent(payload, sessionIdMap.get(session));
+			sendMetricEvent(m, sessionIdMap.get(session));
 			sendMessage(session, m);
 		});
 	}
@@ -108,6 +122,18 @@ public class GameSocketHandler {
 
 	private Connection getConnection(int id, Session session) {
 		return connectionFactory.getConnection(id, session);
+	}
+
+	private void sendMetricEvent(IncomingMessage incomingMessage, int connectionId) {
+		long timestamp = System.nanoTime();
+		IncomingTypeMetricEvent event = new IncomingTypeMetricEvent(timestamp, incomingMessage.getType().toString(), connectionId);
+		eventBus.post(event);
+	}
+
+	private void sendMetricEvent(byte[] payload, int connectionId) {
+		long timestamp = System.nanoTime();
+		IncomingSizeMetricEvent event = new IncomingSizeMetricEvent(timestamp, connectionId, payload.length);
+		eventBus.post(event);
 	}
 
 }

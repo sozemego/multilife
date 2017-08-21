@@ -124,7 +124,7 @@ public class MultiLife {
 
 	private void start(ServerConfiguration serverConfiguration) throws InterruptedException, ExecutionException {
 		new ServerBuilder(serverConfiguration.getServerPort())
-			.withWebSocketHandler("/game", new GameSocketHandler(lobby, loginService, connectionFactory))
+			.withWebSocketHandler("/game", new GameSocketHandler(lobby, loginService, connectionFactory, eventBus))
 			.withWebSocketHandler("/metrics-live", metricsWebSocketHandler)
 			.withHttpHandler("/metrics", metricsHttpHandler)
 			.withExternalStaticFileHandler(serverConfiguration.getExternalStaticFilesPath())

@@ -3,6 +3,7 @@ package soze.multilife.server;
 import org.eclipse.jetty.websocket.api.Session;
 import org.junit.Test;
 import org.mockito.Mockito;
+import soze.multilife.events.EventBus;
 import soze.multilife.messages.incoming.ClickMessage;
 import soze.multilife.messages.incoming.LoginMessage;
 import soze.multilife.server.connection.Connection;
@@ -20,7 +21,8 @@ public class GameSocketHandlerTest {
         Lobby lobby = Mockito.mock(Lobby.class);
         LoginService loginService = Mockito.mock(LoginService.class);
         ConnectionFactory connectionFactory = Mockito.mock(ConnectionFactory.class);
-        GameSocketHandler gameSocketHandler = new GameSocketHandler(lobby, loginService, connectionFactory);
+        EventBus bus = Mockito.mock(EventBus.class);
+        GameSocketHandler gameSocketHandler = new GameSocketHandler(lobby, loginService, connectionFactory, bus);
 
         Session session = Mockito.mock(Session.class);
         gameSocketHandler.onOpen(session);
@@ -32,7 +34,8 @@ public class GameSocketHandlerTest {
         Lobby lobby = Mockito.mock(Lobby.class);
         LoginService loginService = Mockito.mock(LoginService.class);
         ConnectionFactory connectionFactory = Mockito.mock(ConnectionFactory.class);
-        GameSocketHandler gameSocketHandler = new GameSocketHandler(lobby, loginService, connectionFactory);
+		EventBus bus = Mockito.mock(EventBus.class);
+		GameSocketHandler gameSocketHandler = new GameSocketHandler(lobby, loginService, connectionFactory, bus);
 
         Session session = Mockito.mock(Session.class);
         gameSocketHandler.onOpen(session);
@@ -45,7 +48,8 @@ public class GameSocketHandlerTest {
         Lobby lobby = Mockito.mock(Lobby.class);
         LoginService loginService = Mockito.mock(LoginService.class);
         ConnectionFactory connectionFactory = Mockito.mock(ConnectionFactory.class);
-        GameSocketHandler gameSocketHandler = new GameSocketHandler(lobby, loginService, connectionFactory);
+		EventBus bus = Mockito.mock(EventBus.class);
+		GameSocketHandler gameSocketHandler = new GameSocketHandler(lobby, loginService, connectionFactory, bus);
 
         Session session = Mockito.mock(Session.class);
         gameSocketHandler.onOpen(session);
@@ -59,7 +63,8 @@ public class GameSocketHandlerTest {
         Lobby lobby = Mockito.mock(Lobby.class);
         LoginService loginService = Mockito.mock(LoginService.class);
         ConnectionFactory connectionFactory = Mockito.mock(ConnectionFactory.class);
-        GameSocketHandler gameSocketHandler = new GameSocketHandler(lobby, loginService, connectionFactory);
+		EventBus bus = Mockito.mock(EventBus.class);
+		GameSocketHandler gameSocketHandler = new GameSocketHandler(lobby, loginService, connectionFactory, bus);
 
         Session session = Mockito.mock(Session.class);
         gameSocketHandler.onOpen(session);

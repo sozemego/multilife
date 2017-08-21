@@ -6,8 +6,8 @@ import org.eclipse.jetty.websocket.api.Session;
 import soze.multilife.events.EventBus;
 import soze.multilife.messages.outgoing.OutgoingMessage;
 import soze.multilife.messages.outgoing.OutgoingType;
-import soze.multilife.metrics.events.SerializedMetricEvent;
-import soze.multilife.metrics.events.TypeMetricEvent;
+import soze.multilife.metrics.events.OutgoingSizeMetricEvent;
+import soze.multilife.metrics.events.OutgoingTypeMetricEvent;
 import soze.multilife.server.connection.BaseConnection;
 import soze.multilife.server.connection.Connection;
 
@@ -47,12 +47,12 @@ public class MetricsConnection extends BaseConnection {
 
 	private void postEvent(byte[] bytes) {
 		long timeStamp = System.nanoTime();
-		eventBus.post(new SerializedMetricEvent(timeStamp, getId(), bytes.length));
+		eventBus.post(new OutgoingSizeMetricEvent(timeStamp, getId(), bytes.length));
 	}
 
 	private void postEvent(OutgoingType type) {
 		long timeStamp = System.nanoTime();
-		eventBus.post(new TypeMetricEvent(timeStamp, type.toString(), getId()));
+		eventBus.post(new OutgoingTypeMetricEvent(timeStamp, type.toString(), getId()));
 	}
 
 	/**
@@ -60,35 +60,35 @@ public class MetricsConnection extends BaseConnection {
 	 * @param msg outgoing message
 	 */
 	private void postEvent(OutgoingMessage msg) {
-		TypeMetricEvent event = createEvent(msg);
+		OutgoingTypeMetricEvent event = createEvent(msg);
 		eventBus.post(event);
 	}
 
 	/**
-	 * Creates {@link TypeMetricEvent}.
+	 * Creates {@link OutgoingTypeMetricEvent}.
 	 *
 	 * @param msg outgoing message
 	 * @return event constructed from the data
 	 */
-	private TypeMetricEvent createEvent(OutgoingMessage msg) {
+	private OutgoingTypeMetricEvent createEvent(OutgoingMessage msg) {
 		long timeStamp = System.nanoTime();
-		return new TypeMetricEvent(timeStamp, msg.getType().toString(), getId());
+		return new OutgoingTypeMetricEvent(timeStamp, msg.getType().toString(), getId());
 	}
 
 	/**
 	 * Assembles and posts an event based on this data.
 	 */
 	private void postEvent(String message) {
-		SerializedMetricEvent event = createEvent(message);
+		OutgoingSizeMetricEvent event = createEvent(message);
 		eventBus.post(event);
 	}
 
 	/**
 	 * Creates an event based on this message.
 	 */
-	private SerializedMetricEvent createEvent(String message) {
+	private OutgoingSizeMetricEvent createEvent(String message) {
 		long timeStamp = System.nanoTime();
-		return new SerializedMetricEvent(timeStamp, getId(), message.getBytes().length);
+		return new OutgoingSizeMetricEvent(timeStamp, getId(), message.getBytes().length);
 	}
 
 	private String serialize(OutgoingMessage message) {

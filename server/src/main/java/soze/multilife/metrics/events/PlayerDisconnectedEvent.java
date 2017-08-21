@@ -1,6 +1,6 @@
 package soze.multilife.metrics.events;
 
-public class PlayerDisconnectedEvent {
+public class PlayerDisconnectedEvent implements MetricEvent {
 
 	private final int playerId;
 

@@ -13,6 +13,7 @@ import soze.multilife.server.connection.Connection;
 import soze.multilife.server.connection.ConnectionFactory;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -33,10 +34,14 @@ public class MetricsWebSocketHandlerImpl implements MetricsWebSocketHandler {
 	private final Map<Session, Integer> sessionIdMap = new ConcurrentHashMap<>();
 	private final Map<Integer, Connection> connections = new ConcurrentHashMap<>();
 
-	public MetricsWebSocketHandlerImpl(MetricsConfiguration configuration, MetricsService metricsService, ConnectionFactory connectionFactory) {
-		this.configuration = configuration;
-		this.metricsService = metricsService;
-		this.connectionFactory = connectionFactory;
+	public MetricsWebSocketHandlerImpl(
+			MetricsConfiguration configuration,
+			MetricsService metricsService,
+			ConnectionFactory connectionFactory
+	) {
+		this.configuration = Objects.requireNonNull(configuration);
+		this.metricsService = Objects.requireNonNull(metricsService);
+		this.connectionFactory = Objects.requireNonNull(connectionFactory);
 	}
 
 	@OnWebSocketConnect
@@ -50,7 +55,7 @@ public class MetricsWebSocketHandlerImpl implements MetricsWebSocketHandler {
 
 	@OnWebSocketClose
 	public void onClose(Session session, int statusCode, String reason) throws Exception {
-		long id = sessionIdMap.remove(session);
+		int id = sessionIdMap.remove(session);
 		synchronized (connections) {
 			connections.remove(id);
 		}
@@ -85,20 +90,32 @@ public class MetricsWebSocketHandlerImpl implements MetricsWebSocketHandler {
 	}
 
 	private MetricsMessage createMetricsMessage() {
-		double averageKbs = metricsService.getAverageKbs();
+		double averageOutgoingKbs = metricsService.getAverageOutgoingKbs();
 		long totalBytesSent = metricsService.getTotalBytesSent();
 		long messagesSent = metricsService.getTotalMessagesSent();
 		double averageBytesSent = metricsService.getAverageBytesSent();
-		Map<String, Long> typeCountMap = metricsService.getTypeCountMap();
+
+		double averageIncomingKbs = metricsService.getAverageBytesReceived();
+		long totalBytesReceived = metricsService.getTotalBytesReceived();
+		long totalMessagesReceived = metricsService.getTotalMessagesReceived();
+		double averageBytesPerIncomingMessage = metricsService.getAverageBytesReceived();
+
+		Map<String, Long> outgoingTypeCountMap = metricsService.getOutgoingTypeCountMap();
+		Map<String, Long> incomingTypeCount = metricsService.getIncomingTypeCountMap();
 		Map<Integer, Integer> playerMap = metricsService.getPlayerMap();
 
 		return new MetricsMessage(
-			averageKbs,
-			totalBytesSent,
-			averageBytesSent,
-			messagesSent,
-			typeCountMap,
-			playerMap
+				averageOutgoingKbs,
+				totalBytesSent,
+				averageBytesSent,
+				messagesSent,
+				averageIncomingKbs,
+				totalBytesReceived,
+				averageBytesPerIncomingMessage,
+				totalMessagesReceived,
+				outgoingTypeCountMap,
+				incomingTypeCount,
+				playerMap
 		);
 	}
 

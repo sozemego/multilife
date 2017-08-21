@@ -4,10 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soze.multilife.configuration.interfaces.MetricsConfiguration;
-import soze.multilife.metrics.events.PlayerDisconnectedEvent;
-import soze.multilife.metrics.events.PlayerLoggedEvent;
-import soze.multilife.metrics.events.SerializedMetricEvent;
-import soze.multilife.metrics.events.TypeMetricEvent;
+import soze.multilife.metrics.events.*;
 import soze.multilife.metrics.repository.MetricsRepository;
 
 import java.time.Instant;
@@ -32,13 +29,23 @@ public class MetricsService implements Runnable {
 	private double averageBytesSent = 0d;
 	private long totalMessagesSent = 0;
 
-	private long lastKbsCalculationTime = System.currentTimeMillis();
-	private double totalBytesDuringLastCheck = 0;
-	private double averageKbs = 0d;
+	private long totalBytesReceived = 0;
+	private double averageBytesReceived = 0d;
+	private long totalMessagesReceived = 0;
+
+	private long lastOutgoingKbsCalculationTime = System.currentTimeMillis();
+	private double totalOutgoingBytesDuringLastCheck = 0;
+	private double averageOutgoingKbs = 0d;
+
+	private long lastIncomingKbsCalculationTime = System.currentTimeMillis();
+	private double totalIncomingBytesDuringLastCheck = 0;
+	private double averageIncomingKbs = 0d;
+
 	private long lastSaveTime = 0L;
 	private int maxPlayersBeforeSave = 0;
 
-	private final Map<String, Long> typeCountMap = new ConcurrentHashMap<>();
+	private final Map<String, Long> outgoingTypeCountMap = new ConcurrentHashMap<>();
+	private final Map<String, Long> incomingTypeCountMap = new ConcurrentHashMap<>();
 	private final Map<Integer, Integer> playerMap = new ConcurrentHashMap<>();
 
 	public MetricsService(MetricsRepository repository, MetricsConfiguration configuration) {
@@ -46,7 +53,6 @@ public class MetricsService implements Runnable {
 		this.configuration = configuration;
 	}
 
-	@Override
 	public void run() {
 		while (true) {
 
@@ -58,16 +64,23 @@ public class MetricsService implements Runnable {
 				if (event instanceof PlayerDisconnectedEvent) {
 					process((PlayerDisconnectedEvent) event);
 				}
-				if (event instanceof SerializedMetricEvent) {
-					process((SerializedMetricEvent) event);
+				if (event instanceof OutgoingSizeMetricEvent) {
+					process((OutgoingSizeMetricEvent) event);
 				}
-				if (event instanceof TypeMetricEvent) {
-					process((TypeMetricEvent) event);
+				if (event instanceof OutgoingTypeMetricEvent) {
+					process((OutgoingTypeMetricEvent) event);
+				}
+				if (event instanceof IncomingTypeMetricEvent) {
+					process((IncomingTypeMetricEvent) event);
+				}
+				if (event instanceof IncomingSizeMetricEvent) {
+					process((IncomingSizeMetricEvent) event);
 				}
 			}
 
 			countMaxPlayers();
-			calculateKilobytesPerSecond();
+			calculateOutgoingKilobytesPerSecond();
+			calculateIncomingKilobytesPerSecond();
 			save();
 
 			try {
@@ -80,7 +93,7 @@ public class MetricsService implements Runnable {
 
 	private void process(PlayerLoggedEvent playerEvent) {
 		int playerId = playerEvent.getPlayerId();
-		int instanceId = playerEvent.getInstanceId();
+		int instanceId = playerEvent.getGameId();
 		playerMap.put(playerId, instanceId);
 	}
 
@@ -88,26 +101,49 @@ public class MetricsService implements Runnable {
 		playerMap.remove(playerEvent.getPlayerId());
 	}
 
-	private void process(SerializedMetricEvent event) {
+	private void process(OutgoingSizeMetricEvent event) {
 		totalBytesSent += event.getBytesSent();
 		totalMessagesSent++;
 		averageBytesSent = totalBytesSent / totalMessagesSent;
 	}
 
-	private void process(TypeMetricEvent event) {
+	private void process(OutgoingTypeMetricEvent event) {
 		String type = event.getType();
-		Long count = typeCountMap.get(type);
-		typeCountMap.put(type, count == null ? 1 : ++count);
+		Long count = outgoingTypeCountMap.get(type);
+		outgoingTypeCountMap.put(type, count == null ? 1 : ++count);
 	}
 
-	private void calculateKilobytesPerSecond() {
+	private void process(IncomingSizeMetricEvent event) {
+		totalBytesReceived += event.getBytesReceived();
+		totalMessagesReceived++;
+		averageBytesReceived = totalBytesReceived / totalMessagesReceived;
+	}
+
+	private void process(IncomingTypeMetricEvent event) {
+		LOG.trace("Got incoming type metric event");
+		String type = event.getType();
+		Long count = outgoingTypeCountMap.get(type);
+		outgoingTypeCountMap.put(type, count == null ? 1 : ++count);
+	}
+
+	private void calculateOutgoingKilobytesPerSecond() {
 		long currentTime = System.currentTimeMillis();
-		long timePassedMs = currentTime - lastKbsCalculationTime;
-		double kilobytesSentSinceLastCheck = (totalBytesSent - totalBytesDuringLastCheck) / 1024;
-		averageKbs = kilobytesSentSinceLastCheck / (timePassedMs / 1000);
-		totalBytesDuringLastCheck = totalBytesSent;
-		lastKbsCalculationTime = currentTime;
-		LOG.trace("Currently sending [{}] kb/s", averageKbs);
+		long timePassedMs = currentTime - lastOutgoingKbsCalculationTime;
+		double kilobytesSentSinceLastCheck = (totalBytesSent - totalOutgoingBytesDuringLastCheck) / 1024;
+		averageOutgoingKbs = kilobytesSentSinceLastCheck / (timePassedMs / 1000);
+		totalOutgoingBytesDuringLastCheck = totalBytesSent;
+		lastOutgoingKbsCalculationTime = currentTime;
+		LOG.trace("Currently sending [{}] kb/s", averageOutgoingKbs);
+	}
+
+	private void calculateIncomingKilobytesPerSecond() {
+		long currentTime = System.currentTimeMillis();
+		long timePassedMs = currentTime - lastIncomingKbsCalculationTime;
+		double kilobytesReceivedSinceLastCheck = (totalBytesReceived - totalIncomingBytesDuringLastCheck) / 1024;
+		averageIncomingKbs = kilobytesReceivedSinceLastCheck / (timePassedMs / 1000);
+		totalIncomingBytesDuringLastCheck = totalBytesReceived;
+		lastIncomingKbsCalculationTime = currentTime;
+		LOG.trace("Currently receiving [{}] kb/s", averageIncomingKbs);
 	}
 
 	private void countMaxPlayers() {
@@ -119,7 +155,8 @@ public class MetricsService implements Runnable {
 	}
 
 	private void saveKbs() {
-		repository.saveKilobytesPerSecond(averageKbs, Instant.now().toEpochMilli());
+		repository.saveOutgoingKilobytesPerSecond(averageOutgoingKbs, Instant.now().toEpochMilli());
+		repository.saveIncomingKilobytesPerSecond(averageIncomingKbs, Instant.now().toEpochMilli());
 	}
 
 	private void saveMaxPlayers() {
@@ -137,12 +174,12 @@ public class MetricsService implements Runnable {
 	}
 
 	@Subscribe
-	public void handleInstanceMetricEvent(TypeMetricEvent event) {
+	public void handleOutgoingTypeMetricEvent(OutgoingTypeMetricEvent event) {
 		events.add(event);
 	}
 
 	@Subscribe
-	public void handleSerializedMetricEvent(SerializedMetricEvent event) {
+	public void handleOutgoingSizeMetricEvent(OutgoingSizeMetricEvent event) {
 		events.add(event);
 	}
 
@@ -156,8 +193,18 @@ public class MetricsService implements Runnable {
 		events.add(event);
 	}
 
-	public double getAverageKbs() {
-		return averageKbs;
+	@Subscribe
+	public void handleIncomingSizeMetricEvent(IncomingSizeMetricEvent event) {
+		events.add(event);
+	}
+
+	@Subscribe
+	public void handleIncomingTypeMetricEvent(IncomingTypeMetricEvent event) {
+		events.add(event);
+	}
+
+	public double getAverageOutgoingKbs() {
+		return averageOutgoingKbs;
 	}
 
 	public long getTotalBytesSent() {
@@ -172,8 +219,24 @@ public class MetricsService implements Runnable {
 		return totalMessagesSent;
 	}
 
-	public Map<String, Long> getTypeCountMap() {
-		return typeCountMap;
+	public long getTotalBytesReceived() {
+		return totalBytesReceived;
+	}
+
+	public double getAverageBytesReceived() {
+		return averageBytesReceived;
+	}
+
+	public long getTotalMessagesReceived() {
+		return totalMessagesReceived;
+	}
+
+	public Map<String, Long> getOutgoingTypeCountMap() {
+		return outgoingTypeCountMap;
+	}
+
+	public Map<String, Long> getIncomingTypeCountMap() {
+		return incomingTypeCountMap;
 	}
 
 	public Map<Integer, Integer> getPlayerMap() {
