@@ -1,10 +1,10 @@
-export default class TypeCountMetric {
+export default class OutgoingTypeCountMetric {
 
 	constructor(socket) {
 		socket.addObserver(this._handleTypeCount);
 	}
 
-	_handleTypeCount = ({typeCount} = msg) => {
+	_handleTypeCount = ({outgoingTypeCount: typeCount} = msg) => {
 		let data = this._transformTypeCountToArray(typeCount);
 
 		let max = this._findMax(data.map(d => d.count));

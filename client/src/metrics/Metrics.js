@@ -33,7 +33,7 @@ const styles = {
 		display: "flex",
 		flexDirection: "column"
 	},
-	totalBytesSent: {
+	totalBytes: {
 		width: "100%",
 		textAlign: "center"
 	},
@@ -77,7 +77,8 @@ export default class Metrics extends React.Component {
 						</MenuItem>
 					</Paper>
 					<div style={styles.content}>
-						<div id="total-bytes-sent" style={styles.totalBytesSent}/>
+						<div id="total-bytes-sent" style={styles.totalBytes}/>
+						<div id="total-bytes-received" style={styles.totalBytes}/>
 						<Divider />
 						<div id="average-kbs-container" style={selectedView !== 0 ? {display:"none"} : styles.averageKbsContainer}>
 							<div id="average-kbs">

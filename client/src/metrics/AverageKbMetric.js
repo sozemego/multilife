@@ -10,7 +10,7 @@ export default class AverageKbMetric {
 		this._text = new TextD3(document.getElementById("average-kbs"), this._textFunction);
 	}
 
-	_handleAverageKbs = ({averageKbs} = msg) => {
+	_handleAverageKbs = ({averageOutgoingKbs : averageKbs} = msg) => {
 		this._addAverageKbsToDataSet(averageKbs);
 		let timeDomainMin = this._getTimeDomainMin();
 		let timeDomainMax = this._getTimeDomainMax();
