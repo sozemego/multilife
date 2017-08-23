@@ -81,7 +81,10 @@ export default class Metrics extends React.Component {
 						<div id="total-bytes-received" style={styles.totalBytes}/>
 						<Divider />
 						<div id="average-kbs-container" style={selectedView !== 0 ? {display:"none"} : styles.averageKbsContainer}>
-							<div id="average-kbs">
+							<div id="average-kbs-outgoing">
+
+							</div>
+							<div id="average-kbs-incoming">
 
 							</div>
 						</div>
