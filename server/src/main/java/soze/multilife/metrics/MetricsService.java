@@ -122,8 +122,8 @@ public class MetricsService implements Runnable {
 	private void process(IncomingTypeMetricEvent event) {
 		LOG.trace("Got incoming type metric event");
 		String type = event.getType();
-		Long count = outgoingTypeCountMap.get(type);
-		outgoingTypeCountMap.put(type, count == null ? 1 : ++count);
+		Long count = incomingTypeCountMap.get(type);
+		incomingTypeCountMap.put(type, count == null ? 1 : ++count);
 	}
 
 	private void calculateOutgoingKilobytesPerSecond() {
