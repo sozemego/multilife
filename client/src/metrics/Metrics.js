@@ -8,7 +8,8 @@ import MetricsSocket from "./MetricsSocket";
 import TotalMessagesMetric from "./TotalMessagesMetric";
 import injectTapEventPlugin from "react-tap-event-plugin";
 import AverageKbMetric from "./AverageKbMetric";
-import TypeCountMetric from "./TypeCountMetric";
+import OutgoingTypeCountMetric from "./OutgoingTypeCountMetric";
+import IncomingTypeCountMetric from "./IncomingTypeCountMetric";
 import LineIcon from "./line-chart.svg";
 import BarChart from "./bar-chart-7.svg";
 import PlayerCountMetric from "./PlayerCountMetric";
@@ -69,9 +70,13 @@ export default class Metrics extends React.Component {
 						</MenuItem>
 						<MenuItem onTouchTap={() => this.setState({selectedView: 1})}
 								  leftIcon={<img src={BarChart} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
-							Type chart
+							Outgoing type chart
 						</MenuItem>
 						<MenuItem onTouchTap={() => this.setState({selectedView: 2})}
+								  leftIcon={<img src={BarChart} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
+							Incoming type chart
+						</MenuItem>
+						<MenuItem onTouchTap={() => this.setState({selectedView: 3})}
 								  leftIcon={<img src={LineIcon} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
 							Player count
 						</MenuItem>
@@ -90,11 +95,17 @@ export default class Metrics extends React.Component {
 						</div>
 						<div style={selectedView !== 1 ? {display:"none"} : styles.typeCountTitle}>
 							<p>Message type count</p>
-							<div id="message-type-count">
+							<div id="message-type-count-outgoing">
 
 							</div>
 						</div>
 						<div style={selectedView !== 2 ? {display:"none"} : styles.typeCountTitle}>
+							<p>Message type count</p>
+							<div id="message-type-count-incoming">
+
+							</div>
+						</div>
+						<div style={selectedView !== 3 ? {display:"none"} : styles.typeCountTitle}>
 							<div id="player-count">
 
 							</div>
@@ -112,6 +123,7 @@ ReactDOM.render(<Metrics/>, document.getElementById("metrics"));
 let socket = new MetricsSocket();
 new TotalMessagesMetric(socket);
 new AverageKbMetric(socket);
-new TypeCountMetric(socket);
+new OutgoingTypeCountMetric(socket);
+new IncomingTypeCountMetric(socket);
 new PlayerCountMetric(socket);
 

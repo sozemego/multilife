@@ -1,10 +1,10 @@
-export default class OutgoingTypeCountMetric {
+export default class IncomingTypeCountMetric {
 
 	constructor(socket) {
 		socket.addObserver(this._handleTypeCount);
 	}
 
-	_handleTypeCount = ({outgoingTypeCount: typeCount} = msg) => {
+	_handleTypeCount = ({incomingTypeCount: typeCount} = msg) => {
 		let data = this._transformTypeCountToArray(typeCount);
 
 		let max = this._findMax(data.map(d => d.count));
@@ -12,7 +12,7 @@ export default class OutgoingTypeCountMetric {
 
 		let colors = d3.scaleOrdinal(this._genRandomColors(10));
 
-		let chart = d3.select("#message-type-count")
+		let chart = d3.select("#message-type-count-incoming")
 			.selectAll("div")
 			.data(data, d => d.type);
 
@@ -68,7 +68,7 @@ export default class OutgoingTypeCountMetric {
 	};
 
 	_getMaxWidth = () => {
-		return document.getElementById("message-type-count").offsetWidth * 0.9;
+		return document.getElementById("message-type-count-incoming").offsetWidth * 0.9;
 	}
 
 }
