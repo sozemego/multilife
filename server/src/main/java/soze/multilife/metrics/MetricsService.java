@@ -219,6 +219,10 @@ public class MetricsService implements Runnable {
 		return totalMessagesSent;
 	}
 
+	public double getAverageIncomingKbs() {
+		return averageIncomingKbs;
+	}
+
 	public long getTotalBytesReceived() {
 		return totalBytesReceived;
 	}

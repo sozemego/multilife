@@ -95,7 +95,7 @@ public class MetricsWebSocketHandlerImpl implements MetricsWebSocketHandler {
 		long messagesSent = metricsService.getTotalMessagesSent();
 		double averageBytesSent = metricsService.getAverageBytesSent();
 
-		double averageIncomingKbs = metricsService.getAverageBytesReceived();
+		double averageIncomingKbs = metricsService.getAverageIncomingKbs();
 		long totalBytesReceived = metricsService.getTotalBytesReceived();
 		long totalMessagesReceived = metricsService.getTotalMessagesReceived();
 		double averageBytesPerIncomingMessage = metricsService.getAverageBytesReceived();
