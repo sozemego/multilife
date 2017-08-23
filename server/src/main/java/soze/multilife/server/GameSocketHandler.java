@@ -109,6 +109,7 @@ public class GameSocketHandler { //TODO decorate this for metric events?
 	private void sendMessage(Session session, String msg) throws java.io.IOException {
 		IncomingMessage inc = mapper.readValue(msg, IncomingMessage.class);
 		sendMessage(session, inc);
+		sendMetricEvent(inc, sessionIdMap.get(session));
 	}
 
 	private void sendMessage(Session session, IncomingMessage incomingMessage) {
