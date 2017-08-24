@@ -23,11 +23,14 @@ const styles = {
 		height: "100%"
 	},
 	sidebar: {
-		width: "15%"
+
 	},
 	sideBarIcon: {
 		width: "24px",
 		height: "24px"
+	},
+	sideBarItem: {
+		fontSize: "0.65em"
 	},
 	content: {
 		width: "85%",
@@ -65,18 +68,22 @@ export default class Metrics extends React.Component {
 				<div style={styles.container}>
 					<Paper zDepth={2} style={styles.sidebar}>
 						<MenuItem onTouchTap={() => this.setState({selectedView: 0})}
+								  style={styles.sideBarItem}
 								  leftIcon={<img src={LineIcon} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
 							Average kb/s
 						</MenuItem>
 						<MenuItem onTouchTap={() => this.setState({selectedView: 1})}
+								  style={styles.sideBarItem}
 								  leftIcon={<img src={BarChart} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
 							Outgoing type chart
 						</MenuItem>
 						<MenuItem onTouchTap={() => this.setState({selectedView: 2})}
+								  style={styles.sideBarItem}
 								  leftIcon={<img src={BarChart} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
 							Incoming type chart
 						</MenuItem>
 						<MenuItem onTouchTap={() => this.setState({selectedView: 3})}
+								  style={styles.sideBarItem}
 								  leftIcon={<img src={LineIcon} alt="Maxim Basinski, http://www.flaticon.com/authors/maxim-basinski"/>}>
 							Player count
 						</MenuItem>
