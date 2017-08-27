@@ -1,6 +1,8 @@
 pipeline {
     agent any
 
+    echo 'Building client'
+
     stages {
 
         stage('build client') {
