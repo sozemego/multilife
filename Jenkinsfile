@@ -1,20 +1,14 @@
-pipeline {
-    agent any
+#!groovy
+# Best of Jenkinsfile
+# `Jenkinsfile` is a groovy script DSL for defining CI/CD workflows for Jenkins
 
-    echo 'Building client'
 
-    stages {
-
-        stage('build client') {
-            steps {
-                echo 'Building client'
-            }
-        }
-
-        stage('build server') {
-            steps {
-                echo 'Building server'
-            }
-        }
+def clientCompile() {
+    stage 'Compile client'
+    node {
+        echo 'COOL!'
     }
+
 }
+
+clientCompile();
