@@ -1,14 +1,16 @@
-let path = require("path");
-let webpack = require("webpack");
-var CopyWebpackPlugin = require('copy-webpack-plugin');
+const path = require("path");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-	entry: "./src/Game.js",
+	entry: {
+		game: "./src/Game.js",
+		metrics: "./src/metrics/Metrics.js"
+	},
 	output: {
-		filename: "game.js",
+		filename: "[name].js",
 		path: path.resolve(__dirname, "../server/src/main/resources/public")
 	},
-	devtool: "cheap-module-source-map",
+	devtool: "source-map",
 	module: {
 		rules: [
 			{
@@ -19,15 +21,30 @@ module.exports = {
 						loader: "babel-loader"
 					}
 				]
+			},
+			{
+				test: /\.svg$/,
+				exclude: /node_modules/,
+				use: [
+					{
+						loader: "file-loader",
+						query: {
+							name: 'static/media/[name].[hash:8].[ext]'
+						}
+					}
+				]
 			}
 		]
 	},
 	plugins: [
 		new CopyWebpackPlugin([
 			{from: "src/index.html"},
-			{from: "src/metrics.html"},
+			{from: "src/metrics/metrics.html"},
 			{from: "src/main.css"},
 			{from: "src/login_background.gif"}
 		])
-	]
+	],
+	externals: {
+		d3: "d3"
+	}
 };

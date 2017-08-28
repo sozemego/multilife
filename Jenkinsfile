@@ -2,21 +2,12 @@ pipeline {
     agent any 
 
     stages {
-        stage('Build') { 
-            steps { 
-                echo 'COOL!'
-            }
-        }
-        stage('Test'){
+
+        stage('Build client') {
             steps {
-
-
+                bat 'npm run build'
             }
         }
-        stage('Deploy') {
-            steps {
 
-            }
-        }
     }
 }
