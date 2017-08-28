@@ -8,7 +8,7 @@ module.exports = {
 	},
 	output: {
 		filename: "[name].js",
-		path: path.resolve(__dirname, "../server/src/main/resources/public")
+		path: path.resolve(__dirname, "build")
 	},
 	devtool: "source-map",
 	module: {
