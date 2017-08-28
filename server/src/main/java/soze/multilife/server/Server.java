@@ -35,7 +35,12 @@ public class Server {
 			staticFileLocation(path);
 		}
 		for(String path: externalStaticFileHandlerPaths) {
-			staticFiles.externalLocation(path);
+			try {
+				staticFiles.externalLocation(path);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(5);
+			}
 		}
 		for (PathHandlerPair<Route> pair : pathHandlerPairs) {
 			get(pair.getPath(), pair.getHandler());
