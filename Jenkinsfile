@@ -1,12 +1,22 @@
-#!groovy
+pipeline {
+    agent any 
 
-def clientCompile() {
-
-    stage 'Compile client'
-    node {
-        echo 'COOL!'
+    stages {
+        stage('Build') { 
+            steps { 
+                sh 'make' 
+            }
+        }
+        stage('Test'){
+            steps {
+                sh 'make check'
+                junit 'reports/**/*.xml' 
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'make publish'
+            }
+        }
     }
-
 }
-
-clientCompile()
