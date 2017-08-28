@@ -24,6 +24,10 @@ node_modules/
 
 **/public/
 
+build/
+
 app.cfg
 
 db
+
+*.sh
