@@ -1,4 +1,4 @@
-package main.java.soze.serverrunner;
+package soze.serverrunner;
 
 import java.io.BufferedReader;
 import java.io.File;
