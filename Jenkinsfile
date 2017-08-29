@@ -63,11 +63,16 @@ pipeline {
             }
         }
 
-        stage('Server-runner') {
+        stage('Build server-runner') {
             steps {
                 dir('serverrunner') {
                     bat 'mvn clean compile install'
                 }
+            }
+        }
+
+        stage('Copy server-runner') {
+            steps {
                 dir('serverrunner/target') {
                     bat 'del ServerRunner.jar || true'
                     bat 'rename server-runner-1.0-SNAPSHOT.jar ServerRunner.jar'
