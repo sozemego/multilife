@@ -44,7 +44,9 @@ module.exports = {
 			{from: "src/main.css"},
 			{from: "src/login_background.gif"}
 		]),
-		new webpack.EnvironmentPlugin(['MULTILIFE_WS'])
+		new webpack.DefinePlugin({
+			WEBSOCKET_HOST: JSON.stringify("ws://138.68.89.151:8000/game")
+		}),
 	],
 	externals: {
 		d3: "d3"

@@ -29,7 +29,7 @@ class Game {
 		this.cells = [];
 		this.width = 0;
 		this.height = 0;
-		this.websocketHost = process.env.MULTILIFE_WS;
+		this.websocketHost = WEBSOCKET_HOST;
 		this.webSocket = undefined;
 		this.myId = 0;
 		this.connected = false;
