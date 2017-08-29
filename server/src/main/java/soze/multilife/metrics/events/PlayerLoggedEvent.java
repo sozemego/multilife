@@ -1,5 +1,7 @@
 package soze.multilife.metrics.events;
 
+import soze.multilife.metrics.MetricsService;
+
 /**
  * Event fired when a player logs in.
  *
@@ -22,4 +24,9 @@ public class PlayerLoggedEvent implements MetricEvent {
 	public int getGameId() {
 		return gameId;
 	}
+
+	public void accept(MetricsService.MetricEventVisitor visitor) {
+		visitor.visit(this);
+	}
+
 }

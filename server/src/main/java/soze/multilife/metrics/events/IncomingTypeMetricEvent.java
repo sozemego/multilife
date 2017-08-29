@@ -1,5 +1,7 @@
 package soze.multilife.metrics.events;
 
+import soze.multilife.metrics.MetricsService;
+
 /**
  * Information about type of an incoming message.
  */
@@ -27,4 +29,7 @@ public class IncomingTypeMetricEvent implements MetricEvent {
 		return connectionId;
 	}
 
+	public void accept(MetricsService.MetricEventVisitor visitor) {
+		visitor.visit(this);
+	}
 }

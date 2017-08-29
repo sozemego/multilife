@@ -9,6 +9,7 @@ import soze.multilife.metrics.repository.MetricsRepository;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -22,6 +23,7 @@ public class MetricsService implements Runnable {
 
 	private final MetricsRepository repository;
 	private final MetricsConfiguration configuration;
+	private final MetricEventVisitor metricEventVisitor;
 
 	private final Queue<Object> events = new ConcurrentLinkedQueue<>();
 
@@ -49,8 +51,9 @@ public class MetricsService implements Runnable {
 	private final Map<Integer, Integer> playerMap = new ConcurrentHashMap<>();
 
 	public MetricsService(MetricsRepository repository, MetricsConfiguration configuration) {
-		this.repository = repository;
-		this.configuration = configuration;
+		this.repository = Objects.requireNonNull(repository);
+		this.configuration = Objects.requireNonNull(configuration);
+		this.metricEventVisitor = new MetricEventVisitor();
 	}
 
 	public void run() {
@@ -58,24 +61,7 @@ public class MetricsService implements Runnable {
 
 			Object event;
 			while ((event = events.poll()) != null) {
-				if (event instanceof PlayerLoggedEvent) {
-					process((PlayerLoggedEvent) event);
-				}
-				if (event instanceof PlayerDisconnectedEvent) {
-					process((PlayerDisconnectedEvent) event);
-				}
-				if (event instanceof OutgoingSizeMetricEvent) {
-					process((OutgoingSizeMetricEvent) event);
-				}
-				if (event instanceof OutgoingTypeMetricEvent) {
-					process((OutgoingTypeMetricEvent) event);
-				}
-				if (event instanceof IncomingTypeMetricEvent) {
-					process((IncomingTypeMetricEvent) event);
-				}
-				if (event instanceof IncomingSizeMetricEvent) {
-					process((IncomingSizeMetricEvent) event);
-				}
+				((MetricEvent)event).accept(this.metricEventVisitor);
 			}
 
 			countMaxPlayers();
@@ -89,40 +75,6 @@ public class MetricsService implements Runnable {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	private void process(PlayerLoggedEvent playerEvent) {
-		int playerId = playerEvent.getPlayerId();
-		int instanceId = playerEvent.getGameId();
-		playerMap.put(playerId, instanceId);
-	}
-
-	private void process(PlayerDisconnectedEvent playerEvent) {
-		playerMap.remove(playerEvent.getPlayerId());
-	}
-
-	private void process(OutgoingSizeMetricEvent event) {
-		totalBytesSent += event.getBytesSent();
-		totalMessagesSent++;
-		averageBytesSent = totalBytesSent / totalMessagesSent;
-	}
-
-	private void process(OutgoingTypeMetricEvent event) {
-		String type = event.getType();
-		Long count = outgoingTypeCountMap.get(type);
-		outgoingTypeCountMap.put(type, count == null ? 1 : ++count);
-	}
-
-	private void process(IncomingSizeMetricEvent event) {
-		totalBytesReceived += event.getBytesReceived();
-		totalMessagesReceived++;
-		averageBytesReceived = totalBytesReceived / totalMessagesReceived;
-	}
-
-	private void process(IncomingTypeMetricEvent event) {
-		String type = event.getType();
-		Long count = incomingTypeCountMap.get(type);
-		incomingTypeCountMap.put(type, count == null ? 1 : ++count);
 	}
 
 	private void calculateOutgoingKilobytesPerSecond() {
@@ -244,5 +196,46 @@ public class MetricsService implements Runnable {
 
 	public Map<Integer, Integer> getPlayerMap() {
 		return playerMap;
+	}
+
+	/**
+	 * Inner helper class for handling {@link MetricEvent}s.
+	 */
+	public class MetricEventVisitor {
+
+		public void visit(IncomingSizeMetricEvent event) {
+			totalBytesReceived += event.getBytesReceived();
+			totalMessagesReceived++;
+			averageBytesReceived = totalBytesReceived / totalMessagesReceived;
+		}
+
+		public void visit(IncomingTypeMetricEvent event) {
+			String type = event.getType();
+			Long count = incomingTypeCountMap.get(type);
+			incomingTypeCountMap.put(type, count == null ? 1 : ++count);
+		}
+
+		public void visit(OutgoingSizeMetricEvent event) {
+			totalBytesSent += event.getBytesSent();
+			totalMessagesSent++;
+			averageBytesSent = totalBytesSent / totalMessagesSent;
+		}
+
+		public void visit(OutgoingTypeMetricEvent event) {
+			String type = event.getType();
+			Long count = outgoingTypeCountMap.get(type);
+			outgoingTypeCountMap.put(type, count == null ? 1 : ++count);
+		}
+
+		public void visit(PlayerDisconnectedEvent event) {
+			playerMap.remove(event.getPlayerId());
+		}
+
+		public void visit(PlayerLoggedEvent event) {
+			int playerId = event.getPlayerId();
+			int instanceId = event.getGameId();
+			playerMap.put(playerId, instanceId);
+		}
+
 	}
 }

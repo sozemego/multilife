@@ -1,5 +1,7 @@
 package soze.multilife.metrics.events;
 
+import soze.multilife.metrics.MetricsService;
+
 /**
  * Event for size data about an incoming event.
  */
@@ -27,5 +29,8 @@ public class IncomingSizeMetricEvent implements MetricEvent {
 		return bytesReceived;
 	}
 
+	public void accept(MetricsService.MetricEventVisitor visitor) {
+		visitor.visit(this);
+	}
 
 }
