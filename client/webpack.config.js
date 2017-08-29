@@ -1,5 +1,6 @@
 const path = require("path");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const webpack = require("webpack");
 
 module.exports = {
 	entry: {
@@ -45,6 +46,7 @@ module.exports = {
 		])
 	],
 	externals: {
-		d3: "d3"
+		d3: "d3",
+		config: JSON.stringify(require("./dev.config.json"))
 	}
 };

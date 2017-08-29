@@ -1,6 +1,7 @@
 import p5 from "p5";
 import Simulation from "./Simulation";
 import Cell from "./Cell";
+import * as config from "config";
 
 class Game {
 
@@ -15,6 +16,7 @@ class Game {
 	};
 
 	constructor(canvas, sketch) {
+		console.log(config);
 		this.sketch = sketch;
 		this.ticks = 0;
 		this.FPS = 60;

@@ -45,6 +45,7 @@ module.exports = {
 		])
 	],
 	externals: {
-		d3: "d3"
+		d3: "d3",
+		config: JSON.stringify(require("./prod.config.json"))
 	}
 };

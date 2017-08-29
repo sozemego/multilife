@@ -31,3 +31,5 @@ app.cfg
 db
 
 *.sh
+
+prod.config.json
