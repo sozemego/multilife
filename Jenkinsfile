@@ -37,6 +37,12 @@ pipeline {
             }
         }
 
+        stage('Server - Unit tests') {
+            steps {
+                bat 'mvn test'
+            }
+        }
+
         stage('Build server') {
             steps {
                 dir('server') {
