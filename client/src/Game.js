@@ -1,7 +1,6 @@
 import p5 from "p5";
 import Simulation from "./Simulation";
 import Cell from "./Cell";
-import * as config from "config";
 
 class Game {
 
@@ -16,7 +15,6 @@ class Game {
 	};
 
 	constructor(canvas, sketch) {
-		console.log(config);
 		this.sketch = sketch;
 		this.ticks = 0;
 		this.FPS = 60;
@@ -31,6 +29,7 @@ class Game {
 		this.cells = [];
 		this.width = 0;
 		this.height = 0;
+		this.websocketHost = process.env.MULTILIFE_WS;
 		this.webSocket = undefined;
 		this.myId = 0;
 		this.connected = false;
@@ -115,7 +114,7 @@ class Game {
 			return;
 		}
 
-		this.webSocket = new WebSocket("ws://127.0.0.1:8000/game");
+		this.webSocket = new WebSocket(this.websocketHost);
 		this.webSocket.onopen = () => {
 			this.webSocket.send(JSON.stringify({name, type: "LOGIN"}));
 			document.getElementById("login-container").classList.add("logged");

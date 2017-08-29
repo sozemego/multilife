@@ -42,10 +42,10 @@ module.exports = {
 			{from: "src/metrics/metrics.html"},
 			{from: "src/main.css"},
 			{from: "src/login_background.gif"}
-		])
+		]),
+		new webpack.EnvironmentPlugin(['MULTILIFE_WS'])
 	],
 	externals: {
-		d3: "d3",
-		config: JSON.stringify(require("./prod.config.json"))
+		d3: "d3"
 	}
 };
