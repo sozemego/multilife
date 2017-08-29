@@ -12,6 +12,8 @@ import soze.multilife.metrics.events.PlayerDisconnectedEvent;
 import soze.multilife.server.connection.Connection;
 import soze.multilife.server.gamerunner.GameManager;
 
+import java.util.Optional;
+
 import static org.mockito.Mockito.*;
 
 public class LobbyTest {
@@ -82,6 +84,8 @@ public class LobbyTest {
 		GameManager gameManager = Mockito.mock(GameManager.class);
 
 		Game game = Mockito.mock(Game.class);
+		when(game.getId()).thenReturn(1);
+		when(game.getPlayerColor(1)).thenReturn("#000000");
 		when(gameFactory.createGame()).thenReturn(game);
 		Lobby lobby = new Lobby(bus, gameManager, gameFactory);
 
@@ -90,8 +94,10 @@ public class LobbyTest {
 
 		lobby.onConnect(conn);
 		Player player = new Player(conn.getId(), conn, "Player");
+		when(gameManager.getFreeGame()).thenReturn(Optional.empty());
 		lobby.addPlayer(player);
 
+		when(gameManager.getGameById(1)).thenReturn(Optional.of(game));
 		lobby.onDisconnect(conn);
 
 		verify(conn, atLeastOnce()).getId();
