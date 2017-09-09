@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -89,11 +88,10 @@ public class GameSocketHandler { //TODO decorate this for metric events?
 	@OnWebSocketMessage
 	public void onBinaryMessage(Session session, InputStream stream) {
 		byte[] payload = toByteArray(stream);
-		Optional<IncomingMessage> message = IncomingMessageConverter.convert(payload);
-		message.ifPresent(m -> {
+		IncomingMessageConverter.convert(payload).ifPresent(message -> {
 			sendMetricEvent(payload, sessionIdMap.get(session));
-			sendMetricEvent(m, sessionIdMap.get(session));
-			sendMessage(session, m);
+			sendMetricEvent(message, sessionIdMap.get(session));
+			sendMessage(session, message);
 		});
 	}
 
