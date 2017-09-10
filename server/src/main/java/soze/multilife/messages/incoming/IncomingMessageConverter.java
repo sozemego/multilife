@@ -10,7 +10,7 @@ public class IncomingMessageConverter {
 
 	public static Optional<IncomingMessage> convert(byte[] payload) {
 		if(payload.length == 0) {
-			throw new IllegalArgumentException("");
+			throw new IllegalArgumentException("Outgoing byte array message cannot have 0 length.");
 		}
 		final byte firstByte = payload[0];
 		try {
