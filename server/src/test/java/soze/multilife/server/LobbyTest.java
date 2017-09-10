@@ -2,7 +2,9 @@ package soze.multilife.server;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import soze.multilife.events.EventBus;
 import soze.multilife.game.Game;
 import soze.multilife.game.GameFactory;
@@ -18,10 +20,18 @@ import static org.mockito.Mockito.*;
 
 public class LobbyTest {
 
+	@Mock
+	private EventBus bus;
+
+	@Mock
+	private GameFactory gameFactory;
+
+	@Mock
+	private GameManager gameManager;
 
 	@Before
 	public void setUp() {
-
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -31,9 +41,6 @@ public class LobbyTest {
 
 	@Test
 	public void testOnOpen() throws Exception {
-		EventBus bus = Mockito.mock(EventBus.class);
-		GameFactory gameFactory = Mockito.mock(GameFactory.class);
-		GameManager gameManager = Mockito.mock(GameManager.class);
 		Lobby lobby = new Lobby(bus, gameManager, gameFactory);
 
 		Connection conn = Mockito.mock(Connection.class);
@@ -46,27 +53,18 @@ public class LobbyTest {
 
 	@Test(expected = NullPointerException.class)
 	public void testNullConnectionOnConnect() throws Exception {
-		EventBus bus = Mockito.mock(EventBus.class);
-		GameFactory gameFactory = Mockito.mock(GameFactory.class);
-		GameManager gameManager = Mockito.mock(GameManager.class);
 		Lobby lobby = new Lobby(bus, gameManager, gameFactory);
 		lobby.onConnect(null);
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void testNullConnectionOnDisconnect() throws Exception {
-		EventBus bus = Mockito.mock(EventBus.class);
-		GameFactory gameFactory = Mockito.mock(GameFactory.class);
-		GameManager gameManager = Mockito.mock(GameManager.class);
 		Lobby lobby = new Lobby(bus, gameManager, gameFactory);
 		lobby.onDisconnect(null);
 	}
 
 	@Test
 	public void testValidOnDisconnectPlayerConnectedButNotInGame() throws Exception {
-		EventBus bus = Mockito.mock(EventBus.class);
-		GameFactory gameFactory = Mockito.mock(GameFactory.class);
-		GameManager gameManager = Mockito.mock(GameManager.class);
 		Lobby lobby = new Lobby(bus, gameManager, gameFactory);
 
 		Connection conn = Mockito.mock(Connection.class);
@@ -79,9 +77,6 @@ public class LobbyTest {
 
 	@Test
 	public void testValidOnDisconnectPlayerInGame() throws Exception {
-		EventBus bus = Mockito.mock(EventBus.class);
-		GameFactory gameFactory = Mockito.mock(GameFactory.class);
-		GameManager gameManager = Mockito.mock(GameManager.class);
 
 		Game game = Mockito.mock(Game.class);
 		when(game.getId()).thenReturn(1);
@@ -106,9 +101,6 @@ public class LobbyTest {
 
 	@Test
 	public void testValidAddPlayer() throws Exception {
-		EventBus bus = Mockito.mock(EventBus.class);
-		GameFactory gameFactory = Mockito.mock(GameFactory.class);
-		GameManager gameManager = Mockito.mock(GameManager.class);
 
 		Game game = Mockito.mock(Game.class);
 		when(gameFactory.createGame()).thenReturn(game);
