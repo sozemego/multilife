@@ -1,5 +1,6 @@
 package soze.multilife.metrics;
 
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,7 @@ public class MetricsService implements Runnable {
 
 			Object event;
 			while ((event = events.poll()) != null) {
-				((MetricEvent)event).accept(this.metricEventVisitor);
+				((MetricEvent) event).accept(this.metricEventVisitor);
 			}
 
 			countMaxPlayers();
@@ -125,32 +126,8 @@ public class MetricsService implements Runnable {
 	}
 
 	@Subscribe
-	public void handleOutgoingTypeMetricEvent(OutgoingTypeMetricEvent event) {
-		events.add(event);
-	}
-
-	@Subscribe
-	public void handleOutgoingSizeMetricEvent(OutgoingSizeMetricEvent event) {
-		events.add(event);
-	}
-
-	@Subscribe
-	public void handlePlayerLoggedEvent(PlayerLoggedEvent event) {
-		events.add(event);
-	}
-
-	@Subscribe
-	public void handlePlayerDisconnectedEvent(PlayerDisconnectedEvent event) {
-		events.add(event);
-	}
-
-	@Subscribe
-	public void handleIncomingSizeMetricEvent(IncomingSizeMetricEvent event) {
-		events.add(event);
-	}
-
-	@Subscribe
-	public void handleIncomingTypeMetricEvent(IncomingTypeMetricEvent event) {
+	@AllowConcurrentEvents
+	public void handleMetricEvent(MetricEvent event) {
 		events.add(event);
 	}
 
