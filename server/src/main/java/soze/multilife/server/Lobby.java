@@ -98,16 +98,15 @@ public class Lobby implements Runnable {
 		}
 
 		gameToPlayers.removeAll(gameId);
-		Optional<Game> game = gameManager.getGameById(gameId);
-		if(game.isPresent()) {
+		gameManager.getGameById(gameId).ifPresent(game -> {
 			try {
-				game.get().removePlayer(id);
+				game.removePlayer(id);
 			} catch (PlayerNotInGameException e) {
 				LOG.warn("Trying to remove a player with id [{}] that is not in-game.", e.getPlayerId());
 			} finally {
 				eventBus.post(new PlayerDisconnectedEvent(id));
 			}
-		}
+		});
 	}
 
 	/**
