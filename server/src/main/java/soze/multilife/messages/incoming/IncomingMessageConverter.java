@@ -36,14 +36,14 @@ public class IncomingMessageConverter {
 	private static int[] convertPayloadToIntArray(byte[] payload) {
 		int intNumber = payload.length / 4;
 
-		int[] ints = new int[intNumber];
-		for(int i = 0; i < ints.length; i++) {
-			ByteBuffer buffer = ByteBuffer.wrap(reverseArray(copyArray(payload, i * 4, 4)));
+		int[] integers = new int[intNumber];
+		ByteBuffer buffer = ByteBuffer.wrap(reverseArray(payload));
+		for(int i = 0; i < integers.length; i++) {
 			int index = buffer.getInt();
-			ints[i] = index;
+			integers[i] = index;
 		}
 
-		return ints;
+		return integers;
 	}
 
 	private static String getString(byte[] payload) {
