@@ -14,4 +14,7 @@ public class MapData extends OutgoingMessage {
 		this.height = height;
 	}
 
+	public void accept(OutgoingMessageVisitor visitor) {
+		visitor.visit(this);
+	}
 }

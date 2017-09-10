@@ -11,6 +11,10 @@ public class PlayerPoints extends OutgoingMessage {
 		this.playerPoints = playerPoints;
 	}
 
+	public void accept(OutgoingMessageVisitor visitor) {
+		visitor.visit(this);
+	}
+
 	public int getPlayerId() {
 		return playerId;
 	}

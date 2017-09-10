@@ -11,4 +11,8 @@ public class PlayerIdentity extends OutgoingMessage {
 		setType(OutgoingType.PLAYER_IDENTITY);
 		this.playerId = playerId;
 	}
+
+	public void accept(OutgoingMessageVisitor visitor) {
+		visitor.visit(this);
+	}
 }

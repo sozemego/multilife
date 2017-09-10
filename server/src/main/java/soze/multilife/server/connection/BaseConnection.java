@@ -45,32 +45,19 @@ public class BaseConnection implements Connection {
 	public void send(OutgoingMessage message) {
 		LOG.trace("Sending [{}]", message);
 		Objects.requireNonNull(message);
-		if (message instanceof PongMessage) {
-			this.send(OutgoingMessageConverter.convertMessage((PongMessage) message));
-		} else if (message instanceof CellList) {
-			this.send(OutgoingMessageConverter.convertMessage((CellList) message));
-		} else if (message instanceof TickData) {
-			this.send(OutgoingMessageConverter.convertMessage((TickData) message));
-		} else if (message instanceof MapData) {
-			this.send(OutgoingMessageConverter.convertMessage((MapData) message));
-		} else if (message instanceof PlayerIdentity) {
-			this.send(OutgoingMessageConverter.convertMessage((PlayerIdentity) message));
-		} else if (message instanceof TimeRemainingMessage) {
-			this.send(OutgoingMessageConverter.convertMessage((TimeRemainingMessage) message));
-		} else if (message instanceof PlayerAdded) {
-			this.send(OutgoingMessageConverter.convertMessage((PlayerAdded) message));
-		} else if (message instanceof PlayerRemoved) {
-			this.send(OutgoingMessageConverter.convertMessage((PlayerRemoved) message));
-		} else if (message instanceof PlayerPoints) {
-			this.send(OutgoingMessageConverter.convertMessage((PlayerPoints) message));
-		} else {
+		if(message instanceof MetricsMessage) {
 			try {
 				String json = JsonUtils.stringify(message);
 				this.session.getRemote().sendStringByFuture(json);
 			} catch (IOException e) {
 				LOG.warn("Base connection could not send string.", e);
 			}
+			return;
 		}
+		OutgoingMessageConverterVisitor converter = new OutgoingMessageConverterVisitor();
+		message.accept(converter);
+		final byte[] payload = converter.getPayload();
+		this.send(payload);
 	}
 
 	@Override

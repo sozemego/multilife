@@ -89,4 +89,8 @@ public class MetricsMessage extends OutgoingMessage {
 	public Map<String, Long> getIncomingTypeCount() {
 		return incomingTypeCount;
 	}
+
+	public void accept(OutgoingMessageVisitor visitor) {
+		//noop
+	}
 }

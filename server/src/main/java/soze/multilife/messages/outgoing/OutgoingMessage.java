@@ -12,4 +12,6 @@ public abstract class OutgoingMessage {
 		return this.type;
 	}
 
+	public abstract void accept(OutgoingMessageVisitor visitor);
+
 }

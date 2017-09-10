@@ -27,6 +27,10 @@ public class PlayerAdded extends OutgoingMessage {
 		return playerColor;
 	}
 
+	public void accept(OutgoingMessageVisitor visitor) {
+		visitor.visit(this);
+	}
+
 	public int getPlayerId() {
 		return playerId;
 	}

@@ -8,4 +8,8 @@ public class PongMessage extends OutgoingMessage {
 	public PongMessage() {
 		setType(OutgoingType.PONG);
 	}
+
+	public void accept(OutgoingMessageVisitor visitor) {
+		visitor.visit(this);
+	}
 }

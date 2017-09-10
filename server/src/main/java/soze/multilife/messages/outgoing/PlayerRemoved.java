@@ -9,6 +9,10 @@ public class PlayerRemoved extends OutgoingMessage {
 		this.playerId = playerId;
 	}
 
+	public void accept(OutgoingMessageVisitor visitor) {
+		visitor.visit(this);
+	}
+
 	public int getPlayerId() {
 		return playerId;
 	}

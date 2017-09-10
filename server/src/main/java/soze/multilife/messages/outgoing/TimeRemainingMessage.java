@@ -16,4 +16,8 @@ public class TimeRemainingMessage extends OutgoingMessage {
 	public void setRemainingTime(float remainingTime) {
 		this.remainingTime = remainingTime;
 	}
+
+	public void accept(OutgoingMessageVisitor visitor) {
+		visitor.visit(this);
+	}
 }

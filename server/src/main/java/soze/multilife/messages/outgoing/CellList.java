@@ -16,6 +16,10 @@ public class CellList extends OutgoingMessage {
 		this.cells = cells;
 	}
 
+	public void accept(OutgoingMessageVisitor visitor) {
+		visitor.visit(this);
+	}
+
 	/**
 	 * Data about one cell.
 	 */

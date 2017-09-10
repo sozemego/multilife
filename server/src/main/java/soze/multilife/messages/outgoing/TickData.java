@@ -11,4 +11,8 @@ public class TickData extends OutgoingMessage {
 		setType(OutgoingType.TICK_DATA);
 		this.iterations = iterations;
 	}
+
+	public void accept(OutgoingMessageVisitor visitor) {
+		visitor.visit(this);
+	}
 }
