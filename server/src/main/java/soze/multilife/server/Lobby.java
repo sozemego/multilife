@@ -150,10 +150,12 @@ public class Lobby implements Runnable {
 	private void sendDataToPlayers(Player player, Game game) {
 		Collection<Player> players = gameToPlayers.get(game.getId());
 		PlayerAdded playerAdded = new PlayerAdded(player.getId(), game.getPlayerColor(player.getId()), player.getName());
-		players.forEach(p -> {
-			player.send(new PlayerAdded(p.getId(), game.getPlayerColor(p.getId()), p.getName()));
-			p.send(playerAdded);
-		});
+		synchronized (gameToPlayers) {
+			players.forEach(p -> {
+				player.send(new PlayerAdded(p.getId(), game.getPlayerColor(p.getId()), p.getName()));
+				p.send(playerAdded);
+			});
+		}
 
 		player.send(new MapData(game.getWidth(), game.getHeight()));
 		player.send(getAllAliveCellData(game));
