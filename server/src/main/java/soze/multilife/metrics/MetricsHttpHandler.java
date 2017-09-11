@@ -2,8 +2,6 @@ package soze.multilife.metrics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spark.Request;
-import spark.Response;
 import spark.Route;
 
 import java.io.IOException;
@@ -14,7 +12,7 @@ import java.util.List;
 /**
  * A http handler for /metrics endpoint.
  */
-public class MetricsHttpHandler implements Route {
+public class MetricsHttpHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MetricsHttpHandler.class);
 
@@ -24,10 +22,11 @@ public class MetricsHttpHandler implements Route {
 
 	}
 
-	@Override
-	public Object handle(Request request, Response response) throws Exception {
-		response.header("Content-type", "text-html");
-		return createResponse();
+	public Route getMetricsRoute() {
+		return (request, response) -> {
+			response.header("Content-type", "text-html");
+			return createResponse();
+		};
 	}
 
 	private String createResponse() {

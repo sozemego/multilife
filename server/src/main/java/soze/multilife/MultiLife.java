@@ -12,7 +12,6 @@ import soze.multilife.configuration.interfaces.ServerConfiguration;
 import soze.multilife.events.EventBus;
 import soze.multilife.events.EventBusImpl;
 import soze.multilife.game.GameFactory;
-import soze.multilife.server.gamerunner.GameManager;
 import soze.multilife.metrics.*;
 import soze.multilife.metrics.repository.MetricsRepository;
 import soze.multilife.metrics.repository.MongoMetricsRepository;
@@ -21,9 +20,9 @@ import soze.multilife.server.Lobby;
 import soze.multilife.server.LoginService;
 import soze.multilife.server.Server.ServerBuilder;
 import soze.multilife.server.connection.ConnectionFactory;
+import soze.multilife.server.gamerunner.GameManager;
 import soze.multilife.utils.UncaughtExceptionLogger;
-import spark.Request;
-import spark.Response;
+import spark.Route;
 
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
@@ -97,8 +96,8 @@ public class MultiLife {
 			executor.execute(metricsWebSocketHandler);
 		} else {
 			this.metricsHttpHandler = new MetricsHttpHandler() {
-				public Object handle(Request request, Response response) throws Exception {
-					return "Metrics disabled";
+				public Route getMetricsRoute() {
+					return (req, res) -> "Metrics disabled";
 				}
 			};
 			this.metricsWebSocketHandler = new NullMetricsSocketHandler();
@@ -126,7 +125,7 @@ public class MultiLife {
 		new ServerBuilder(serverConfiguration.getServerPort())
 			.withWebSocketHandler("/game", new GameSocketHandler(lobby, loginService, connectionFactory, eventBus))
 			.withWebSocketHandler("/metrics-live", metricsWebSocketHandler)
-			.withHttpHandler("/metrics", metricsHttpHandler)
+			.withHttpHandler("/metrics", metricsHttpHandler.getMetricsRoute())
 			.withExternalStaticFileHandler(serverConfiguration.getExternalStaticFilesPath())
 			.build();
 	}
