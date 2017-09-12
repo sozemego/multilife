@@ -24,7 +24,7 @@ import soze.multilife.server.gamerunner.GameManager;
 import soze.multilife.utils.UncaughtExceptionLogger;
 import spark.Route;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -118,7 +118,8 @@ public class MultiLife {
 				config.getHost(),
 				config.getDatabasePort()
 			),
-			Arrays.asList(credential));
+			Collections.singletonList(credential)
+		);
 	}
 
 	private void start(ServerConfiguration serverConfiguration) throws InterruptedException, ExecutionException {
