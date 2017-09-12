@@ -1,4 +1,4 @@
-package soze.multilife.metrics;
+package soze.multilife.metrics.service;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
@@ -9,18 +9,16 @@ import soze.multilife.metrics.events.*;
 import soze.multilife.metrics.repository.MetricsRepository;
 
 import java.time.Instant;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * A service for storing, calculating and reporting various metrics.
  */
-public class MetricsService implements Runnable {
+public class MetricsServiceImpl implements MetricsService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MetricsService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MetricsServiceImpl.class);
 
 	private final MetricsRepository repository;
 	private final MetricsConfiguration configuration;
@@ -51,7 +49,7 @@ public class MetricsService implements Runnable {
 	private final Map<String, Long> incomingTypeCountMap = new ConcurrentHashMap<>();
 	private final Map<Integer, Integer> playerMap = new ConcurrentHashMap<>();
 
-	public MetricsService(MetricsRepository repository, MetricsConfiguration configuration) {
+	public MetricsServiceImpl(MetricsRepository repository, MetricsConfiguration configuration) {
 		this.repository = Objects.requireNonNull(repository);
 		this.configuration = Objects.requireNonNull(configuration);
 		this.metricEventVisitor = new MetricEventVisitor();
@@ -173,6 +171,16 @@ public class MetricsService implements Runnable {
 
 	public Map<Integer, Integer> getPlayerMap() {
 		return playerMap;
+	}
+
+	@Override
+	public Map<Long, Double> getAverageKbsOutgoingSince(Instant timeSince) {
+		return repository.getAverageKbsOutgoingSince(timeSince);
+	}
+
+	@Override
+	public Map<Long, Double> getAverageKbsIncomingSince(Instant timeSince) {
+		return repository.getAverageKbsIncomingSince(timeSince);
 	}
 
 	/**

@@ -12,9 +12,14 @@ import soze.multilife.configuration.interfaces.ServerConfiguration;
 import soze.multilife.events.EventBus;
 import soze.multilife.events.EventBusImpl;
 import soze.multilife.game.GameFactory;
-import soze.multilife.metrics.*;
+import soze.multilife.metrics.MetricsHttpHandler;
+import soze.multilife.metrics.MetricsWebSocketHandler;
+import soze.multilife.metrics.MetricsWebSocketHandlerImpl;
+import soze.multilife.metrics.NullMetricsSocketHandler;
 import soze.multilife.metrics.repository.MetricsRepository;
 import soze.multilife.metrics.repository.MongoMetricsRepository;
+import soze.multilife.metrics.service.MetricsServiceImpl;
+import soze.multilife.metrics.service.NullMetricsService;
 import soze.multilife.server.GameSocketHandler;
 import soze.multilife.server.Lobby;
 import soze.multilife.server.LoginService;
@@ -80,13 +85,13 @@ public class MultiLife {
 							mongoClient.getDatabase(mongoConfiguration.getDatabase())
 					);
 
-			 MetricsService metricsService = new MetricsService(
+			 MetricsServiceImpl metricsService = new MetricsServiceImpl(
 					metricsRepository,
 					metricsConfiguration
 			);
 			this.eventBus.register(metricsService);
 
-			metricsHttpHandler = new MetricsHttpHandler();
+			metricsHttpHandler = new MetricsHttpHandler(metricsService);
 			this.metricsWebSocketHandler = new MetricsWebSocketHandlerImpl(
 					metricsConfiguration,
 					metricsService, connectionFactory
@@ -95,9 +100,12 @@ public class MultiLife {
 			executor.execute(metricsService);
 			executor.execute(metricsWebSocketHandler);
 		} else {
-			this.metricsHttpHandler = new MetricsHttpHandler() {
+			this.metricsHttpHandler = new MetricsHttpHandler(new NullMetricsService()) {
 				public Route getMetricsRoute() {
 					return (req, res) -> "Metrics disabled";
+				}
+				public Route getMetricsOutgoingApi() {
+					return (request, response) -> "Metrics disabled";
 				}
 			};
 			this.metricsWebSocketHandler = new NullMetricsSocketHandler();
@@ -127,6 +135,8 @@ public class MultiLife {
 			.withWebSocketHandler("/game", new GameSocketHandler(lobby, loginService, connectionFactory, eventBus))
 			.withWebSocketHandler("/metrics-live", metricsWebSocketHandler)
 			.withHttpHandler("/metrics", metricsHttpHandler.getMetricsRoute())
+			.withHttpHandler("/metrics/outgoing", metricsHttpHandler.getMetricsOutgoingApi())
+			.withHttpHandler("/metrics/incoming", metricsHttpHandler.getMetricsIncomingApi())
 			.withExternalStaticFileHandler(serverConfiguration.getExternalStaticFilesPath())
 			.build();
 	}

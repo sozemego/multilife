@@ -1,6 +1,6 @@
 package soze.multilife.metrics.events;
 
-import soze.multilife.metrics.MetricsService;
+import soze.multilife.metrics.service.MetricsServiceImpl;
 
 /**
  * Event based on outgoing serialized data.
@@ -29,7 +29,7 @@ public class OutgoingSizeMetricEvent implements MetricEvent {
 		return bytesSent;
 	}
 
-	public void accept(MetricsService.MetricEventVisitor visitor) {
+	public void accept(MetricsServiceImpl.MetricEventVisitor visitor) {
 		visitor.visit(this);
 	}
 

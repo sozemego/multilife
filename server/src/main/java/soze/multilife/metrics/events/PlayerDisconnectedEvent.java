@@ -1,6 +1,6 @@
 package soze.multilife.metrics.events;
 
-import soze.multilife.metrics.MetricsService;
+import soze.multilife.metrics.service.MetricsServiceImpl;
 
 public class PlayerDisconnectedEvent implements MetricEvent {
 
@@ -14,7 +14,7 @@ public class PlayerDisconnectedEvent implements MetricEvent {
 		return playerId;
 	}
 
-	public void accept(MetricsService.MetricEventVisitor visitor) {
+	public void accept(MetricsServiceImpl.MetricEventVisitor visitor) {
 		visitor.visit(this);
 	}
 }

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import soze.multilife.configuration.interfaces.MetricsConfiguration;
 import soze.multilife.messages.outgoing.MetricsMessage;
+import soze.multilife.metrics.service.MetricsServiceImpl;
 import soze.multilife.server.connection.Connection;
 import soze.multilife.server.connection.ConnectionFactory;
 
@@ -27,7 +28,7 @@ public class MetricsWebSocketHandlerImpl implements MetricsWebSocketHandler {
 
 	private final MetricsConfiguration configuration;
 
-	private final MetricsService metricsService;
+	private final MetricsServiceImpl metricsService;
 	private final ConnectionFactory connectionFactory;
 
 	private final AtomicInteger nextId = new AtomicInteger();
@@ -36,7 +37,7 @@ public class MetricsWebSocketHandlerImpl implements MetricsWebSocketHandler {
 
 	public MetricsWebSocketHandlerImpl(
 			MetricsConfiguration configuration,
-			MetricsService metricsService,
+			MetricsServiceImpl metricsService,
 			ConnectionFactory connectionFactory
 	) {
 		this.configuration = Objects.requireNonNull(configuration);

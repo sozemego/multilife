@@ -1,6 +1,6 @@
 package soze.multilife.metrics.events;
 
-import soze.multilife.metrics.MetricsService;
+import soze.multilife.metrics.service.MetricsServiceImpl;
 
 /**
  * Event constructed based on the instance of outgoing data.
@@ -31,7 +31,7 @@ public class OutgoingTypeMetricEvent implements MetricEvent {
 		return connectionId;
 	}
 
-	public void accept(MetricsService.MetricEventVisitor visitor) {
+	public void accept(MetricsServiceImpl.MetricEventVisitor visitor) {
 		visitor.visit(this);
 	}
 
