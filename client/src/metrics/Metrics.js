@@ -3,7 +3,7 @@
  */
 import React from "react";
 import ReactDOM from "react-dom";
-import {Divider, MenuItem, MuiThemeProvider, Paper, SvgIcon} from "material-ui";
+import {Divider, FlatButton, MenuItem, MuiThemeProvider, Paper, RaisedButton, SvgIcon} from "material-ui";
 import MetricsSocket from "./MetricsSocket";
 import TotalMessagesMetric from "./TotalMessagesMetric";
 import injectTapEventPlugin from "react-tap-event-plugin";
@@ -93,12 +93,24 @@ export default class Metrics extends React.Component {
 						<div id="total-bytes-received" style={styles.totalBytes}/>
 						<Divider />
 						<div id="average-kbs-container" style={selectedView !== 0 ? {display:"none"} : styles.averageKbsContainer}>
+						  <div>
+							<div>
+							  <RaisedButton label={"NOW"} style={{margin: "2px"}} onTouchTap={() => averageKb.setLive()}/>
+							  <RaisedButton label={"TODAY"} style={{margin: "2px"}} onTouchTap={() => averageKb.setDays(1)}/>
+							  <RaisedButton label={"LAST 2 DAYS"} style={{margin: "2px"}} onTouchTap={() => averageKb.setDays(2)}/>
+							  <RaisedButton label={"LAST 7 DAYS"} style={{margin: "2px"}} onTouchTap={() => averageKb.setDays(7)}/>
+							  <RaisedButton label={"LAST 31 DAYS"} style={{margin: "2px"}} onTouchTap={() => averageKb.setDays(31)}/>
+							</div>
 							<div id="average-kbs-outgoing">
 
 							</div>
+						  </div>
+						  <div>
 							<div id="average-kbs-incoming">
 
 							</div>
+						  </div>
+
 						</div>
 						<div style={selectedView !== 1 ? {display:"none"} : styles.typeCountTitle}>
 							<p>Message type count</p>
@@ -129,7 +141,7 @@ ReactDOM.render(<Metrics/>, document.getElementById("metrics"));
 
 let socket = new MetricsSocket();
 new TotalMessagesMetric(socket);
-new AverageKbMetric(socket);
+const averageKb = new AverageKbMetric(socket);
 new OutgoingTypeCountMetric(socket);
 new IncomingTypeCountMetric(socket);
 new PlayerCountMetric(socket);

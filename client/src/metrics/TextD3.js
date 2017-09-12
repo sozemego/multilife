@@ -16,7 +16,7 @@ export default class TextD3 {
 		text.exit().remove();
 
 		text.enter()
-			.append("p")
+			.insert("p", ":first-child")
 			.text(this._textFunction);
 
 	};
