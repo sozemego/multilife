@@ -7,7 +7,7 @@ export default class MetricsSocket {
 
 	_init() {
 
-		this.webSocket = new WebSocket("ws://localhost:8000/metrics-live");
+		this.webSocket = new WebSocket(METRICS_WEBSOCKET_HOST);
 
 		this.webSocket.onopen = () => {
 

@@ -45,7 +45,8 @@ module.exports = {
 			{from: "src/login_background.gif"}
 		]),
 		new webpack.DefinePlugin({
-			WEBSOCKET_HOST: JSON.stringify("ws://127.0.0.1:8000/game")
+			WEBSOCKET_HOST: JSON.stringify("ws://127.0.0.1:8000/game"),
+			METRICS_WEBSOCKET_HOST: JSON.stringify("ws://127.0.0.1:8000/metrics-live")
 		}),
 	],
 	externals: {
