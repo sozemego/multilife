@@ -1,5 +1,5 @@
 import LineChart from "./LineChart";
-import TextD3 from "./TextD3";
+import {textD3} from "./text-d3";
 
 export default class AverageKbMetric {
 
@@ -10,8 +10,8 @@ export default class AverageKbMetric {
 		this._averageIncomingKbs = [];
 		this._chartOutgoing = new LineChart(document.getElementById("average-kbs-outgoing"), 850, 420);
 		this._chartIncoming = new LineChart(document.getElementById("average-kbs-incoming"), 850, 420);
-		this._textOutgoing = new TextD3(document.getElementById("average-kbs-outgoing"), this._outgoingTextFunction);
-		this._textIncoming = new TextD3(document.getElementById("average-kbs-incoming"), this._incomingTextFunction);
+		this._textOutgoing = textD3(document.getElementById("average-kbs-outgoing"), this._outgoingTextFunction);
+		this._textIncoming = textD3(document.getElementById("average-kbs-incoming"), this._incomingTextFunction);
 		this._mode = "live";
 		this._days = 1;
 		this._maxElements = 500;

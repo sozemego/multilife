@@ -1,4 +1,4 @@
-import TextD3 from "./TextD3";
+import {textD3} from "./text-d3";
 
 const sentTextFunction = (data) => {
 	return "Total bytes sent: "
@@ -28,8 +28,8 @@ const getTruncatedMb = (bytes) => {
  */
 export const totalMessagesMetric = (socket) => {
 
-	const sentText = new TextD3(document.getElementById("total-bytes-sent"), sentTextFunction);
-	const receivedText = new TextD3(document.getElementById("total-bytes-received"), receivedTextFunction);
+	const sentText = textD3(document.getElementById("total-bytes-sent"), sentTextFunction);
+	const receivedText = textD3(document.getElementById("total-bytes-received"), receivedTextFunction);
 
 	const handleTotalMessages = (msg) => {
 		sentText.update({
