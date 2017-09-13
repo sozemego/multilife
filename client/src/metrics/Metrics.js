@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import {Divider, FlatButton, MenuItem, MuiThemeProvider, Paper, RaisedButton, SvgIcon} from "material-ui";
 import {metricsSocket} from "./metrics-socket";
-import TotalMessagesMetric from "./TotalMessagesMetric";
+import TotalMessagesMetric, {totalMessagesMetric} from "./total-messages-metric";
 import injectTapEventPlugin from "react-tap-event-plugin";
 import AverageKbMetric from "./AverageKbMetric";
 import OutgoingTypeCountMetric from "./OutgoingTypeCountMetric";
@@ -111,7 +111,9 @@ ReactDOM.render(<Metrics/>, document.getElementById("metrics"));
 
 let socket = metricsSocket();
 socket.init(METRICS_WEBSOCKET_HOST);
-new TotalMessagesMetric(socket);
+
+totalMessagesMetric(socket);
+
 const averageKb = new AverageKbMetric(socket);
 new OutgoingTypeCountMetric(socket);
 new IncomingTypeCountMetric(socket);
