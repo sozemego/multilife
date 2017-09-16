@@ -1,11 +1,11 @@
-import LineChart from "./LineChart";
+import {lineChart} from "./line-chart";
 import {textD3} from "./text-d3";
 export default class PlayerCountMetric {
 
 	constructor(socket) {
 		socket.addObserver(this._handlePlayerMapCount);
 		this._playerCount = [];
-		this._chart = new LineChart(document.getElementById("player-count"), 850, 420);
+		this._chart = lineChart(document.getElementById("player-count"), 850, 420);
 		this._text = textD3(document.getElementById("player-count"), this._textFunction);
 	}
 

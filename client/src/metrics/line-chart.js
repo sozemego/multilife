@@ -4,61 +4,59 @@ import * as d3 from "d3";
  * Encapsulates default, but customizable behavior for a live
  * d3 line chart. By default, y axis is linear, but x axis is time scale.
  */
-export default class LineChart {
+export const lineChart = (dom, width, height) => {
 
-	constructor(domElement, width = 500, height = 300) {
-		this._domElement = domElement;
-		this._width = width;
-		this._height = height;
-		this._initialized = false;
-	}
+	let initialized = false;
+	let chart = null;
 
-	_init = () => {
-		if(this._initialized) {
+	let lineChart = {};
+
+	lineChart.init = () => {
+		if (initialized) {
 			return;
 		}
-		this._chart = d3.select(this._domElement)
+		chart = d3.select(dom)
 			.append("svg")
-			.attr("width", this._width)
-			.attr("height", this._height)
+			.attr("width", width)
+			.attr("height", height)
 			.append("g")
 			.attr("transform", "translate(" + 50 + "," + 20 + ")");
 
-		let x = d3.scaleLinear().domain([0, this._width]).range([0, this._width]);
-		let y = d3.scaleLinear().domain([0, this._height]).range([0, this._height]);
+		let x = d3.scaleLinear().domain([0, width]).range([0, width]);
+		let y = d3.scaleLinear().domain([0, height]).range([0, height]);
 
-		this._chart.selectAll("line.x")
+		chart.selectAll("line.x")
 			.data(x.ticks(8))
 			.enter().append("line")
 			.attr("x1", x)
 			.attr("x2", x)
 			.attr("y1", 0)
-			.attr("y2", this._height)
+			.attr("y2", height)
 			.style("stroke", "#ccc");
 
-		this._chart.selectAll("line.y")
+		chart.selectAll("line.y")
 			.data(y.ticks(6))
 			.enter().append("line")
 			.attr("x1", 0)
-			.attr("x2", this._width)
+			.attr("x2", width)
 			.attr("y1", y)
 			.attr("y2", y)
 			.style("stroke", "#ccc");
 
 		let yAxis = d3.axisLeft().scale(y);
-		this._chart
+		chart
 			.append("g")
 			.attr("class", "y axis")
 			.call(yAxis);
 
 		let xAxis = d3.axisTop().scale(x);
-		this._chart
+		chart
 			.append("g")
 			.attr("class", "x axis")
 			.attr("transform", "translate(0, " + 399 + ")")
 			.call(xAxis);
 
-		this._initialized = true;
+		initialized = true;
 	};
 
 	/**
@@ -68,18 +66,19 @@ export default class LineChart {
 	 * @param timeDomainMin
 	 * @param timeDomainMax
 	 */
-	update = (data, timeDomainMin, timeDomainMax) => {
-		this._init();
+	lineChart.update = (data, timeDomainMin, timeDomainMax) => {
+
+		lineChart.init();
 		let yMax = d3.max(data.map(item => item.count)) * 1.25;
 
-		let x = d3.scaleTime().domain([timeDomainMin, timeDomainMax]).range([0, this._width]);
-		let y = d3.scaleLinear().domain([0, yMax]).range([this._height, 0]);
+		let x = d3.scaleTime().domain([timeDomainMin, timeDomainMax]).range([0, width]);
+		let y = d3.scaleLinear().domain([0, yMax]).range([height, 0]);
 
 		let line = d3.line()
 			.x(d => x(d.time))
 			.y(d => y(d.count));
 
-		let path = this._chart.selectAll("path.content")
+		let path = chart.selectAll("path.content")
 			.data([data]);
 
 		path.exit().remove();
@@ -94,13 +93,14 @@ export default class LineChart {
 		path.attr("d", line(data));
 
 		let yAxis = d3.axisLeft().scale(y);
-		this._chart.selectAll("g.y.axis")
+		chart.selectAll("g.y.axis")
 			.call(yAxis);
 
 		let xAxis = d3.axisTop().scale(x).ticks(4);
-		this._chart.selectAll("g.x.axis")
+		chart.selectAll("g.x.axis")
 			.call(xAxis);
 
 	};
 
-}
+	return lineChart;
+};

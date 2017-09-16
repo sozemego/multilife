@@ -1,4 +1,4 @@
-import LineChart from "./LineChart";
+import {lineChart} from "./line-chart";
 import {textD3} from "./text-d3";
 
 export default class AverageKbMetric {
@@ -8,8 +8,8 @@ export default class AverageKbMetric {
 		socket.addObserver(this._handleAverageIncomingKbs);
 		this._averageOutgoingKbs = [];
 		this._averageIncomingKbs = [];
-		this._chartOutgoing = new LineChart(document.getElementById("average-kbs-outgoing"), 850, 420);
-		this._chartIncoming = new LineChart(document.getElementById("average-kbs-incoming"), 850, 420);
+		this._chartOutgoing = lineChart(document.getElementById("average-kbs-outgoing"), 850, 420);
+		this._chartIncoming = lineChart(document.getElementById("average-kbs-incoming"), 850, 420);
 		this._textOutgoing = textD3(document.getElementById("average-kbs-outgoing"), this._outgoingTextFunction);
 		this._textIncoming = textD3(document.getElementById("average-kbs-incoming"), this._incomingTextFunction);
 		this._mode = "live";
