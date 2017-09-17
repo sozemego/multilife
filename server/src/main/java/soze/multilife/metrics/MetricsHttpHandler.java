@@ -6,13 +6,9 @@ import soze.multilife.metrics.service.MetricsService;
 import soze.multilife.utils.JsonUtils;
 import spark.Route;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,7 +32,8 @@ public class MetricsHttpHandler {
 	public Route getMetricsRoute() {
 		return (request, response) -> {
 			response.header("Content-type", "text-html");
-			return getMetricsPage();
+			response.redirect("metrics.html");
+			return null;
 		};
 	}
 
@@ -98,24 +95,6 @@ public class MetricsHttpHandler {
 
 		} catch (NumberFormatException e) {
 			return Optional.empty();
-		}
-	}
-
-	private String getMetricsPage() {
-		//if(html == null) {
-		loadHtml();
-		//}
-		return html;
-	}
-
-	private void loadHtml() {
-		try {
-			//TODO MAKE THIS PATH DEPENDENT ON SOME ENVIRONMENT VARIABLE
-			//TODO no, make it load from resources/public always
-			List<String> lines = Files.readAllLines(Paths.get("server/src/main/resources/public/metrics.html"));
-			html = lines.stream().reduce("", (prev, curr) -> prev += curr + "\n");
-		} catch (IOException e) {
-			LOG.error("Could not load metrics.html file. [{}]", e);
 		}
 	}
 
