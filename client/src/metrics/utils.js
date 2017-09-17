@@ -2,7 +2,7 @@
  * Finds and returns the maximum element of an array.
  */
 export const findMaxNumber = arr => {
-	let max = 0;
+	let max = Number.MIN_SAFE_INTEGER;
 	arr.forEach(i => {
 		if(i > max) max = i;
 	});
