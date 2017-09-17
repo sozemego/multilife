@@ -1,5 +1,5 @@
 /**
- * Finds and returns the maximum element of an array.
+ * Finds and returns the maximum number in an array.
  */
 export const findMaxNumber = arr => {
 	let max = Number.MIN_SAFE_INTEGER;
