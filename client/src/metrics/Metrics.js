@@ -4,7 +4,7 @@ import {Divider, MuiThemeProvider, RaisedButton} from "material-ui";
 import {metricsSocket} from "./metrics-socket";
 import {totalMessagesMetric} from "./total-messages-metric";
 import injectTapEventPlugin from "react-tap-event-plugin";
-import AverageKbMetric from "./AverageKbMetric";
+import AverageKbMetric, {averageKbMetric} from "./average-kb-metric";
 import OutgoingTypeCountMetric from "./OutgoingTypeCountMetric";
 import IncomingTypeCountMetric from "./IncomingTypeCountMetric";
 
@@ -115,7 +115,7 @@ socket.init(METRICS_WEBSOCKET_HOST);
 totalMessagesMetric(socket);
 playerCountMetric(socket);
 
-const averageKb = new AverageKbMetric(socket);
+const averageKb = averageKbMetric(socket);
 new OutgoingTypeCountMetric(socket);
 new IncomingTypeCountMetric(socket);
 
