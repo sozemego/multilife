@@ -4,11 +4,10 @@ import {Divider, MuiThemeProvider, RaisedButton} from "material-ui";
 import {metricsSocket} from "./metrics-socket";
 import {totalMessagesMetric} from "./total-messages-metric";
 import injectTapEventPlugin from "react-tap-event-plugin";
-import AverageKbMetric, {averageKbMetric} from "./average-kb-metric";
-import OutgoingTypeCountMetric from "./OutgoingTypeCountMetric";
+import {averageKbMetric} from "./average-kb-metric";
+import {outgoingTypeCountMetric} from "./outgoing-type-count-metric";
 import IncomingTypeCountMetric from "./IncomingTypeCountMetric";
-
-import PlayerCountMetric, {playerCountMetric} from "./player-count-metric";
+import {playerCountMetric} from "./player-count-metric";
 import {Sidebar} from "./sidebar";
 injectTapEventPlugin();
 
@@ -116,7 +115,7 @@ totalMessagesMetric(socket);
 playerCountMetric(socket);
 
 const averageKb = averageKbMetric(socket);
-new OutgoingTypeCountMetric(socket);
+outgoingTypeCountMetric(socket);
 new IncomingTypeCountMetric(socket);
 
 
