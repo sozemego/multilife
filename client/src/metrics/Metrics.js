@@ -6,7 +6,7 @@ import {totalMessagesMetric} from "./total-messages-metric";
 import injectTapEventPlugin from "react-tap-event-plugin";
 import {averageKbMetric} from "./average-kb-metric";
 import {outgoingTypeCountMetric} from "./outgoing-type-count-metric";
-import IncomingTypeCountMetric from "./IncomingTypeCountMetric";
+import {incomingTypeCountMetric} from "./incoming-type-count-metric";
 import {playerCountMetric} from "./player-count-metric";
 import {Sidebar} from "./sidebar";
 injectTapEventPlugin();
@@ -116,6 +116,6 @@ playerCountMetric(socket);
 
 const averageKb = averageKbMetric(socket);
 outgoingTypeCountMetric(socket);
-new IncomingTypeCountMetric(socket);
+incomingTypeCountMetric(socket);
 
 
