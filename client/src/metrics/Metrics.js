@@ -1,14 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import {Divider, FlatButton, MenuItem, MuiThemeProvider, Paper, RaisedButton, SvgIcon} from "material-ui";
+import {Divider, MuiThemeProvider, RaisedButton} from "material-ui";
 import {metricsSocket} from "./metrics-socket";
-import TotalMessagesMetric, {totalMessagesMetric} from "./total-messages-metric";
+import {totalMessagesMetric} from "./total-messages-metric";
 import injectTapEventPlugin from "react-tap-event-plugin";
 import AverageKbMetric from "./AverageKbMetric";
 import OutgoingTypeCountMetric from "./OutgoingTypeCountMetric";
 import IncomingTypeCountMetric from "./IncomingTypeCountMetric";
 
-import PlayerCountMetric from "./PlayerCountMetric";
+import PlayerCountMetric, {playerCountMetric} from "./player-count-metric";
 import {Sidebar} from "./sidebar";
 injectTapEventPlugin();
 
@@ -113,9 +113,10 @@ let socket = metricsSocket();
 socket.init(METRICS_WEBSOCKET_HOST);
 
 totalMessagesMetric(socket);
+playerCountMetric(socket);
 
 const averageKb = new AverageKbMetric(socket);
 new OutgoingTypeCountMetric(socket);
 new IncomingTypeCountMetric(socket);
-new PlayerCountMetric(socket);
+
 
