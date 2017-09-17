@@ -1,8 +1,8 @@
 /**
  * Finds and returns the maximum element of an array.
  */
-export const findMax = arr => {
-	let max = undefined;
+export const findMaxNumber = arr => {
+	let max = 0;
 	arr.forEach(i => {
 		if(i > max) max = i;
 	});

@@ -1,4 +1,4 @@
-import {findMax, generateRandomColors} from "./utils";
+import {findMaxNumber, generateRandomColors} from "./utils";
 
 const transformTypeCountToArray = (typeCount) => {
 	const arr = [];
@@ -19,7 +19,7 @@ export const outgoingTypeCountMetric = socket => {
 	const handleTypeCount = ({outgoingTypeCount: typeCount} = msg) => {
 		let data = transformTypeCountToArray(typeCount);
 
-		let max = findMax(data.map(d => d.count));
+		let max = findMaxNumber(data.map(d => d.count));
 		let length = d3.scaleLinear().domain([0, max]).range([0, getMaxWidth()]);
 
 		let colors = d3.scaleOrdinal(generateRandomColors(10));
@@ -44,7 +44,7 @@ export const outgoingTypeCountMetric = socket => {
 		chart.enter()
 			.append("div")
 			.style("background-color", d => colors(d.type))
-			.style("width", 25)
+			.style("width", 25 + "px")
 			.transition()
 			.duration(500)
 			.style("width", d => length(d.count) + "px");
