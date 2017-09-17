@@ -173,14 +173,40 @@ public class MetricsServiceImpl implements MetricsService {
 		return playerMap;
 	}
 
-	@Override
+	/**
+	 * Maximum amount of time/kbs value pairs retrieved by
+	 * <br>
+	 * {@link MetricsService#getAverageKbsOutgoingSince}
+	 * <br>
+	 * {@link MetricsService#getAverageKbsIncomingSince}
+	 */
+	private static final int MAX_AVERAGE_KBS_COUNT = 500;
+
 	public Map<Long, Double> getAverageKbsOutgoingSince(Instant timeSince) {
-		return repository.getAverageKbsOutgoingSince(timeSince);
+		Map<Long, Double> data = repository.getAverageKbsIncomingSince(timeSince);
+		return thinData(data, MAX_AVERAGE_KBS_COUNT);
 	}
 
-	@Override
 	public Map<Long, Double> getAverageKbsIncomingSince(Instant timeSince) {
-		return repository.getAverageKbsIncomingSince(timeSince);
+		Map<Long, Double> data = repository.getAverageKbsIncomingSince(timeSince);
+		return thinData(data, MAX_AVERAGE_KBS_COUNT);
+	}
+
+	private Map<Long, Double> thinData(Map<Long, Double> data, int maxCount) {
+		if(data.size() < maxCount) {
+			return data;
+		}
+		int index = 0;
+		List<Long> keysToRemove = new ArrayList<>(maxCount);
+		int leaveNthElement = (int) Math.ceil(data.size() / maxCount);
+		for (Map.Entry<Long, Double> entry : data.entrySet()) {
+			if (index % leaveNthElement != 0) {
+				keysToRemove.add(entry.getKey());
+			}
+			index++;
+		}
+		keysToRemove.forEach(data::remove);
+		return data;
 	}
 
 	/**
