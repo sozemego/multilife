@@ -257,8 +257,6 @@ class Game {
 
 				listElement.appendChild(playerColorElement);
 
-				points = points === undefined ? "0" : points;
-
 				const nameElement = document.createElement("span");
 				nameElement.classList.add("player-points-name");
 				const nameNode = document.createTextNode(name);
@@ -268,7 +266,7 @@ class Game {
 				const pointsElement = document.createElement("span");
 				pointsElement.classList.add("player-points-points");
 
-				const pointsNode = document.createTextNode(points);
+				const pointsNode = document.createTextNode(points === undefined ? "0" : points);
 				pointsElement.appendChild(pointsNode);
 
 				listElement.appendChild(pointsElement);
