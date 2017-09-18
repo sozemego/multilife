@@ -191,8 +191,10 @@ class Game {
 			return;
 		}
 
-		const keys = this.keys;
-		const shapeMap = this.shapeMap;
+		const {
+			keys,
+			shapeMap
+		} = this;
 
 		const dom = document.getElementById("available-shapes");
 		dom.innerHTML = "";
@@ -227,7 +229,7 @@ class Game {
 	_getKey = (obj, value) => {
 		for (const key in obj) {
 			if (obj.hasOwnProperty(key)) {
-				if (obj[key] === value) {
+				if (obj[key] == value) {
 					return key;
 				}
 			}
