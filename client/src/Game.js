@@ -199,21 +199,21 @@ class Game {
 		const dom = document.getElementById("available-shapes");
 		dom.innerHTML = "";
 
-		for (const k in shapeMap) {
-			if (shapeMap.hasOwnProperty(k)) {
+		for (const key in shapeMap) {
+			if (shapeMap.hasOwnProperty(key)) {
 
-				const shape = shapeMap[k];
+				const shape = shapeMap[key];
 				const shapeName = shape.name;
-				const key = this._getKey(keys, k);
+				const button = this._getKey(keys, key);
 
 				const container = document.createElement("div");
 				container.addEventListener("click", () => {
-					this.selectShape(k);
+					this.selectShape(key);
 				});
 
 				const textElement = document.createElement("span");
 				textElement.style.display = "inline-block";
-				textElement.appendChild(document.createTextNode(key + " " + shapeName));
+				textElement.appendChild(document.createTextNode(button + " " + shapeName));
 
 				if (this.selectedShape && shapeName === this.selectedShape.name) {
 					textElement.style.backgroundColor = "red";
@@ -223,7 +223,6 @@ class Game {
 				dom.appendChild(container);
 			}
 		}
-
 	};
 
 	_getKey = (obj, value) => {
