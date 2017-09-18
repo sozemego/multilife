@@ -47,8 +47,8 @@ export default class Cell {
 	}
 
 	update() {
-		let p = this.currentPercentageSize;
-		let t = this.targetSizePercentage;
+		const p = this.currentPercentageSize;
+		const t = this.targetSizePercentage;
 		if (p < t) {
 			this.currentPercentageSize += 0.250;
 		} else if (p > t) {
@@ -71,7 +71,7 @@ export default class Cell {
 	}
 
 	actuallyRender() {
-		let cellSize = this.size * this.currentPercentageSize;
+		const cellSize = this.size * this.currentPercentageSize;
 		this.renderFunction(
 			(this.x * this.size) + (1 - cellSize) * 0.5,
 			(this.y * this.size) + (1 - cellSize) * 0.5,

@@ -62,14 +62,14 @@ export default class Simulation {
 	 * @private
 	 */
 	_getPositionKey = (position) => {
-		let {x, y} = position;
+		const {x, y} = position;
 		let index = x + (y * this.width); // find index
-		let maxSize = this.width * this.height;
+		const maxSize = this.width * this.height;
 		if (index < 0) index = index + (maxSize); // wrap around if neccesary
 		if (index >= maxSize) index = index % (maxSize);
 
-		let wrappedX = index % this.width;
-		let wrappedY = Math.floor(index / this.width);
+		const wrappedX = index % this.width;
+		const wrappedY = Math.floor(index / this.width);
 
 		return "x:" + wrappedX + "y:" + wrappedY;
 	};
@@ -91,14 +91,14 @@ export default class Simulation {
 	};
 
 	update = () => {
-		for (let pos in this.activeCells) {
+		for (const pos in this.activeCells) {
 			if (this.activeCells.hasOwnProperty(pos)) {
-				let cell = this.activeCells[pos];
-				let {x, y} = cell;
-				let aliveNeighbours = this._getAliveNeighbourCells(x, y);
-				let state = basicRule(aliveNeighbours.length, cell.isAlive());
+				const cell = this.activeCells[pos];
+				const {x, y} = cell;
+				const aliveNeighbours = this._getAliveNeighbourCells(x, y);
+				const state = basicRule(aliveNeighbours.length, cell.isAlive());
 				if (state !== 0) {
-					let strongestOwnerId = this._getStrongestOwnerId(aliveNeighbours);
+					const strongestOwnerId = this._getStrongestOwnerId(aliveNeighbours);
 					this.setCellState({
 						x: x,
 						y: y
@@ -113,12 +113,12 @@ export default class Simulation {
 	 Returns an array of alive cells neighbouring a cell at x, y.
 	 */
 	_getAliveNeighbourCells = (x, y) => {
-		let cells = [];
+		const cells = [];
 		for (let i = -1; i < 2; i++) {
 			for (let j = -1; j < 2; j++) {
 				if (i === 0 && j === 0) continue;
-				let positionKey = this._getPositionKey({x: i + x, y: j + y});
-				let cell = this.cells[positionKey];
+				const positionKey = this._getPositionKey({x: i + x, y: j + y});
+				const cell = this.cells[positionKey];
 				if (cell.isAlive()) cells.push(cell);
 			}
 		}
@@ -130,7 +130,7 @@ export default class Simulation {
 			return -1;
 		}
 
-		let ownerIds = cells.map((cell) => {
+		const ownerIds = cells.map((cell) => {
 			return cell.getOwnerId();
 		});
 
@@ -155,10 +155,10 @@ export default class Simulation {
 
 	transferCells = () => {
 		this.activeCells = {};
-		for (let pos in this.nextCells) {
+		for (const pos in this.nextCells) {
 			if (this.nextCells.hasOwnProperty(pos)) {
-				let oldCell = this.nextCells[pos];
-				let c = this.cells[pos];
+				const oldCell = this.nextCells[pos];
+				const c = this.cells[pos];
 				c.setAlive(oldCell.isAlive());
 				c.setOwnerId(oldCell.getOwnerId());
 				c.setColor(this._getColor(oldCell.getOwnerId()));
@@ -175,11 +175,11 @@ export default class Simulation {
 	 * @private
 	 */
 	_addToActive = (cell) => {
-		let {x, y} = cell;
+		const {x, y} = cell;
 		for (let i = -1; i < 2; i++) {
 			for (let j = -1; j < 2; j++) {
-				let position = this._getPositionKey({x: i + x, y: j + y});
-				let cell = this.activeCells[position];
+				const position = this._getPositionKey({x: i + x, y: j + y});
+				const cell = this.activeCells[position];
 				if (!cell) {
 					this.activeCells[position] = this.cells[position];
 				}
@@ -188,7 +188,7 @@ export default class Simulation {
 	};
 
 	render = (viewport) => {
-		for (let pos in this.cells) {
+		for (const pos in this.cells) {
 			if (this.cells.hasOwnProperty(pos)) {
 				this.cells[pos].update();
 				this.cells[pos].render(viewport);

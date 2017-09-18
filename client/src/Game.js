@@ -43,6 +43,7 @@ class Game {
 		this._initShapes();
 		this._createLoginView();
 		this._pingMessage = new Uint8Array([3]).buffer;
+		this._tickDuration = 250;
 	}
 
 	/**
@@ -50,8 +51,10 @@ class Game {
 	 * @private
 	 */
 	_initShapes = () => {
-		let shapeMap = this.shapeMap;
-		let keys = this.keys;
+		const {
+			shapeMap,
+			keys
+		} = this;
 		// INIT BASIC RULES
 		shapeMap[keys.Q] = {name: "block", shape: this._parseShape("11,11")};
 		shapeMap[keys.W] = {name: "hive", shape: this._parseShape("0110,1001,0110")};
@@ -75,29 +78,29 @@ class Game {
 	 * @private
 	 */
 	_parseShape = (str) => {
-		let tokens = str.split(",");
-		let rows = tokens.length;
-		let columns = tokens[0].length;
-		let offsets = [];
+		const tokens = str.split(",");
+		const rows = tokens.length;
+		const columns = tokens[0].length;
+		const offsets = [];
 		for (let i = 0; i < rows; i++) {
 			for (let j = 0; j < columns; j++) {
-				let bit = tokens[i].charAt(j);
-				offsets.push({x: i, y: j, bit: bit});
+				const bit = tokens[i].charAt(j);
+				offsets.push({x: i, y: j, bit});
 			}
 		}
 		return offsets;
 	};
 
 	_createLoginView = () => {
-		let dom = document.getElementById("login");
+		const dom = document.getElementById("login");
 
-		let name = document.createElement("input");
+		const name = document.createElement("input");
 		name.setAttribute("id", "name");
 		name.setAttribute("placeholder", "Type your name");
 		dom.appendChild(name);
 	  	name.focus();
 
-		let button = document.createElement("button");
+		const button = document.createElement("button");
 		button.appendChild(document.createTextNode("ENTER!"));
 		button.classList.add("login-button");
 		button.addEventListener("click", (event) => {
@@ -109,7 +112,7 @@ class Game {
 	};
 
 	_login = () => {
-		let name = document.getElementById("name").value.trim();
+		const name = document.getElementById("name").value.trim();
 		if (!name) {
 			return;
 		}
@@ -162,8 +165,8 @@ class Game {
 	_getIndex = (x, y) => {
 		x = x / this.cellSize;
 		y = y / this.cellSize;
-		let index = Math.floor(x) + (Math.floor(y) * this.width);
-		let maxSize = this.width * this.height;
+		const index = Math.floor(x) + (Math.floor(y) * this.width);
+		const maxSize = this.width * this.height;
 		if (index < 0) return index + (maxSize); // wrap around if neccesary
 		if (index >= maxSize) return index % (maxSize);
 		return index; // return index if not neccesary to wrap
@@ -188,25 +191,25 @@ class Game {
 			return;
 		}
 
-		let keys = this.keys;
-		let shapeMap = this.shapeMap;
+		const keys = this.keys;
+		const shapeMap = this.shapeMap;
 
-		let dom = document.getElementById("available-shapes");
+		const dom = document.getElementById("available-shapes");
 		dom.innerHTML = "";
 
-		for (let k in shapeMap) {
+		for (const k in shapeMap) {
 			if (shapeMap.hasOwnProperty(k)) {
 
-				let shape = shapeMap[k];
-				let shapeName = shape.name;
-				let key = this._getKey(keys, k);
+				const shape = shapeMap[k];
+				const shapeName = shape.name;
+				const key = this._getKey(keys, k);
 
-				let container = document.createElement("div");
+				const container = document.createElement("div");
 				container.addEventListener("click", () => {
 					this.selectShape(k);
 				});
 
-				let textElement = document.createElement("span");
+				const textElement = document.createElement("span");
 				textElement.style.display = "inline-block";
 				textElement.appendChild(document.createTextNode(key + " " + shapeName));
 
@@ -222,9 +225,9 @@ class Game {
 	};
 
 	_getKey = (obj, value) => {
-		for (let key in obj) {
+		for (const key in obj) {
 			if (obj.hasOwnProperty(key)) {
-				if (obj[key] == value) {
+				if (obj[key] === value) {
 					return key;
 				}
 			}
@@ -236,19 +239,19 @@ class Game {
 			return;
 		}
 
-		let dom = document.getElementById("player-points");
+		const dom = document.getElementById("player-points");
 		dom.innerHTML = "";
 
-		for(let playerId in this.playerData) {
+		for(const playerId in this.playerData) {
 			if (this.playerData.hasOwnProperty(playerId)) {
-				let color = this.playerData[playerId].color;
-				let name = this.playerData[playerId].name;
-				let points = this.playerData[playerId].points;
+				const color = this.playerData[playerId].color;
+				const name = this.playerData[playerId].name;
+				const points = this.playerData[playerId].points;
 
-				let listElement = document.createElement("div");
+				const listElement = document.createElement("div");
 				listElement.classList.add("player-points-element");
 
-				let playerColorElement = document.createElement("span");
+				const playerColorElement = document.createElement("span");
 				playerColorElement.classList.add("player-points-color");
 				playerColorElement.style.backgroundColor = this._convertIntToHexColor(color);
 
@@ -256,16 +259,16 @@ class Game {
 
 				points = points === undefined ? "0" : points;
 
-				let nameElement = document.createElement("span");
+				const nameElement = document.createElement("span");
 				nameElement.classList.add("player-points-name");
-				let nameNode = document.createTextNode(name);
+				const nameNode = document.createTextNode(name);
 				nameElement.appendChild(nameNode);
 				listElement.appendChild(nameElement);
 
-				let pointsElement = document.createElement("span");
+				const pointsElement = document.createElement("span");
 				pointsElement.classList.add("player-points-points");
 
-				let pointsNode = document.createTextNode(points);
+				const pointsNode = document.createTextNode(points);
 				pointsElement.appendChild(pointsNode);
 
 				listElement.appendChild(pointsElement);
@@ -311,14 +314,14 @@ class Game {
 
 		this._translateMouse();
 
-		let shape = this.selectedShape.shape;
-		let indices = this._findIndices(shape.filter((p) => p.bit === "1").map((p) => {
+		const shape = this.selectedShape.shape;
+		const indices = this._findIndices(shape.filter((p) => p.bit === "1").map((p) => {
 			return {x: p.x, y: p.y}
 		}));
 
-		let positions = this._findPositions(indices);
+		const positions = this._findPositions(indices);
 		for (let i = 0; i < positions.length; i++) {
-			let p = positions[i];
+			const p = positions[i];
 			this.rectRenderFunction(
 				p.x + (1 - this.cellSize) * 0.5, p.y + (1 - this.cellSize) * 0.5,
 				this.cellSize, this.cellSize, "#adeedd");
@@ -371,7 +374,7 @@ class Game {
 	 * @private
 	 */
 	_findIndices = (positions) => {
-		let indices = [];
+		const indices = [];
 		for (let i = 0; i < positions.length; i++) {
 			indices.push(this._getIndexOffsetFromMouse(positions[i].x, positions[i].y));
 		}
@@ -512,14 +515,18 @@ class Game {
 	}
 
 	_onMapUpdate = (data) => {
-		let newCells = data.cells;
+		const newCells = data.cells;
 		if (newCells.length === this.width * this.height) {
 			this.actualCells = [];
 			console.log("Received all data.");
 			for (let i = 0; i < newCells.length; i++) {
-				let newCell = newCells[i];
-				let {x, y, alive, ownerId} = newCell;
-				let cell = new Cell(x, y, alive, ownerId, this.cellSize, "#0000ff", this.rectRenderFunction);
+				const newCell = newCells[i];
+				const {
+					x, y,
+					alive,
+					ownerId
+				} = newCell;
+				const cell = new Cell(x, y, alive, ownerId, this.cellSize, "#0000ff", this.rectRenderFunction);
 				if (alive) {
 					cell.currentPercentageSize = 1;
 				}
@@ -530,7 +537,7 @@ class Game {
 			}
 		}
 		for (let i = 0; i < newCells.length; i++) {
-			let newCell = newCells[i];
+			const newCell = newCells[i];
 			this.simulation.setCellState({x: newCell.x, y: newCell.y}, newCell.alive, newCell.ownerId);
 		}
 		if (this.firstMapData) {
@@ -549,8 +556,8 @@ class Game {
 		if (this.simulationSteps === -1) {
 			this.simulationSteps = data.iterations;
 		}
-		let tick = data.iterations;
-		let difference = tick - this.simulationSteps;
+		const tick = data.iterations;
+		const difference = tick - this.simulationSteps;
 		console.log("Sent tick " + tick + ". Client side ticks " + this.simulationSteps);
 		this._advanceSimulation();
 		if (difference > 0) {
@@ -568,13 +575,13 @@ class Game {
 	};
 
 	rectRenderFunction = (x, y, width, height, color) => {
-		let pos = this._translateOffsets(x, y);
+		const pos = this._translateOffsets(x, y);
 		this.sketch.fill(color);
 		this.sketch.rect(pos.x, pos.y, width, height);
 	};
 
 	ellipseRenderFunction = (x, y, width, height, color) => {
-		let pos = this._translateOffsets(x, y);
+		const pos = this._translateOffsets(x, y);
 		this.sketch.fill(color);
 		this.sketch.ellipse(pos.x + width / 2, pos.y + height / 2, width, height);
 	};
@@ -602,11 +609,11 @@ class Game {
 
 		this._translateMouse();
 
-		let indices = [];
+		const indices = [];
 		for (let i = 0; i < shape.length; i++) {
-			let el = shape[i];
+			const el = shape[i];
 			if (el.bit === "1") {
-				let index = this._getIndexOffsetFromMouse(el.x, el.y);
+				const index = this._getIndexOffsetFromMouse(el.x, el.y);
 				indices.push(index);
 			}
 		}
@@ -632,8 +639,8 @@ class Game {
 	 * @param height
 	 */
 	onWindowResize(width, height) {
-		let widthTaken = this.width * this.cellSize;
-		let heightTaken = this.height * this.cellSize;
+		const widthTaken = this.width * this.cellSize;
+		const heightTaken = this.height * this.cellSize;
 		this.offsets.x = (width - widthTaken) / 2;
 		this.offsets.y = (height - heightTaken) / 2;
 	}
@@ -664,12 +671,12 @@ class Game {
 	 * @private
 	 */
 	_onRemainingTime = (msg) => {
-		let remainingTime = msg.remainingTime;
+		const remainingTime = msg.remainingTime;
 
-		let dom = document.getElementById("remaining-time");
+		const dom = document.getElementById("remaining-time");
 		dom.innerHTML = "";
 
-		let span = document.createElement("span");
+		const span = document.createElement("span");
 		span.appendChild(document.createTextNode(this._parseRemainingTime(remainingTime)));
 		dom.appendChild(span);
 

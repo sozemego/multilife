@@ -13,9 +13,9 @@
  * @returns {Function}
  */
 const ruleCreator = (ruleString) => {
-	let tokens = ruleString.split("/");
-	let birthNumbers = extractNumbers(tokens[0]);
-	let surviveNumbers = extractNumbers(tokens[1]);
+	const tokens = ruleString.split("/");
+	const birthNumbers = extractNumbers(tokens[0]);
+	const surviveNumbers = extractNumbers(tokens[1]);
 
 
 	return function (n, alive) {
@@ -29,8 +29,8 @@ const ruleCreator = (ruleString) => {
 };
 
 const extractNumbers = (token) => {
-	let numbers = [];
-	let result = token.match(/\d/g);
+	const numbers = [];
+	const result = token.match(/\d/g);
 	if (result) {
 		for (let i = 0; i < result.length; i++) {
 			numbers.push(parseInt(result[i]));
