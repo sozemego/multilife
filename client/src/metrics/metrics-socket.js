@@ -11,7 +11,7 @@ export const metricsSocket = () => {
 		webSocket.onopen = () => {};
 
 		webSocket.onmessage = msg => {
-			let parsedMsg = JSON.parse(msg.data);
+			const parsedMsg = JSON.parse(msg.data);
 			if(parsedMsg.type === "METRICS") {
 				observers.forEach(fn => fn(parsedMsg));
 			}

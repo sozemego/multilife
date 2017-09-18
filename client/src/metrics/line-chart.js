@@ -9,7 +9,7 @@ export const lineChart = (dom, width, height) => {
 	let initialized = false;
 	let chart = null;
 
-	let lineChart = {};
+	const lineChart = {};
 
 	lineChart.init = () => {
 		if (initialized) {
@@ -22,8 +22,8 @@ export const lineChart = (dom, width, height) => {
 			.append("g")
 			.attr("transform", "translate(" + 50 + "," + 20 + ")");
 
-		let x = d3.scaleLinear().domain([0, width]).range([0, width]);
-		let y = d3.scaleLinear().domain([0, height]).range([0, height]);
+		const x = d3.scaleLinear().domain([0, width]).range([0, width]);
+		const y = d3.scaleLinear().domain([0, height]).range([0, height]);
 
 		chart.selectAll("line.x")
 			.data(x.ticks(8))
@@ -43,13 +43,13 @@ export const lineChart = (dom, width, height) => {
 			.attr("y2", y)
 			.style("stroke", "#ccc");
 
-		let yAxis = d3.axisLeft().scale(y);
+		const yAxis = d3.axisLeft().scale(y);
 		chart
 			.append("g")
 			.attr("class", "y axis")
 			.call(yAxis);
 
-		let xAxis = d3.axisTop().scale(x);
+		const xAxis = d3.axisTop().scale(x);
 		chart
 			.append("g")
 			.attr("class", "x axis")
@@ -69,16 +69,16 @@ export const lineChart = (dom, width, height) => {
 	lineChart.update = (data, timeDomainMin, timeDomainMax) => {
 
 		lineChart.init();
-		let yMax = d3.max(data.map(item => item.count)) * 1.25;
+		const yMax = d3.max(data.map(item => item.count)) * 1.25;
 
-		let x = d3.scaleTime().domain([timeDomainMin, timeDomainMax]).range([0, width]);
-		let y = d3.scaleLinear().domain([0, yMax]).range([height, 0]);
+		const x = d3.scaleTime().domain([timeDomainMin, timeDomainMax]).range([0, width]);
+		const y = d3.scaleLinear().domain([0, yMax]).range([height, 0]);
 
-		let line = d3.line()
+		const line = d3.line()
 			.x(d => x(d.time))
 			.y(d => y(d.count));
 
-		let path = chart.selectAll("path.content")
+		const path = chart.selectAll("path.content")
 			.data([data]);
 
 		path.exit().remove();
@@ -92,11 +92,11 @@ export const lineChart = (dom, width, height) => {
 
 		path.attr("d", line(data));
 
-		let yAxis = d3.axisLeft().scale(y);
+		const yAxis = d3.axisLeft().scale(y);
 		chart.selectAll("g.y.axis")
 			.call(yAxis);
 
-		let xAxis = d3.axisTop().scale(x).ticks(4);
+		const xAxis = d3.axisTop().scale(x).ticks(4);
 		chart.selectAll("g.x.axis")
 			.call(xAxis);
 

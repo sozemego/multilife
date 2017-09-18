@@ -52,7 +52,7 @@ class Metrics extends React.Component {
 	};
 
 	render() {
-		let {selectedView} = this.state;
+		const {selectedView} = this.state;
 		return(
 			<MuiThemeProvider>
 				<div style={styles.container}>
@@ -108,7 +108,7 @@ class Metrics extends React.Component {
 
 ReactDOM.render(<Metrics/>, document.getElementById("metrics"));
 
-let socket = metricsSocket();
+const socket = metricsSocket();
 socket.init(METRICS_WEBSOCKET_HOST);
 
 totalMessagesMetric(socket);

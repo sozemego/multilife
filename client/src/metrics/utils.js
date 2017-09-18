@@ -19,7 +19,7 @@ export const generateRandomColor = () => '#'+Math.floor(Math.random()*16777215).
  * Colors are in the form of #HEX (e.g. #000000).
  */
 export const generateRandomColors = amount => {
-	let colors = [];
+	const colors = [];
 	for(let i = 0; i < amount; i++) {
 		colors.push(generateRandomColor());
 	}

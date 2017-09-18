@@ -2,7 +2,7 @@ import {findMaxNumber, generateRandomColors} from "./utils";
 
 const transformTypeCountToArray = (typeCount) => {
 	const arr = [];
-	for (let key in typeCount) {
+	for (const key in typeCount) {
 		if (typeCount.hasOwnProperty(key)) {
 			arr.push({type: key, count: typeCount[key]})
 		}
@@ -19,7 +19,7 @@ export const barChart = (dom) => {
 	};
 
 	barChart.update = data => {
-		let transformedData = transformTypeCountToArray(data);
+		const transformedData = transformTypeCountToArray(data);
 		const max = findMaxNumber(transformedData.map(d => d.count));
 		const length = d3.scaleLinear().domain([0, max]).range([0, getMaxWidth()]);
 

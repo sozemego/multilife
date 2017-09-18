@@ -35,9 +35,9 @@ export const playerCountMetric = socket => {
 
 	const handlePlayerMapCount = ({instancePlayerMap} = msg) => {
 		addPlayerCount(instancePlayerMap);
-		let timeDomainMin = getTimeDomainMin();
-		let timeDomainMax = getTimeDomainMax();
-		let transformedData = transformData();
+		const timeDomainMin = getTimeDomainMin();
+		const timeDomainMax = getTimeDomainMax();
+		const transformedData = transformData();
 		chart.update(transformedData, timeDomainMin, timeDomainMax);
 		text.update(transformedData[transformedData.length - 1].count);
 	};

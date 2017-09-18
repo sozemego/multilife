@@ -10,8 +10,9 @@ export const textD3 = (dom, textFunction) => {
 	}
 
 	const textD3 = {};
+
 	textD3.update = data => {
-		let text = d3.select(dom)
+		const text = d3.select(dom)
 			.selectAll("p")
 			.data([data], data => Math.random()); //almost always updates to new values
 

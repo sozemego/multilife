@@ -10,7 +10,7 @@ const incomingTextFunction = (data) => {
 };
 
 const getTimeDomainMax = () => {
-	let date = new Date();
+	const date = new Date();
 	date.setMinutes(date.getMinutes() + 1);
 	return date;
 };
@@ -23,7 +23,7 @@ const handleResponse = response => {
 };
 
 const sanitizeData = data => {
-	for(let timestamp in data) {
+	for(const timestamp in data) {
 		if(isNaN(data[timestamp])) {
 			delete data[timestamp];
 		}
@@ -35,7 +35,7 @@ const thinData = (data, maxElements) => {
 	if(elements > maxElements) {
 		const leaveNthElement = Math.ceil(elements / maxElements);
 		let index = 0;
-		for(let timestamp in data) {
+		for(const timestamp in data) {
 			if(index % leaveNthElement !== 0) {
 				delete data[timestamp];
 			}
@@ -61,21 +61,21 @@ export const averageKbMetric = socket => {
 		thinData(data, maxElements);
 
 		averageOutgoingKbs = [];
-		for(let timestamp in data) {
+		for(const timestamp in data) {
 			addAverageOutgoingKbsToDataSet(data[timestamp], new Date(parseInt(timestamp)));
 		}
 
 		averageOutgoingKbs.sort((a, b) => a.time.getTime() - b.time.getTime());
 
-		let transformedData = transformOutgoingData();
-		let timeDomainMin = getTimeDomainMin();
-		let timeDomainMax = getTimeDomainMax();
+		const transformedData = transformOutgoingData();
+		const timeDomainMin = getTimeDomainMin();
+		const timeDomainMax = getTimeDomainMax();
 		chartOutgoing.update(transformedData, timeDomainMin, timeDomainMax);
 	};
 
 	const handleAverageIncomingKbs = ({averageIncomingKbs : averageKbs} = msg) => {
 		addAverageIncomingKbsToDataSet(averageKbs);
-		let transformedData = transformIncomingData();
+		const transformedData = transformIncomingData();
 		if(transformedData.length === 0) return;
 		textIncoming.update(transformedData[transformedData.length - 1].count);
 
@@ -83,8 +83,8 @@ export const averageKbMetric = socket => {
 			return;
 		}
 
-		let timeDomainMin = getTimeDomainMin();
-		let timeDomainMax = getTimeDomainMax();
+		const timeDomainMin = getTimeDomainMin();
+		const timeDomainMax = getTimeDomainMax();
 		chartIncoming.update(transformedData, timeDomainMin, timeDomainMax);
 	};
 
@@ -92,7 +92,7 @@ export const averageKbMetric = socket => {
 
 	const addAverageIncomingKbsToDataSet = (averageKbs, time) => {
 		averageIncomingKbs.push({kbs: averageKbs, time: time ? time: new Date()});
-		let timeDomainMin = getTimeDomainMin();
+		const timeDomainMin = getTimeDomainMin();
 		averageIncomingKbs = averageIncomingKbs.filter(item => {
 			return item.time > timeDomainMin;
 		});
@@ -109,20 +109,20 @@ export const averageKbMetric = socket => {
 		thinData(data);
 
 		averageIncomingKbs = [];
-		for(let timestamp in data) {
+		for(const timestamp in data) {
 			addAverageIncomingKbsToDataSet(data[timestamp], new Date(parseInt(timestamp)));
 		}
 
 		averageIncomingKbs.sort((a, b) => a.time.getTime() - b.time.getTime());
 
-		let transformedData = transformIncomingData();
-		let timeDomainMin = getTimeDomainMin();
-		let timeDomainMax = getTimeDomainMax();
+		const transformedData = transformIncomingData();
+		const timeDomainMin = getTimeDomainMin();
+		const timeDomainMax = getTimeDomainMax();
 		chartIncoming.update(transformedData, timeDomainMin, timeDomainMax);
 	};
 
 	const getTimeDomainMin = () => {
-		let date = new Date();
+		const date = new Date();
 		if(mode === "live") {
 			date.setMinutes(date.getMinutes() - 4);
 			return date;
@@ -144,7 +144,7 @@ export const averageKbMetric = socket => {
 			return;
 		}
 		averageOutgoingKbs.push({kbs: averageKbs, time: time ? time : new Date()});
-		let timeDomainMin = getTimeDomainMin();
+		const timeDomainMin = getTimeDomainMin();
 		averageOutgoingKbs = averageOutgoingKbs.filter(item => {
 			return item.time > timeDomainMin;
 		});
@@ -158,15 +158,15 @@ export const averageKbMetric = socket => {
 
 	const handleAverageOutgoingKbs = ({averageOutgoingKbs : averageKbs} = msg) => {
 		addAverageOutgoingKbsToDataSet(averageKbs);
-		let transformedData = transformOutgoingData();
+		const transformedData = transformOutgoingData();
 		textOutgoing.update(transformedData[transformedData.length - 1].count);
 
 		if (mode !== "live") {
 			return;
 		}
 
-		let timeDomainMin = getTimeDomainMin();
-		let timeDomainMax = getTimeDomainMax();
+		const timeDomainMin = getTimeDomainMin();
+		const timeDomainMax = getTimeDomainMax();
 		chartOutgoing.update(transformedData, timeDomainMin, timeDomainMax);
 	};
 
