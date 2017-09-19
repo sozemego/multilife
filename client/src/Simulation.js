@@ -1,4 +1,4 @@
-import Cell from "./Cell";
+import {cellCreator as createCell} from "./cell";
 import { basicRule } from "./Rules";
 
 /**
@@ -6,16 +6,14 @@ import { basicRule } from "./Rules";
  */
 export default class Simulation {
 
-	constructor(width, height, playerData, cellSize, renderFunction) {
+	constructor(width, height, playerData) {
 		this.width = width;
 		this.height = height;
 		this.cells = {};
 		this.activeCells = {};
 		this.nextCells = {};
 		this.playerData = playerData;
-		this.cellSize = cellSize;
 		this.defaultOwnerId = 0;
-		this.renderFunction = renderFunction;
 		this._init();
 	}
 
@@ -26,10 +24,9 @@ export default class Simulation {
 		for (let i = 0; i < this.width; i++) {
 			for (let j = 0; j < this.height; j++) {
 				this.cells["x:" + i + "y:" + j] =
-					new Cell(
+					createCell(
 						i, j, false, this.defaultOwnerId,
-						this.cellSize, this._getColor(this.defaultOwnerId),
-						this.renderFunction
+						this._getColor(this.defaultOwnerId)
 					);
 			}
 		}
@@ -45,10 +42,8 @@ export default class Simulation {
 	setCellState = (position, alive, ownerId) => {
 		let cell = this.nextCells[this._getPositionKey(position)];
 		if (!cell) {
-			cell = new Cell(
-				position.x, position.y, alive, ownerId,
-				this.cellSize, this._getColor(ownerId),
-				this.renderFunction
+			cell = createCell(
+				position.x, position.y, alive, ownerId, this._getColor(ownerId),
 			);
 			this.nextCells[this._getPositionKey(position)] = cell;
 		}
@@ -61,7 +56,7 @@ export default class Simulation {
 	 * @returns {string}
 	 * @private
 	 */
-	_getPositionKey = (position) => {
+	_getPositionKey = position => {
 		const {x, y} = position;
 		let index = x + (y * this.width); // find index
 		const maxSize = this.width * this.height;
@@ -74,7 +69,7 @@ export default class Simulation {
 		return "x:" + wrappedX + "y:" + wrappedY;
 	};
 
-	_getColor = (ownerId) => {
+	_getColor = ownerId => {
 		if(this.playerData[ownerId]) {
 			const color = this.playerData[ownerId].color;
 			return color ? this._convertIntToHexColor(color) : "#000000";
@@ -82,7 +77,7 @@ export default class Simulation {
 		return "#000000";
 	};
 
-	_convertIntToHexColor = (int) => {
+	_convertIntToHexColor = int => {
 		int >>>= 0;
 		const b = int & 0xFF,
 			g = (int & 0xFF00) >>> 8,
@@ -94,14 +89,13 @@ export default class Simulation {
 		for (const pos in this.activeCells) {
 			if (this.activeCells.hasOwnProperty(pos)) {
 				const cell = this.activeCells[pos];
-				const {x, y} = cell;
+				const {x, y} = cell.getPosition();
 				const aliveNeighbours = this._getAliveNeighbourCells(x, y);
 				const state = basicRule(aliveNeighbours.length, cell.isAlive());
 				if (state !== 0) {
 					const strongestOwnerId = this._getStrongestOwnerId(aliveNeighbours);
 					this.setCellState({
-						x: x,
-						y: y
+						x, y
 					}, state > 0, strongestOwnerId == -1 ? cell.getOwnerId() : strongestOwnerId);
 				}
 			}
@@ -125,7 +119,7 @@ export default class Simulation {
 		return cells;
 	};
 
-	_getStrongestOwnerId = (cells) => {
+	_getStrongestOwnerId = cells => {
 		if (cells.length === 0) {
 			return -1;
 		}
@@ -137,7 +131,7 @@ export default class Simulation {
 		return this._mode(ownerIds);
 	};
 
-	_mode = (ownerIds) => {
+	_mode = ownerIds => {
 		let maxValue = 0, maxCount = 0;
 
 		for (let i = 0; i < ownerIds.length; ++i) {
@@ -175,7 +169,7 @@ export default class Simulation {
 	 * @private
 	 */
 	_addToActive = (cell) => {
-		const {x, y} = cell;
+		const {x, y} = cell.getPosition();
 		for (let i = -1; i < 2; i++) {
 			for (let j = -1; j < 2; j++) {
 				const position = this._getPositionKey({x: i + x, y: j + y});

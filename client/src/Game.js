@@ -1,6 +1,7 @@
 import p5 from "p5";
 import Simulation from "./Simulation";
-import Cell from "./Cell";
+import {cellCreator as createCell} from "./cell";
+import {rectRenderFunction as renderFunction} from "./renderer";
 
 class Game {
 
@@ -39,7 +40,6 @@ class Game {
 		this.firstMapData = true;
 		this.shapeMap = {};
 		this.offsets = {};
-		this.onWindowResize(window.innerWidth, window.innerHeight);
 		this._initShapes();
 		this._createLoginView();
 		this._pingMessage = new Uint8Array([3]).buffer;
@@ -143,14 +143,14 @@ class Game {
 	/**
 	 * Returns index of a cell that is (xOffset, yOffset) away from mouse cursor.
 	 * xOffset and yOffset should be in pixels.
-	 * @param xOffset
-	 * @param yOffset
+	 * @param xPixels
+	 * @param yPixels
 	 * @private
 	 */
-	_getIndexOffsetFromMouse = (xOffset, yOffset) => {
+	_getIndexOffsetFromMouse = (xPixels, yPixels) => {
 		return this._getIndex(
-			this.sketch.mouseX + (xOffset * this.cellSize),
-			this.sketch.mouseY + (yOffset * this.cellSize)
+			this.sketch.mouseX + (xPixels * this.cellSize),
+			this.sketch.mouseY + (yPixels * this.cellSize)
 		);
 	};
 
@@ -175,7 +175,6 @@ class Game {
 	draw = () => {
 		this.sketch.background(245);
 		this.ticks++;
-		this.onWindowResize(window.innerWidth, window.innerHeight);
 		this._update();
 		this._render();
 	};
@@ -311,8 +310,6 @@ class Game {
 			return;
 		}
 
-		this._translateMouse();
-
 		const shape = this.selectedShape.shape;
 		const indices = this._findIndices(shape.filter((p) => p.bit === "1").map((p) => {
 			return {x: p.x, y: p.y}
@@ -321,29 +318,18 @@ class Game {
 		const positions = this._findPositions(indices);
 		for (let i = 0; i < positions.length; i++) {
 			const p = positions[i];
-			this.rectRenderFunction(
+			renderFunction(
 				p.x + (1 - this.cellSize) * 0.5, p.y + (1 - this.cellSize) * 0.5,
-				this.cellSize, this.cellSize, "#adeedd");
+				this.cellSize, this.cellSize, "#adeedd"
+			);
 		}
-
-		this._untranslateMouse();
-
 	};
 
-	_translateMouse = () => {
-		this.mouseSnapshotX = this.sketch.mouseX;
-		this.mouseSnapshotY = this.sketch.mouseY;
-
-		this.sketch.mouseX -= this.offsets.x;
-		this.sketch.mouseY -= this.offsets.y;
-	};
-
-	_untranslateMouse = () => {
-		if (this.mouseSnapshotX === undefined || this.mouseSnapshotY === undefined) {
-			throw new Error("You did not translate");
-		}
-		this.sketch.mouseX = this.mouseSnapshotX;
-		this.sketch.mouseY = this.mouseSnapshotY;
+	_getMousePosition = () => {
+		return {
+			x: this.sketch.mouseX,
+			y: this.sketch.mouseY
+		};
 	};
 
 	/**
@@ -461,7 +447,6 @@ class Game {
 	};
 
 	_handleByteCellList = (data) => {
-
 		const bytesPerCell = 13;
 		const cellCount = (data.length - 1) / bytesPerCell;
 		const cells = [];
@@ -525,7 +510,7 @@ class Game {
 					alive,
 					ownerId
 				} = newCell;
-				const cell = new Cell(x, y, alive, ownerId, this.cellSize, "#0000ff", this.rectRenderFunction);
+				const cell = createCell(x, y, alive, ownerId, "#0000ff");
 				if (alive) {
 					cell.currentPercentageSize = 1;
 				}
@@ -573,18 +558,6 @@ class Game {
 		return this.FPS;
 	};
 
-	rectRenderFunction = (x, y, width, height, color) => {
-		const pos = this._translateOffsets(x, y);
-		this.sketch.fill(color);
-		this.sketch.rect(pos.x, pos.y, width, height);
-	};
-
-	ellipseRenderFunction = (x, y, width, height, color) => {
-		const pos = this._translateOffsets(x, y);
-		this.sketch.fill(color);
-		this.sketch.ellipse(pos.x + width / 2, pos.y + height / 2, width, height);
-	};
-
 	_onMouseUp = () => {
 		if (this.recentlyClicked || !this.connected) {
 			return;
@@ -606,8 +579,6 @@ class Game {
 			return;
 		}
 
-		this._translateMouse();
-
 		const indices = [];
 		for (let i = 0; i < shape.length; i++) {
 			const el = shape[i];
@@ -616,8 +587,7 @@ class Game {
 				indices.push(index);
 			}
 		}
-		this._untranslateMouse();
-		// this.webSocket.send(JSON.stringify({type: "CLICK", indices: indices}));
+
 		this.webSocket.send(this._getBytesClickMessage(indices));
 	};
 
@@ -629,33 +599,6 @@ class Game {
 			bufferView[i + 1] = indices[i];
 		}
 		return buffer;
-	};
-
-	/**
-	 * Called when a window is resized. Used to calculate stuff based on window size
-	 * (e.g. offset from top-left so that rendering area is in the middle).
-	 * @param width
-	 * @param height
-	 */
-	onWindowResize(width, height) {
-		const widthTaken = this.width * this.cellSize;
-		const heightTaken = this.height * this.cellSize;
-		this.offsets.x = (width - widthTaken) / 2;
-		this.offsets.y = (height - heightTaken) / 2;
-	}
-
-	/**
-	 * Translates x and y coordinates of a cell, so that the rendering area
-	 * is in the middle of the screen.
-	 * @param x
-	 * @param y
-	 * @private
-	 */
-	_translateOffsets = (x, y) => {
-		return {
-			x: x + this.offsets.x,
-			y: y + this.offsets.y
-		};
 	};
 
 	_handleByteTimeRemaining = (msg) => {
@@ -730,7 +673,7 @@ class Game {
 
 }
 
-let sketch = new p5((p) => {
+export const sketch = new p5(p => {
 
 	let game;
 
@@ -760,6 +703,5 @@ let sketch = new p5((p) => {
 		);
 		game.onWindowResize(window.innerWidth, window.innerHeight);
 	};
-
 });
 
