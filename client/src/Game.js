@@ -1,5 +1,5 @@
 import p5 from "p5";
-import Simulation from "./Simulation";
+import {simulation} from "./simulation";
 import {cellCreator as createCell} from "./cell";
 import {rectRenderFunction as renderFunction} from "./renderer";
 
@@ -26,7 +26,7 @@ class Game {
 		this.canvas.mouseReleased(this._onMouseUp);
 		this._styleCanvas(canvas);
 		this.cellSize = 10;
-		this.simulation = new Simulation(0, 0, {}, this.cellSize, this.rectRenderFunction);
+		this.simulation = simulation(0, 0, {});
 		this.cells = [];
 		this.width = 0;
 		this.height = 0;
@@ -443,7 +443,7 @@ class Game {
 	_onMapData = (data) => {
 		this.width = data.width;
 		this.height = data.height;
-		this.simulation = new Simulation(this.width, this.height, this.playerData, this.cellSize, this.rectRenderFunction);
+		this.simulation = simulation(this.width, this.height, this.playerData);
 	};
 
 	_handleByteCellList = (data) => {
@@ -701,7 +701,6 @@ export const sketch = new p5(p => {
 			Math.max(window.innerWidth, game.width * game.cellSize),
 			Math.max(window.innerHeight, game.height * game.cellSize)
 		);
-		game.onWindowResize(window.innerWidth, window.innerHeight);
 	};
 });
 

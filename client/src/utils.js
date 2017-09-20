@@ -29,3 +29,11 @@ export const generateRandomColors = amount => {
 	}
 	return colors;
 };
+
+export const convertIntToHexColor = int => {
+	int >>>= 0;
+	const b = int & 0xFF,
+		g = (int & 0xFF00) >>> 8,
+		r = (int & 0xFF0000) >>> 16;
+	return "rgb(" + [r, g, b].join(",") + ")";
+};
