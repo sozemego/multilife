@@ -1,3 +1,7 @@
+export const throwError = message => {
+	throw new Error(message);
+};
+
 /**
  * Finds and returns the maximum number in an array.
  */

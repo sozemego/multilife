@@ -1,8 +1,5 @@
 import {rectRenderFunction} from "./renderer";
-
-const throwError = message => {
-	throw new Error(message);
-};
+import {throwError} from "./utils";
 
 const makeCellCreator = (size, renderFunction) => {
 	if(typeof size !== "number") {

@@ -1,4 +1,4 @@
-import {findMaxNumber, generateRandomColors} from "./utils";
+import {findMaxNumber, generateRandomColors} from "../utils";
 
 const transformTypeCountToArray = (typeCount) => {
 	const arr = [];
