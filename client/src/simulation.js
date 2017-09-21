@@ -43,6 +43,8 @@ export const simulation = (width, height, playerData) => {
 
 	const simulation = {};
 
+	let initialized = false;
+
 	/**
 	 * Creates all cells.
 	 */
@@ -56,6 +58,7 @@ export const simulation = (width, height, playerData) => {
 					);
 			}
 		}
+		initialized = true;
 	};
 
 	/**
@@ -66,6 +69,7 @@ export const simulation = (width, height, playerData) => {
 	 * @param ownerId
 	 */
 	simulation.setCellState = (position, alive, ownerId) => {
+		validateInitialized();
 		let cell = nextCells[getPositionKey(position)];
 		if (!cell) {
 			cell = createCell(
@@ -76,6 +80,7 @@ export const simulation = (width, height, playerData) => {
 	};
 
 	simulation.update = () => {
+		validateInitialized();
 		for (const pos in activeCells) {
 			if (activeCells.hasOwnProperty(pos)) {
 				const cell = activeCells[pos];
@@ -96,6 +101,7 @@ export const simulation = (width, height, playerData) => {
 	};
 
 	simulation.render = viewport => {
+		validateInitialized();
 		for (const pos in cells) {
 			if (cells.hasOwnProperty(pos)) {
 				cells[pos].update();
@@ -106,6 +112,12 @@ export const simulation = (width, height, playerData) => {
 
 	simulation.setPlayerData = newPlayerData => {
 		Object.assign(playerData, newPlayerData);
+	};
+
+	const validateInitialized = () => {
+		if(!initialized) {
+			throwError("Simulation is not initialized!");
+		}
 	};
 
 	const transferCells = () => {
@@ -154,16 +166,16 @@ export const simulation = (width, height, playerData) => {
 	 Returns an array of alive cells neighbouring a cell at x, y.
 	 */
 	const getAliveNeighbourCells = (x, y) => {
-		const cells = [];
+		const aliveCells = [];
 		for (let i = -1; i < 2; i++) {
 			for (let j = -1; j < 2; j++) {
 				if (i === 0 && j === 0) continue;
 				const positionKey = getPositionKey({x: i + x, y: j + y});
 				const cell = cells[positionKey];
-				if (cell.isAlive()) cells.push(cell);
+				if (cell.isAlive()) aliveCells.push(cell);
 			}
 		}
-		return cells;
+		return aliveCells;
 	};
 
 	const getStrongestOwnerId = cells => {

@@ -3,6 +3,13 @@ import {simulation} from "./simulation";
 import {cellCreator as createCell} from "./cell";
 import {rectRenderFunction as renderFunction} from "./renderer";
 
+/**
+ * Separate game class into the following functionalities
+ * 1. network layer. connects, transforms messages into usable objects and calls game methods
+ * 2. ui. sends events to game
+ * 3. game itself. just runs the game and renders
+ */
+
 class Game {
 
 	keys = {
@@ -27,6 +34,7 @@ class Game {
 		this._styleCanvas(canvas);
 		this.cellSize = 10;
 		this.simulation = simulation(0, 0, {});
+		this.simulation.init();
 		this.cells = [];
 		this.width = 0;
 		this.height = 0;
@@ -444,6 +452,7 @@ class Game {
 		this.width = data.width;
 		this.height = data.height;
 		this.simulation = simulation(this.width, this.height, this.playerData);
+		this.simulation.init();
 	};
 
 	_handleByteCellList = (data) => {
