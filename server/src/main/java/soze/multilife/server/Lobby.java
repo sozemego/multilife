@@ -73,7 +73,6 @@ public class Lobby implements Runnable {
 	void onConnect(Connection connection) {
 		Objects.requireNonNull(connection);
 		connections.put(connection.getId(), connection);
-		connection.send(getPlayerIdentity(connection.getId()));
 	}
 
 	/**
@@ -157,6 +156,7 @@ public class Lobby implements Runnable {
 			});
 		}
 
+		player.send(getPlayerIdentity(player.getId()));
 		player.send(new MapData(game.getWidth(), game.getHeight()));
 		player.send(getAllAliveCellData(game));
 		player.send(new PlayerAdded(0, "#000000", "AI"));
