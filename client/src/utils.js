@@ -37,3 +37,20 @@ export const convertIntToHexColor = int => {
 		r = (int & 0xFF0000) >>> 16;
 	return "rgb(" + [r, g, b].join(",") + ")";
 };
+
+/**
+ * Iterates over key-property pairs of an object
+ * and returns the key associated with the given value.
+ * @param obj
+ * @param value
+ * @returns {string}
+ */
+export const getKey = (obj, value) => {
+	for (const key in obj) {
+		if (obj.hasOwnProperty(key)) {
+			if (obj[key] == value) {
+				return key;
+			}
+		}
+	}
+};
