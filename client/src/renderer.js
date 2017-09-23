@@ -1,4 +1,4 @@
-import {sketch} from "./Game";
+import {sketch} from "./index";
 
 export const rectRenderFunction = (x, y, width, height, color) => {
 	sketch.fill(color);

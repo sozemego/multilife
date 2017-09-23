@@ -33,7 +33,7 @@ const mode = ownerIds => {
 /**
  * Object responsible for the simulation of game of life.
  */
-export const simulation = (width, height, playerData) => {
+export const createSimulation = (width, height, playerData) => {
 	validateConstructorArguments(width, height, playerData);
 
 	const cells = {};
