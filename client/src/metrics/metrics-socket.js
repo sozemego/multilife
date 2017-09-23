@@ -1,3 +1,5 @@
+import {throwError} from "../utils";
+
 export const metricsSocket = () => {
 
 	const observers = [];
@@ -20,7 +22,7 @@ export const metricsSocket = () => {
 
 	metricSocket.addObserver = observer => {
 		if(typeof observer !== "function") {
-			throw new Error("Observer has to be a function.");
+			throwError("Observer has to be a function.");
 		}
 		observers.push(observer);
 	};
