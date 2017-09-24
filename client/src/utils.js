@@ -1,3 +1,5 @@
+import {assertIsArray, assertIsNumber, assertIsObject} from './assert';
+
 export const throwError = message => {
 	throw new Error(message);
 };
@@ -6,6 +8,7 @@ export const throwError = message => {
  * Finds and returns the maximum number in an array.
  */
 export const findMaxNumber = arr => {
+	assertIsArray(arr);
 	let max = Number.MIN_SAFE_INTEGER;
 	arr.forEach(i => {
 		if(i > max) max = i;
@@ -23,6 +26,7 @@ export const generateRandomColor = () => '#'+Math.floor(Math.random()*16777215).
  * Colors are in the form of #HEX (e.g. #000000).
  */
 export const generateRandomColors = amount => {
+	assertIsNumber(amount);
 	const colors = [];
 	for(let i = 0; i < amount; i++) {
 		colors.push(generateRandomColor());
@@ -31,6 +35,7 @@ export const generateRandomColors = amount => {
 };
 
 export const convertIntToHexColor = int => {
+	assertIsNumber(int);
 	int >>>= 0;
 	const b = int & 0xFF,
 		g = (int & 0xFF00) >>> 8,
@@ -46,6 +51,7 @@ export const convertIntToHexColor = int => {
  * @returns {string}
  */
 export const getKey = (obj, value) => {
+	assertIsObject(obj);
 	for (const key in obj) {
 		if (obj.hasOwnProperty(key)) {
 			if (obj[key] == value) {
