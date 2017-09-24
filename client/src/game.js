@@ -1,18 +1,12 @@
-import {createSimulation} from "./simulation";
-import {rectRenderFunction as renderFunction} from "./renderer";
+import {createSimulation} from './simulation';
+import {rectRenderFunction as renderFunction} from './renderer';
 import {
 	CELL_LIST, MAP_DATA, PLACE_SHAPE, PLAYER_DATA_UPDATED, PLAYER_IDENTITY,
 	PLAYER_REMOVED, SHAPE_PLACED, PLAYER_ADDED, PLAYER_POINTS,
 	SHAPE_SELECTED, TICK_DATA, PLAYER_DATA, TIME_REMAINING, GAME_ENDED
 } from './events';
 import {notify, off, on} from './event-bus';
-import {sketch} from "./index";
 import {assertIsArray, assertIsNumber, assertIsObject} from './assert';
-
-
-
-
-
 
 
 const getViewport = () => {
@@ -24,16 +18,8 @@ const getViewport = () => {
 	};
 };
 
-
-
-
-
-
-
-
-
 const onTimeRemaining = msg => {
-	if(msg.remainingTime <= 0) {
+	if (msg.remainingTime <= 0) {
 		notify(GAME_ENDED);
 	}
 };
@@ -53,7 +39,6 @@ export const createGame = sketch => {
 		framesRendered = 0,
 		selectedShape = undefined,
 		firstMapData = false;
-
 
 
 	const game = {};
@@ -90,7 +75,7 @@ export const createGame = sketch => {
 		const indices = [];
 		for (let i = 0; i < shapeCells.length; i++) {
 			const el = shapeCells[i];
-			if (el.bit === "1") {
+			if (el.bit === '1') {
 				const index = getIndexOffsetFromMouse(el.x, el.y);
 				indices.push(index);
 			}
@@ -107,7 +92,7 @@ export const createGame = sketch => {
 	};
 
 	const onPlayerPoints = ({playerId, points}) => {
-		if(playerData[playerId]) {
+		if (playerData[playerId]) {
 			playerData[playerId].points = points;
 			notify(PLAYER_DATA_UPDATED, playerData);
 		}
@@ -212,8 +197,8 @@ export const createGame = sketch => {
 	const getIndexOffsetFromMouse = (xPixels, yPixels) => {
 		assertIsNumber(xPixels);
 		assertIsNumber(yPixels);
-		if(sketch.mouseX < 0 || sketch.mouseY < 0) return;
-		if(sketch.mouseX > sketch.width || sketch.mouseY > sketch.height) return;
+		if (sketch.mouseX < 0 || sketch.mouseY < 0) return;
+		if (sketch.mouseX > sketch.width || sketch.mouseY > sketch.height) return;
 
 		return getIndex(
 			sketch.mouseX + (xPixels * cellSize),
@@ -259,8 +244,8 @@ export const createGame = sketch => {
 		}
 
 		const shape = selectedShape.shape;
-		const indices = findIndices(shape.filter((p) => p.bit === "1").map((p) => {
-			return {x: p.x, y: p.y}
+		const indices = findIndices(shape.filter((p) => p.bit === '1').map((p) => {
+			return {x: p.x, y: p.y};
 		}));
 
 		const positions = findPositions(indices);
@@ -268,7 +253,7 @@ export const createGame = sketch => {
 			const p = positions[i];
 			renderFunction(
 				p.x + (1 - cellSize) * 0.5, p.y + (1 - cellSize) * 0.5,
-				cellSize, cellSize, "#adeedd"
+				cellSize, cellSize, '#adeedd'
 			);
 		}
 	};
