@@ -12,11 +12,13 @@
  * @param ruleString
  * @returns {Function}
  */
-const ruleCreator = (ruleString) => {
-	const tokens = ruleString.split("/");
+import {assertIsString} from './assert';
+
+const ruleCreator = ruleString => {
+	assertIsString(ruleString);
+	const tokens = ruleString.split('/');
 	const birthNumbers = extractNumbers(tokens[0]);
 	const surviveNumbers = extractNumbers(tokens[1]);
-
 
 	return function (n, alive) {
 		if (alive) {
@@ -25,10 +27,11 @@ const ruleCreator = (ruleString) => {
 			if (birthNumbers.includes(n)) return 1;
 		}
 		return 0;
-	}
+	};
 };
 
-const extractNumbers = (token) => {
+const extractNumbers = token => {
+	assertIsString(token);
 	const numbers = [];
 	const result = token.match(/\d/g);
 	if (result) {
@@ -39,4 +42,4 @@ const extractNumbers = (token) => {
 	return numbers;
 };
 
-export const basicRule = ruleCreator("B3/S23");
+export const basicRule = ruleCreator('B3/S23');
