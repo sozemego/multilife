@@ -6,8 +6,7 @@ import {
 	TICK_DATA, PLAYER_REMOVED,
 	TIME_REMAINING
 } from './events';
-import {throwError} from './utils';
-import {assertIsArray, assertIsObject, assertIsString} from './assert';
+import {assertIsArray, assertIsString} from './assert';
 
 const messageTypeMarkers = {
 	[CELL_LIST]: 1,
@@ -65,7 +64,6 @@ const onPlayerPoints = msg => {
 };
 
 const handleByteMessage = msg => {
-	assertIsArray(msg);
 	const messageTypeMarker = msg[0];
 	switch (messageTypeMarker) {
 		case messageTypeMarkers[CELL_LIST]:
