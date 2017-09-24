@@ -1,5 +1,5 @@
-import {rectRenderFunction} from "./renderer";
-import {throwError} from "./utils";
+import {rectRenderFunction} from './renderer';
+import {throwError} from './utils';
 import {assertIsBoolean, assertIsFunction, assertIsNumber, assertIsString} from './assert';
 
 const makeCellCreator = (size, renderFunction) => {
