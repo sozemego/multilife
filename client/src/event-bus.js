@@ -18,7 +18,7 @@ export const off = (event, handler) => {
 	assertIsFunction(handler);
 
 	const eventObservers = observers[event];
-	if (!eventObservers) {
+	if (eventObservers) {
 		const index = observers[event].findIndex(obs => obs === handler);
 		if(index > -1) {
 			observers[event].splice(index, 1);
