@@ -1,5 +1,4 @@
 import p5 from "p5";
-import {setLogging} from "./event-bus";
 import {createNetworkLayer} from "./network";
 import {createLoginUi} from "./login-ui";
 import {createGameUI} from "./game-ui";
@@ -12,7 +11,6 @@ export const sketch = new p5(p => {
 	let game;
 
 	p.setup = () => {
-		setLogging(false);
 		createNetworkLayer(WEBSOCKET_HOST);
 		loginUi = createLoginUi();
 		loginUi.createLoginView();
