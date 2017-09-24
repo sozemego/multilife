@@ -1,4 +1,4 @@
-import {convertIntToHexColor, getKey, throwError} from './utils';
+import {convertIntToHexColor, getKey} from './utils';
 import {notify, on} from './event-bus';
 import {
 	LOGGED_IN, PLACE_SHAPE, PLAYER_DATA_UPDATED, SHAPE_SELECTED,
