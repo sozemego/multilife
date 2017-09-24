@@ -38,12 +38,14 @@ public class GameContainer implements Runnable {
 		return id;
 	}
 
-	public void addGame(Game game) {
-		if(!isRunning()) {
-			throw new IllegalStateException("Cannot add a game to a game container which is not running!");
+	public boolean addGame(Game game) {
+		if (!isRunning()) {
+			return false;
 		}
 		Objects.requireNonNull(game);
 		games.put(game.getId(), game);
+		return true;
+
 	}
 
 	public int getGamesCount() {

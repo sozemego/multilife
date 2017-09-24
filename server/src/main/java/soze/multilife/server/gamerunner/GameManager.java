@@ -68,10 +68,13 @@ public class GameManager {
 		synchronized (gameContainers) {
 			boolean added = false;
 			for (GameContainer gameContainer : gameContainers) {
+				if(gameContainer.isRunning()) continue;
 				if(gameContainer.getGamesCount() < this.gamesPerThread) {
-					gameContainer.addGame(game);
-					gamesToContainers.put(game.getId(), gameContainer);
-					added = true;
+					if(gameContainer.addGame(game)) {
+						gamesToContainers.put(game.getId(), gameContainer);
+						added = true;
+						break;
+					}
 				}
 			}
 			if(!added) {
