@@ -1,10 +1,14 @@
-import * as d3 from "d3";
+import * as d3 from 'd3';
+import {assertIsArray, assertIsNumber, assertIsObject} from '../assert';
 
 /**
  * Encapsulates default, but customizable behavior for a live
  * d3 line chart. By default, y axis is linear, but x axis is time scale.
  */
 export const lineChart = (dom, width, height) => {
+	assertIsObject(dom);
+	assertIsNumber(width);
+	assertIsNumber(height);
 
 	let initialized = false;
 	let chart = null;
@@ -16,44 +20,44 @@ export const lineChart = (dom, width, height) => {
 			return;
 		}
 		chart = d3.select(dom)
-			.append("svg")
-			.attr("width", width)
-			.attr("height", height)
-			.append("g")
-			.attr("transform", "translate(" + 50 + "," + 20 + ")");
+			.append('svg')
+			.attr('width', width)
+			.attr('height', height)
+			.append('g')
+			.attr('transform', 'translate(' + 50 + ',' + 20 + ')');
 
 		const x = d3.scaleLinear().domain([0, width]).range([0, width]);
 		const y = d3.scaleLinear().domain([0, height]).range([0, height]);
 
-		chart.selectAll("line.x")
+		chart.selectAll('line.x')
 			.data(x.ticks(8))
-			.enter().append("line")
-			.attr("x1", x)
-			.attr("x2", x)
-			.attr("y1", 0)
-			.attr("y2", height)
-			.style("stroke", "#ccc");
+			.enter().append('line')
+			.attr('x1', x)
+			.attr('x2', x)
+			.attr('y1', 0)
+			.attr('y2', height)
+			.style('stroke', '#ccc');
 
-		chart.selectAll("line.y")
+		chart.selectAll('line.y')
 			.data(y.ticks(6))
-			.enter().append("line")
-			.attr("x1", 0)
-			.attr("x2", width)
-			.attr("y1", y)
-			.attr("y2", y)
-			.style("stroke", "#ccc");
+			.enter().append('line')
+			.attr('x1', 0)
+			.attr('x2', width)
+			.attr('y1', y)
+			.attr('y2', y)
+			.style('stroke', '#ccc');
 
 		const yAxis = d3.axisLeft().scale(y);
 		chart
-			.append("g")
-			.attr("class", "y axis")
+			.append('g')
+			.attr('class', 'y axis')
 			.call(yAxis);
 
 		const xAxis = d3.axisTop().scale(x);
 		chart
-			.append("g")
-			.attr("class", "x axis")
-			.attr("transform", "translate(0, " + 399 + ")")
+			.append('g')
+			.attr('class', 'x axis')
+			.attr('transform', 'translate(0, ' + 399 + ')')
 			.call(xAxis);
 
 		initialized = true;
@@ -67,6 +71,7 @@ export const lineChart = (dom, width, height) => {
 	 * @param timeDomainMax
 	 */
 	lineChart.update = (data, timeDomainMin, timeDomainMax) => {
+		assertIsArray(data);
 
 		lineChart.init();
 		const yMax = d3.max(data.map(item => item.count)) * 1.25;
@@ -78,26 +83,26 @@ export const lineChart = (dom, width, height) => {
 			.x(d => x(d.time))
 			.y(d => y(d.count));
 
-		const path = chart.selectAll("path.content")
+		const path = chart.selectAll('path.content')
 			.data([data]);
 
 		path.exit().remove();
 
 		path.enter()
-			.append("path")
-			.attr("class", "content")
-			.style("stroke", "#000000")
-			.style("stroke-width", "2px")
-			.style("fill", "transparent");
+			.append('path')
+			.attr('class', 'content')
+			.style('stroke', '#000000')
+			.style('stroke-width', '2px')
+			.style('fill', 'transparent');
 
-		path.attr("d", line(data));
+		path.attr('d', line(data));
 
 		const yAxis = d3.axisLeft().scale(y);
-		chart.selectAll("g.y.axis")
+		chart.selectAll('g.y.axis')
 			.call(yAxis);
 
 		const xAxis = d3.axisTop().scale(x).ticks(4);
-		chart.selectAll("g.x.axis")
+		chart.selectAll('g.x.axis')
 			.call(xAxis);
 
 	};
