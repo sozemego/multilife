@@ -156,6 +156,15 @@ const renderAvailableShapes = () => {
 			const button = getKey(keys, key);
 
 			const container = document.createElement('div');
+			container.style.width = '150px';
+			if (selectedShape && shapeName === selectedShape.name) {
+				container.style.backgroundColor = 'rgba(127, 127, 127, 0.3)';
+				container.style.border = '1px solid gray';
+				container.style.cursor = 'pointer';
+			} else {
+				container.style.border = '1px solid rgba(0, 0, 0, 0)';
+			}
+
 			container.addEventListener('click', () => {
 				selectShape(key);
 			});
@@ -163,10 +172,6 @@ const renderAvailableShapes = () => {
 			const textElement = document.createElement('span');
 			textElement.style.display = 'inline-block';
 			textElement.appendChild(document.createTextNode(button + ' ' + shapeName));
-
-			if (selectedShape && shapeName === selectedShape.name) {
-				textElement.style.backgroundColor = 'red';
-			}
 
 			container.appendChild(textElement);
 			dom.appendChild(container);
