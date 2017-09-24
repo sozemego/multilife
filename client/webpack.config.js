@@ -1,17 +1,17 @@
-const path = require("path");
+const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const webpack = require("webpack");
+const webpack = require('webpack');
 
 module.exports = {
 	entry: {
-		index: "./src/index.js",
-		metrics: "./src/metrics/Metrics.js"
+		index: './src/index.js',
+		metrics: './src/metrics/Metrics.js'
 	},
 	output: {
-		filename: "[name].js",
-		path: path.resolve(__dirname, "../server/src/main/resources/public")
+		filename: '[name].js',
+		path: path.resolve(__dirname, '../server/src/main/resources/public')
 	},
-	devtool: "inline-source-map",
+	devtool: 'inline-source-map',
 	module: {
 		rules: [
 			{
@@ -19,7 +19,7 @@ module.exports = {
 				exclude: /node_modules/,
 				use: [
 					{
-						loader: "babel-loader"
+						loader: 'babel-loader'
 					}
 				]
 			},
@@ -28,7 +28,7 @@ module.exports = {
 				exclude: /node_modules/,
 				use: [
 					{
-						loader: "file-loader",
+						loader: 'file-loader',
 						query: {
 							name: 'static/media/[name].[hash:8].[ext]'
 						}
@@ -39,18 +39,18 @@ module.exports = {
 	},
 	plugins: [
 		new CopyWebpackPlugin([
-			{from: "src/index.html"},
-			{from: "src/metrics/metrics.html"},
-			{from: "src/main.css"},
-			{from: "src/login_background.gif"}
+			{from: 'src/index.html'},
+			{from: 'src/metrics/metrics.html'},
+			{from: 'src/main.css'},
+			{from: 'src/login_background.gif'}
 		]),
 		new webpack.DefinePlugin({
-			WEBSOCKET_HOST: JSON.stringify("ws://127.0.0.1:8000/game"),
-			METRICS_WEBSOCKET_HOST: JSON.stringify("ws://127.0.0.1:8000/metrics-live")
-		}),
+			WEBSOCKET_HOST: JSON.stringify('ws://127.0.0.1:8000/game'),
+			METRICS_WEBSOCKET_HOST: JSON.stringify('ws://127.0.0.1:8000/metrics-live')
+		})
 	],
 	externals: {
-		d3: "d3",
-		p5: "p5"
+		d3: 'd3',
+		p5: 'p5'
 	}
 };
