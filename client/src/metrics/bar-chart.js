@@ -1,16 +1,17 @@
-import {findMaxNumber, generateRandomColors} from "../utils";
+import {findMaxNumber, generateRandomColors} from '../utils';
+import {assertIsObject} from '../assert';
 
-const transformTypeCountToArray = (typeCount) => {
+const transformTypeCountToArray = typeCount => {
+	assertIsObject(typeCount);
 	const arr = [];
 	for (const key in typeCount) {
-		if (typeCount.hasOwnProperty(key)) {
-			arr.push({type: key, count: typeCount[key]})
-		}
+		arr.push({type: key, count: typeCount[key]});
 	}
 	return arr;
 };
 
-export const barChart = (dom) => {
+export const barChart = dom => {
+	assertIsObject(dom);
 
 	const barChart = {};
 
@@ -19,6 +20,7 @@ export const barChart = (dom) => {
 	};
 
 	barChart.update = data => {
+		assertIsObject(data);
 		const transformedData = transformTypeCountToArray(data);
 		const max = findMaxNumber(transformedData.map(d => d.count));
 		const length = d3.scaleLinear().domain([0, max]).range([0, getMaxWidth()]);
@@ -26,29 +28,29 @@ export const barChart = (dom) => {
 		const colors = d3.scaleOrdinal(generateRandomColors(10));
 
 		const chart = d3.select(dom)
-			.selectAll("div")
+			.selectAll('div')
 			.data(transformedData, d => d.type);
 
 		chart
-			.style("margin", "2px")
-			.style("font-size", "1em")
-			.style("height", "40px")
-			.style("line-height", "40px")
-			.style("border-style", "solid")
+			.style('margin', '2px')
+			.style('font-size', '1em')
+			.style('height', '40px')
+			.style('line-height', '40px')
+			.style('border-style', 'solid')
 			.text(d => {
-				return d.type + "(" +  d.count + ")";
+				return d.type + '(' + d.count + ')';
 			})
 			.transition()
 			.duration(500)
-			.style("width", d => length(d.count) + "px");
+			.style('width', d => length(d.count) + 'px');
 
 		chart.enter()
-			.append("div")
-			.style("background-color", d => colors(d.type))
-			.style("width", 25 + "px")
+			.append('div')
+			.style('background-color', d => colors(d.type))
+			.style('width', 25 + 'px')
 			.transition()
 			.duration(500)
-			.style("width", d => length(d.count) + "px");
+			.style('width', d => length(d.count) + 'px');
 
 		chart.exit().remove();
 	};
