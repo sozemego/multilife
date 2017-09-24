@@ -7,6 +7,7 @@ import {
 } from "./events";
 import {notify, on} from "./event-bus";
 import {sketch} from "./index";
+import {assertIsArray, assertIsNumber, assertIsObject} from './assert';
 
 const FPS = 60,
 	cellSize = 10,
@@ -29,6 +30,8 @@ let simulation = createSimulation(0, 0, {}),
  * @param yPixels
  */
 const getIndexOffsetFromMouse = (xPixels, yPixels) => {
+	assertIsNumber(xPixels);
+	assertIsNumber(yPixels);
 	return getIndex(
 		sketch.mouseX + (xPixels * cellSize),
 		sketch.mouseY + (yPixels * cellSize)
@@ -43,6 +46,8 @@ const getIndexOffsetFromMouse = (xPixels, yPixels) => {
  * @returns {number}
  */
 const getIndex = (x, y) => {
+	assertIsNumber(x);
+	assertIsNumber(y);
 	x = x / cellSize;
 	y = y / cellSize;
 	const index = Math.floor(x) + (Math.floor(y) * width);
@@ -94,7 +99,8 @@ const renderSelectedShape = () => {
  * @param indices
  * @returns {Number|*|Array}
  */
-const findPositions = (indices) => {
+const findPositions = indices => {
+	assertIsArray(indices);
 	return indices.map((i) => {
 		let x = i % width;
 		let y = Math.floor(i / width);
@@ -111,6 +117,7 @@ const findPositions = (indices) => {
  * @private
  */
 const findIndices = positions => {
+	assertIsArray(positions);
 	const indices = [];
 	for (let i = 0; i < positions.length; i++) {
 		indices.push(getIndexOffsetFromMouse(positions[i].x, positions[i].y));
@@ -135,11 +142,13 @@ const onPlayerIdentity = ({playerId}) => {
 
 };
 
-const onPlayerData = (msg) => {
+const onPlayerData = msg => {
+	assertIsObject(msg);
 	simulation.setPlayerData(msg);
 };
 
-const onMapData = (data) => {
+const onMapData = data => {
+	assertIsObject(data);
 	width = data.width;
 	height = data.height;
 	simulation = createSimulation(width, height, playerData);
@@ -147,6 +156,7 @@ const onMapData = (data) => {
 };
 
 const onCellList = newCells => {
+	assertIsArray(newCells);
 	for (let i = 0; i < newCells.length; i++) {
 		const newCell = newCells[i];
 		simulation.setCellState({x: newCell.x, y: newCell.y}, newCell.alive, newCell.ownerId);
@@ -158,11 +168,11 @@ const onCellList = newCells => {
 };
 
 const onTickData = data => {
+	assertIsObject(data);
 	if (simulationSteps === -1) {
 		simulationSteps = data.iterations;
 	}
 	const tick = data.iterations;
-	const difference = tick - simulationSteps;
 	advanceSimulation();
 	recentlyClicked = false;
 };
@@ -189,6 +199,7 @@ const onPlaceShape = () => {
 };
 
 const onPlayerAdded = newPlayerData => {
+	assertIsObject(newPlayerData);
 	const {
 		playerId,
 		color,
@@ -201,6 +212,7 @@ const onPlayerAdded = newPlayerData => {
 };
 
 const onPlayerRemoved = playerId => {
+	assertIsNumber(playerId);
 	delete playerData[playerId];
 	notify(PLAYER_DATA_UPDATED, playerData);
 };
@@ -211,6 +223,7 @@ const onPlayerPoints = ({playerId, points}) => {
 };
 
 export const createGame = sketch => {
+	assertIsObject(sketch);
 
 	const game = {};
 
