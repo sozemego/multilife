@@ -83,8 +83,8 @@ const cell = (size, renderFunction, x, y, alive, ownerId, color) => {
 	cell.actuallyRender = () => {
 		const cellSize = size * currentPercentageSize;
 		renderFunction(
-			(x * size) + (1 - cellSize) * 0.5,
-			(y * size) + (1 - cellSize) * 0.5,
+			((x * size) + (1 - cellSize) * 0.5) + size / 2,
+			((y * size) + (1 - cellSize) * 0.5) + size / 2,
 			cellSize, cellSize, color
 		);
 	};
