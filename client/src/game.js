@@ -107,8 +107,10 @@ export const createGame = sketch => {
 	};
 
 	const onPlayerPoints = ({playerId, points}) => {
-		playerData[playerId].points = points;
-		notify(PLAYER_DATA_UPDATED, playerData);
+		if(playerData[playerId]) {
+			playerData[playerId].points = points;
+			notify(PLAYER_DATA_UPDATED, playerData);
+		}
 	};
 
 	const onPlayerAdded = newPlayerData => {
