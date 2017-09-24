@@ -32,6 +32,9 @@ let simulation = createSimulation(0, 0, {}),
 const getIndexOffsetFromMouse = (xPixels, yPixels) => {
 	assertIsNumber(xPixels);
 	assertIsNumber(yPixels);
+	if(sketch.mouseX < 0 || sketch.mouseY < 0) return;
+	if(sketch.mouseX > sketch.width || sketch.mouseY > sketch.height) return;
+
 	return getIndex(
 		sketch.mouseX + (xPixels * cellSize),
 		sketch.mouseY + (yPixels * cellSize)
