@@ -1,29 +1,19 @@
 import {rectRenderFunction} from "./renderer";
 import {throwError} from "./utils";
+import {assertIsBoolean, assertIsFunction, assertIsNumber, assertIsString} from './assert';
 
 const makeCellCreator = (size, renderFunction) => {
-	if(typeof size !== "number") {
-		throwError("Size has to be a number, it was: " + size);
-	}
+	assertIsNumber(size);
+	assertIsFunction(renderFunction);
 	return cell.bind(null, size, renderFunction);
 };
 
 const validateCellCreatorInput = (x, y, alive, ownerId, color) => {
-	if(typeof x !== "number") {
-		throwError("X coordinate has to be a number, it was: " + x);
-	}
-	if(typeof y !== "number") {
-		throwError("Y coordinate has to be a number, it was: " + y);
-	}
-	if(typeof alive !== "boolean") {
-		throwError("alive state has to be a boolean, it was: " + alive);
-	}
-	if(typeof ownerId !== "number") {
-		throwError("OwnerId has to be a number, it was: " + ownerId);
-	}
-	if(typeof color !== "string") {
-		throwError("Color has to be a string, it was: " + color);
-	}
+	assertIsNumber(x);
+	assertIsNumber(y);
+	assertIsBoolean(alive);
+	assertIsNumber(ownerId);
+	assertIsString(color);
 };
 
 /**
