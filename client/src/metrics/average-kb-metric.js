@@ -1,12 +1,14 @@
-import {lineChart} from "./line-chart";
-import {textD3} from "./text-d3";
+import {lineChart} from './line-chart';
+import {textD3} from './text-d3';
+import {getNumberOfProperties, throwError} from '../utils';
+import {assertIsArray, assertIsNumber, assertIsObject, assertIsString} from '../assert';
 
-const outgoingTextFunction = (data) => {
-	return "Average outgoing " + data + " kb/s";
+const outgoingTextFunction = data => {
+	return `Average outgoing ${data} kb/s`;
 };
 
-const incomingTextFunction = (data) => {
-	return "Average incoming " + data + " kb/s";
+const incomingTextFunction = data => {
+	return `Average incoming ${data} kb/s`;
 };
 
 const getTimeDomainMax = () => {
@@ -16,74 +18,122 @@ const getTimeDomainMax = () => {
 };
 
 const handleResponse = response => {
-	if(response.status !== 200) {
-		throw new Error("Received response with status: " + response.status);
+	if (response.status !== 200) {
+		throwError(`ERROR! Received response with status: ${response.status}`);
 	}
 	return response.json();
 };
 
+/**
+ * Removes all properties of data object which are not a number.
+ * @param data
+ */
 const sanitizeData = data => {
-	for(const timestamp in data) {
-		if(isNaN(data[timestamp])) {
+	assertIsObject(data);
+	for (const timestamp in data) {
+		if (isNaN(data[timestamp])) {
 			delete data[timestamp];
 		}
 	}
 };
 
+/**
+ * If data has less properties than maxElements, does not modify data.
+ * If data has more properties than maxElements, tries to remove properties
+ * to make it have less properties than maxElements. Properties
+ * should be removed uniformly.
+ * @param data
+ * @param maxElements
+ */
 const thinData = (data, maxElements) => {
-	const elements = Object.keys(data).length;
-	if(elements > maxElements) {
+	assertIsObject(data);
+	assertIsNumber(maxElements);
+
+	const elements = getNumberOfProperties(data);
+	if (elements > maxElements) {
 		const leaveNthElement = Math.ceil(elements / maxElements);
 		let index = 0;
-		for(const timestamp in data) {
-			if(index % leaveNthElement !== 0) {
+		for (const timestamp in data) {
+			if (index % leaveNthElement !== 0) {
 				delete data[timestamp];
 			}
 			index++;
 		}
+		if (getNumberOfProperties(data) > maxElements) {
+			thinData(data, maxElements);
+		}
+	}
+};
+
+const transformData = averageKbs => {
+	assertIsArray(averageKbs);
+	return averageKbs.map(item => {
+		return {count: item.kbs, time: item.time};
+	});
+};
+
+const getTimeDomainMin = (mode, days) => {
+	assertIsString(mode);
+	const date = new Date();
+	if (mode === 'live') {
+		date.setMinutes(date.getMinutes() - 4);
+		return date;
+	}
+	if (mode === 'days') {
+		date.setMinutes(0);
+		date.setHours(0);
+		date.setSeconds(0);
+		assertIsNumber(days);
+		if (days === 1) {
+			return date;
+		}
+		date.setDate(date.getDate() - days);
+		return date;
 	}
 };
 
 export const averageKbMetric = socket => {
+	assertIsObject(socket);
 
+	const chartOutgoing = lineChart(document.getElementById('average-kbs-outgoing'), 850, 420);
+	const chartIncoming = lineChart(document.getElementById('average-kbs-incoming'), 850, 420);
+	const textOutgoing = textD3(document.getElementById('average-kbs-outgoing'), outgoingTextFunction);
+	const textIncoming = textD3(document.getElementById('average-kbs-incoming'), incomingTextFunction);
+	const maxElements = 500;
+
+	let mode = 'live';
+	let days = 1;
 	let averageOutgoingKbs = [];
 	let averageIncomingKbs = [];
-	const chartOutgoing = lineChart(document.getElementById("average-kbs-outgoing"), 850, 420);
-	const chartIncoming = lineChart(document.getElementById("average-kbs-incoming"), 850, 420);
-	const textOutgoing = textD3(document.getElementById("average-kbs-outgoing"),  outgoingTextFunction);
-	const textIncoming = textD3(document.getElementById("average-kbs-incoming"),  incomingTextFunction);
-	let mode = "live";
-	let days = 1;
-	const maxElements = 500;
 
 	const displayOutgoing = data => {
 		sanitizeData(data);
 		thinData(data, maxElements);
 
 		averageOutgoingKbs = [];
-		for(const timestamp in data) {
+		for (const timestamp in data) {
 			addAverageOutgoingKbsToDataSet(data[timestamp], new Date(parseInt(timestamp)));
 		}
 
 		averageOutgoingKbs.sort((a, b) => a.time.getTime() - b.time.getTime());
 
-		const transformedData = transformOutgoingData();
-		const timeDomainMin = getTimeDomainMin();
+		const transformedData = transformData(averageOutgoingKbs);
+		const timeDomainMin = getTimeDomainMin(mode, days);
 		const timeDomainMax = getTimeDomainMax();
 		chartOutgoing.update(transformedData, timeDomainMin, timeDomainMax);
 	};
 
-	const handleAverageIncomingKbs = ({averageIncomingKbs : averageKbs} = msg) => {
+	const handleAverageIncomingKbs = ({averageIncomingKbs: averageKbs} = msg) => {
 		addAverageIncomingKbsToDataSet(averageKbs);
-		const transformedData = transformIncomingData();
-		if(transformedData.length === 0) return;
+		const transformedData = transformData(averageIncomingKbs);
+		if (transformedData.length === 0) return;
 		textIncoming.update(transformedData[transformedData.length - 1].count);
 
-		if (mode !== "live") {
+		if (mode !== 'live') {
 			return;
 		}
 
-		const timeDomainMin = getTimeDomainMin();
+		const timeDomainMin = getTimeDomainMin(mode, days);
 		const timeDomainMax = getTimeDomainMax();
 		chartIncoming.update(transformedData, timeDomainMin, timeDomainMax);
 	};
@@ -91,81 +141,51 @@ export const averageKbMetric = socket => {
 	socket.addObserver(handleAverageIncomingKbs);
 
 	const addAverageIncomingKbsToDataSet = (averageKbs, time) => {
-		averageIncomingKbs.push({kbs: averageKbs, time: time ? time: new Date()});
-		const timeDomainMin = getTimeDomainMin();
+		averageIncomingKbs.push({kbs: averageKbs, time: time ? time : new Date()});
+		const timeDomainMin = getTimeDomainMin(mode, days);
 		averageIncomingKbs = averageIncomingKbs.filter(item => {
 			return item.time > timeDomainMin;
 		});
 	};
 
-	const transformIncomingData = () => {
-		return averageIncomingKbs.map(item => {
-			return {count: item.kbs, time: item.time};
-		})
-	};
-
-	const displayIncoming = (data) => {
+	const displayIncoming = data => {
 		sanitizeData(data);
 		thinData(data);
 
 		averageIncomingKbs = [];
-		for(const timestamp in data) {
+		for (const timestamp in data) {
 			addAverageIncomingKbsToDataSet(data[timestamp], new Date(parseInt(timestamp)));
 		}
 
 		averageIncomingKbs.sort((a, b) => a.time.getTime() - b.time.getTime());
 
-		const transformedData = transformIncomingData();
-		const timeDomainMin = getTimeDomainMin();
+		const transformedData = transformData(averageIncomingKbs);
+		const timeDomainMin = getTimeDomainMin(mode, days);
 		const timeDomainMax = getTimeDomainMax();
 		chartIncoming.update(transformedData, timeDomainMin, timeDomainMax);
 	};
 
-	const getTimeDomainMin = () => {
-		const date = new Date();
-		if(mode === "live") {
-			date.setMinutes(date.getMinutes() - 4);
-			return date;
-		}
-		if(mode === "days") {
-			date.setMinutes(0);
-			date.setHours(0);
-			date.setSeconds(0);
-			if(days === 1) {
-				return date;
-			}
-			date.setDate(date.getDate() - days);
-			return date;
-		}
-	};
-
 	const addAverageOutgoingKbsToDataSet = (averageKbs, time) => {
-		if(isNaN(averageKbs)) {
+		if (isNaN(averageKbs)) {
 			return;
 		}
 		averageOutgoingKbs.push({kbs: averageKbs, time: time ? time : new Date()});
-		const timeDomainMin = getTimeDomainMin();
+		const timeDomainMin = getTimeDomainMin(mode, days);
 		averageOutgoingKbs = averageOutgoingKbs.filter(item => {
 			return item.time > timeDomainMin;
 		});
 	};
 
-	const transformOutgoingData = () => {
-		return averageOutgoingKbs.map(item => {
-			return {count: item.kbs, time: item.time};
-		})
-	};
-
-	const handleAverageOutgoingKbs = ({averageOutgoingKbs : averageKbs} = msg) => {
+	const handleAverageOutgoingKbs = ({averageOutgoingKbs: averageKbs} = msg) => {
 		addAverageOutgoingKbsToDataSet(averageKbs);
-		const transformedData = transformOutgoingData();
+		const transformedData = transformData(averageOutgoingKbs);
 		textOutgoing.update(transformedData[transformedData.length - 1].count);
 
-		if (mode !== "live") {
+		if (mode !== 'live') {
 			return;
 		}
 
-		const timeDomainMin = getTimeDomainMin();
+		const timeDomainMin = getTimeDomainMin(mode, days);
 		const timeDomainMax = getTimeDomainMax();
 		chartOutgoing.update(transformedData, timeDomainMin, timeDomainMax);
 	};
@@ -175,20 +195,18 @@ export const averageKbMetric = socket => {
 	const averageKbMetric = {};
 
 	averageKbMetric.setLive = () => {
-		mode = "live";
+		mode = 'live';
 	};
 
 	averageKbMetric.setDays = d => {
-		if(!days instanceof Number) {
-			throw new Error("Days have to be a number.");
-		}
-		mode = "days";
+		assertIsNumber(d);
+		mode = 'days';
 		days = d;
-		fetch("metrics/outgoing?days=" + days)
+		fetch('metrics/outgoing?days=' + days)
 			.then(handleResponse)
 			.then(displayOutgoing);
 
-		fetch("metrics/incoming?days=" + days)
+		fetch('metrics/incoming?days=' + days)
 			.then(handleResponse)
 			.then(displayIncoming);
 	};

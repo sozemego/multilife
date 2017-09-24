@@ -60,3 +60,13 @@ export const getKey = (obj, value) => {
 		}
 	}
 };
+
+/**
+ * Returns a number of properties given object has.
+ * @param obj
+ * @returns {Number}
+ */
+export const getNumberOfProperties = obj => {
+	assertIsObject(obj);
+	return Object.keys(obj).length;
+};
