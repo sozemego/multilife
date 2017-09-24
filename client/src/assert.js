@@ -38,3 +38,4 @@ export const assertIsArray = assertType('array');
 export const assertIsNumber = assertType('number');
 export const assertIsBoolean = assertType('boolean');
 export const assertIsFunction = assertType('function');
+export const assertIsString = assertType('string');
