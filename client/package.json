@@ -5,7 +5,7 @@
   "main": "game.js",
   "scripts": {
     "start": "webpack --watch --progress --colors",
-    "build": "webpack -p --progress --config webpack-production.config.js"
+    "build": "webpack --progress --optimize-minimize --config webpack-production.config.js"
   },
   "author": "kamil jurek",
   "license": "ISC",

@@ -11,7 +11,6 @@ module.exports = {
 		filename: "[name].js",
 		path: path.resolve(__dirname, "build")
 	},
-	devtool: "source-map",
 	module: {
 		rules: [
 			{
@@ -46,8 +45,9 @@ module.exports = {
 		]),
 		new webpack.DefinePlugin({
 			WEBSOCKET_HOST: JSON.stringify("ws://138.68.89.151:8000/game"),
-			METRICS_WEBSOCKET_HOST: JSON.stringify("ws://138.68.89.151:8000/metrics-live")
-		}),
+			METRICS_WEBSOCKET_HOST: JSON.stringify("ws://138.68.89.151:8000/metrics-live"),
+			NODE_ENV: "production"
+		})
 	],
 	externals: {
 		d3: "d3"
