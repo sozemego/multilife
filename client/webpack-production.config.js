@@ -50,6 +50,7 @@ module.exports = {
 		})
 	],
 	externals: {
-		d3: "d3"
+		d3: "d3",
+		p5: "p5"
 	}
 };
