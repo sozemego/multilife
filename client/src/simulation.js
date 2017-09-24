@@ -1,20 +1,17 @@
-import {cellCreator as createCell} from "./cell";
-import { basicRule } from "./rules";
-import {convertIntToHexColor, throwError} from "./utils";
+import {cellCreator as createCell} from './cell';
+import {basicRule} from './rules';
+import {convertIntToHexColor, throwError} from './utils';
+import {assertIsArray, assertIsBoolean, assertIsNumber, assertIsObject} from './assert';
 
 const validateConstructorArguments = (width, height, playerData) => {
-	if(typeof width !== "number") {
-		throwError("width is not a number, it is: " + width);
-	}
-	if(typeof height !== "number") {
-		throwError("height is not a number, it is: " + height);
-	}
-	if(!playerData) {
-		throwError("playerData cannot be null or undefined");
-	}
+	assertIsNumber(width);
+	assertIsNumber(height);
+	assertIsObject(playerData);
 };
 
 const mode = ownerIds => {
+	assertIsArray(ownerIds);
+
 	let maxValue = 0, maxCount = 0;
 
 	for (let i = 0; i < ownerIds.length; ++i) {
@@ -51,7 +48,7 @@ export const createSimulation = (width, height, playerData) => {
 	simulation.init = () => {
 		for (let i = 0; i < width; i++) {
 			for (let j = 0; j < height; j++) {
-				cells["x:" + i + "y:" + j] =
+				cells['x:' + i + 'y:' + j] =
 					createCell(
 						i, j, false, defaultOwnerId,
 						getColor(defaultOwnerId)
@@ -69,11 +66,14 @@ export const createSimulation = (width, height, playerData) => {
 	 * @param ownerId
 	 */
 	simulation.setCellState = (position, alive, ownerId) => {
+		assertIsObject(position);
+		assertIsBoolean(alive);
+		assertIsNumber(ownerId);
 		validateInitialized();
 		let cell = nextCells[getPositionKey(position)];
 		if (!cell) {
 			cell = createCell(
-				position.x, position.y, alive, ownerId, getColor(ownerId),
+				position.x, position.y, alive, ownerId, getColor(ownerId)
 			);
 			nextCells[getPositionKey(position)] = cell;
 		}
@@ -101,6 +101,7 @@ export const createSimulation = (width, height, playerData) => {
 	};
 
 	simulation.render = viewport => {
+		assertIsObject(viewport);
 		validateInitialized();
 		for (const pos in cells) {
 			if (cells.hasOwnProperty(pos)) {
@@ -111,12 +112,13 @@ export const createSimulation = (width, height, playerData) => {
 	};
 
 	simulation.setPlayerData = newPlayerData => {
+		assertIsObject(newPlayerData);
 		Object.assign(playerData, newPlayerData);
 	};
 
 	const validateInitialized = () => {
-		if(!initialized) {
-			throwError("Simulation is not initialized!");
+		if (!initialized) {
+			throwError('Simulation is not initialized!');
 		}
 	};
 
@@ -142,7 +144,7 @@ export const createSimulation = (width, height, playerData) => {
 	 * @returns {string}
 	 * @private
 	 */
-	const getPositionKey = ({x, y})=> {
+	const getPositionKey = ({x, y}) => {
 		let index = x + (y * width); // find index
 		const maxSize = width * height;
 		if (index < 0) index = index + (maxSize); // wrap around if neccesary
@@ -151,21 +153,24 @@ export const createSimulation = (width, height, playerData) => {
 		const wrappedX = index % width;
 		const wrappedY = Math.floor(index / width);
 
-		return "x:" + wrappedX + "y:" + wrappedY;
+		return 'x:' + wrappedX + 'y:' + wrappedY;
 	};
 
 	const getColor = ownerId => {
-		if(playerData[ownerId]) {
+		assertIsNumber(ownerId);
+		if (playerData[ownerId]) {
 			const color = playerData[ownerId].color;
-			return color ? convertIntToHexColor(color) : "#000000";
+			return color ? convertIntToHexColor(color) : '#000000';
 		}
-		return "#000000";
+		return '#000000';
 	};
 
 	/**
 	 Returns an array of alive cells neighbouring a cell at x, y.
 	 */
 	const getAliveNeighbourCells = (x, y) => {
+		assertIsNumber(x);
+		assertIsNumber(y);
 		const aliveCells = [];
 		for (let i = -1; i < 2; i++) {
 			for (let j = -1; j < 2; j++) {
@@ -179,6 +184,7 @@ export const createSimulation = (width, height, playerData) => {
 	};
 
 	const getStrongestOwnerId = cells => {
+		assertIsArray(cells);
 		if (cells.length === 0) {
 			return -1;
 		}
@@ -197,6 +203,7 @@ export const createSimulation = (width, height, playerData) => {
 	 * @private
 	 */
 	const addToActive = cell => {
+		assertIsObject(cell);
 		const {x, y} = cell.getPosition();
 		for (let i = -1; i < 2; i++) {
 			for (let j = -1; j < 2; j++) {
