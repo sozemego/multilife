@@ -1,8 +1,8 @@
-import p5 from "p5";
-import {createNetworkLayer} from "./network";
-import {createLoginUi} from "./login-ui";
-import {createGameUI} from "./game-ui";
-import {createGame} from "./game";
+import p5 from 'p5';
+import {createNetworkLayer} from './network';
+import {createLoginUi} from './login-ui';
+import {createGameUI} from './game-ui';
+import {createGame} from './game';
 
 export const sketch = new p5(p => {
 
