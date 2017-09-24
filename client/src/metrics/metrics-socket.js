@@ -11,11 +11,11 @@ export const metricsSocket = () => {
 		assertIsString(path);
 
 		webSocket = new WebSocket(path);
-		webSocket.onopen = () => {};
+		webSocket.onopen = () => { };
 
 		webSocket.onmessage = msg => {
 			const parsedMsg = JSON.parse(msg.data);
-			if(parsedMsg.type === "METRICS") {
+			if (parsedMsg.type === 'METRICS') {
 				observers.forEach(fn => fn(parsedMsg));
 			}
 		};
