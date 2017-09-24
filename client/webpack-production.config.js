@@ -1,15 +1,15 @@
-const path = require("path");
+const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 
 module.exports = {
 	entry: {
-		index: "./src/index.js",
-		metrics: "./src/metrics/Metrics.js"
+		index: './src/index.js',
+		metrics: './src/metrics/Metrics.js'
 	},
 	output: {
-		filename: "[name].js",
-		path: path.resolve(__dirname, "build")
+		filename: '[name].js',
+		path: path.resolve(__dirname, 'build')
 	},
 	module: {
 		rules: [
@@ -18,7 +18,7 @@ module.exports = {
 				exclude: /node_modules/,
 				use: [
 					{
-						loader: "babel-loader"
+						loader: 'babel-loader'
 					}
 				]
 			},
@@ -27,7 +27,7 @@ module.exports = {
 				exclude: /node_modules/,
 				use: [
 					{
-						loader: "file-loader",
+						loader: 'file-loader',
 						query: {
 							name: 'static/media/[name].[hash:8].[ext]'
 						}
@@ -38,19 +38,21 @@ module.exports = {
 	},
 	plugins: [
 		new CopyWebpackPlugin([
-			{from: "src/index.html"},
-			{from: "src/metrics/metrics.html"},
-			{from: "src/main.css"},
-			{from: "src/login_background.gif"}
+			{from: 'src/index.html'},
+			{from: 'src/metrics/metrics.html'},
+			{from: 'src/main.css'},
+			{from: 'src/login_background.gif'}
 		]),
 		new webpack.DefinePlugin({
-			WEBSOCKET_HOST: JSON.stringify("ws://138.68.89.151:8000/game"),
-			METRICS_WEBSOCKET_HOST: JSON.stringify("ws://138.68.89.151:8000/metrics-live"),
-			NODE_ENV: "production"
+			WEBSOCKET_HOST: JSON.stringify('ws://138.68.89.151:8000/game'),
+			METRICS_WEBSOCKET_HOST: JSON.stringify('ws://138.68.89.151:8000/metrics-live'),
+			'process.env': {
+				NODE_ENV: JSON.stringify('production')
+			}
 		})
 	],
 	externals: {
-		d3: "d3",
-		p5: "p5"
+		d3: 'd3',
+		p5: 'p5'
 	}
 };
