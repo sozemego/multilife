@@ -48,7 +48,7 @@ public class Configuration
 		defaultProperties.put(GAME_CONFIGURATION, GAME_MAX_PLAYERS_PER_GAME + " = " + 4);
 		defaultProperties.put(GAME_CONFIGURATION, GAME_DEFAULT_WIDTH + " = " + 50);
 		defaultProperties.put(GAME_CONFIGURATION, GAME_DEFAULT_HEIGHT + " = " + 50);
-		defaultProperties.put(METRICS_CONFIGURATION, METRICS_ENABLED + " = " + true);
+		defaultProperties.put(METRICS_CONFIGURATION, METRICS_ENABLED + " = " + false);
 		defaultProperties.put(METRICS_CONFIGURATION, CALCULATE_METRICS_INTERVAL + " = " + (1000 * 60));
 		defaultProperties.put(METRICS_CONFIGURATION, METRICS_PUSH_UPDATE_RATE + " = " + (1000 * 60));
 		defaultProperties.put(METRICS_CONFIGURATION, METRICS_INTERVAL_BETWEEN_SAVES + " = " + (1000 * 60));
