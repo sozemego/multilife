@@ -1,9 +1,10 @@
+import {throwError} from './utils';
+
 /**
  * Contains basic functions which assert values of arguments
  * are of correct type.
  */
 
-import {throwError} from './utils';
 
 /**
  * Returns type of the argument. Credit to: https://github.com/MathieuTurcotte/node-precond/blob/master/lib/checks.js
@@ -33,6 +34,15 @@ const assertType = expected => {
 		message = message || `Assertion failed`;
 		throwError(`${message}. Expected [${expected}], but got [${argument}]`);
 	};
+};
+
+export const assertInstanceOf = (argument, type, message) => {
+	assertIsFunction(type);
+	if(argument instanceof type) {
+		return argument;
+	}
+	message = message || `Assertion failed`;
+	throwError(`${message}. Expected [${type}], but got [${argument}]`);
 };
 
 export const assertIsArray = assertType('array');
