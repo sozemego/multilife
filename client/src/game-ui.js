@@ -1,9 +1,17 @@
 import {convertIntToHexColor, getKey, throwError} from "./utils";
 import {notify, on} from "./event-bus";
 import {
-	LOGGED_IN, PLACE_SHAPE, PLAYER_DATA_UPDATED, SEND_SHAPE_CLICKED, SHAPE_SELECTED,
+	LOGGED_IN, PLACE_SHAPE, PLAYER_DATA_UPDATED, SHAPE_SELECTED,
 	TIME_REMAINING
 } from "./events";
+import {assertIsObject, assertIsString} from './assert';
+
+const shapeMap = {};
+
+let selectedShape = null;
+let recentlyClicked = false;
+
+let loggedIn = false;
 
 /**
  * Parses a given string into a shape. Each row in a shape is delimited with a comma.
@@ -14,7 +22,8 @@ import {
  * @returns {Array}
  * @private
  */
-const parseShape = (str) => {
+const parseShape = str => {
+	assertIsString(str);
 	const tokens = str.split(",");
 	const rows = tokens.length;
 	const columns = tokens[0].length;
@@ -29,6 +38,7 @@ const parseShape = (str) => {
 };
 
 const styleCanvas = p5Canvas => {
+	assertIsObject(p5Canvas);
 	p5Canvas.canvas.classList.add("canvas");
 };
 
@@ -100,6 +110,7 @@ const parseRemainingTime = remainingTime => {
  * @private
  */
 const onRemainingTime = msg => {
+	assertIsObject(msg);
 	const remainingTime = msg.remainingTime;
 
 	const dom = document.getElementById("remaining-time");
@@ -119,13 +130,6 @@ const keys = {
 	S: 83,
 	D: 68
 };
-
-const shapeMap = {};
-
-let selectedShape = null;
-let recentlyClicked = false;
-
-let loggedIn = false;
 
 const selectShape = keyCode => {
 	if(!loggedIn) {
@@ -193,9 +197,7 @@ const onLogin = () => {
 };
 
 export const createGameUI = p5Canvas => {
-	if(!p5Canvas) {
-		throwError("Canvas cannot be falsy.");
-	}
+	assertIsObject(p5Canvas);
 
 	styleCanvas(p5Canvas);
 
