@@ -1,12 +1,13 @@
-import {notify, on} from "./event-bus";
+import {notify, on} from './event-bus';
 import {
 	CELL_LIST, LOGGED_IN, LOGIN, MAP_DATA,
 	PLAYER_IDENTITY, PLAYER_POINTS,
 	SHAPE_PLACED, PLAYER_ADDED,
 	TICK_DATA, PLAYER_REMOVED,
 	TIME_REMAINING
-} from "./events";
-import {throwError} from "./utils";
+} from './events';
+import {throwError} from './utils';
+import {assertIsArray, assertIsObject, assertIsString} from './assert';
 
 const messageTypeMarkers = {
 	[CELL_LIST]: 1,
@@ -64,6 +65,7 @@ const onPlayerPoints = msg => {
 };
 
 const handleByteMessage = msg => {
+	assertIsArray(msg);
 	const messageTypeMarker = msg[0];
 	switch (messageTypeMarker) {
 		case messageTypeMarkers[CELL_LIST]:
@@ -91,7 +93,7 @@ const handleByteMessage = msg => {
 			onPlayerPoints(msg);
 			break;
 		default:
-			console.warn("Unrecognized message marker: ", messageTypeMarker);
+			console.warn('Unrecognized message marker: ', messageTypeMarker);
 	}
 };
 
@@ -108,7 +110,7 @@ const convertBytesToFloat = bytes => {
 };
 
 const convertBytesToString = bytes => {
-	let result = "";
+	let result = '';
 	for (let i = 0; i < bytes.length; i += 2) {
 		const charBytes = bytes.slice(i, i + 2);
 		result += String.fromCharCode(convertBytesToInt16(charBytes));
@@ -147,19 +149,19 @@ const handleByteMapData = msg => {
 	return {
 		width: convertBytesToInt32(msg.slice(1, 5)),
 		height: convertBytesToInt32(msg.slice(5))
-	}
+	};
 };
 
 const handleByteTickData = msg => {
 	return {
 		iterations: convertBytesToInt32(msg.slice(1))
-	}
+	};
 };
 
 const handleByteTimeRemaining = msg => {
 	return {
 		remainingTime: convertBytesToFloat(msg.slice(1))
-	}
+	};
 };
 
 const handleBytePlayerAdded = msg => {
@@ -198,9 +200,10 @@ const getBytesClickMessage = indices => {
 };
 
 const openConnection = webSocketPath => {
+	assertIsString(webSocketPath);
 
 	webSocket = new WebSocket(webSocketPath);
-	webSocket.binaryType = "arraybuffer";
+	webSocket.binaryType = 'arraybuffer';
 
 	webSocket.onopen = () => {
 		connected = true;
@@ -216,26 +219,23 @@ const openConnection = webSocketPath => {
 };
 
 const onLogin = name => {
-	if (typeof name !== "string") {
-		throwError("Name needs to be a string, it was: " + name);
-	}
+	assertIsString(name);
 
-	webSocket.send(JSON.stringify({name, type: "LOGIN"}));
+	webSocket.send(JSON.stringify({name, type: 'LOGIN'}));
 };
 
 const onShapePlaced = indices => {
 	if (!connected) {
 		return;
 	}
+	assertIsArray(indices);
 	webSocket.send(getBytesClickMessage(indices));
 };
 
 // this._pingMessage = new Uint8Array([3]).buffer;
 
 export const createNetworkLayer = webSocketPath => {
-	if (typeof webSocketPath !== "string") {
-		throwError("webSocketPath needs to be a string, it was: " + webSocketPath);
-	}
+	assertIsString(webSocketPath);
 
 	on(LOGIN, onLogin);
 	on(SHAPE_PLACED, onShapePlaced);
