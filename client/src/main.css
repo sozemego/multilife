@@ -1,3 +1,7 @@
+.hidden {
+    display: none;
+}
+
 .login-container {
     position: absolute;
     left: 50%;
@@ -119,4 +123,43 @@ hr {
     margin-left: 0;
     margin-right: 0;
     width: 100%
+}
+
+.gray-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(127, 127, 127, 0.8);
+}
+
+.gray-overlay-hidden {
+    display: none;
+}
+
+.scores-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(256, 256, 256, 0.95);
+    width: 300px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.scores-hidden {
+    display: none;
+}
+
+.scores {
+    height: 100%;
+}
+
+.scores-buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.score-button {
 }

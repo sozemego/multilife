@@ -1,5 +1,5 @@
 import {notify, on} from './event-bus';
-import {LOGGED_IN, LOGIN} from './events';
+import {LOGGED_IN, LOGIN, TO_MAIN_MENU} from './events';
 
 const login = () => {
 	const name = document.getElementById('name').value.trim();
@@ -11,9 +11,8 @@ const login = () => {
 };
 
 const destroyLogin = () => {
-	const loginElement = document.getElementById('login-container');
-	const parentOfLogin = loginElement.parentNode;
-	parentOfLogin.removeChild(loginElement);
+	document.getElementById('login').innerHTML = '';
+	document.getElementById('login-container').classList.add('hidden');
 };
 
 export const createLoginUi = () => {
@@ -22,6 +21,9 @@ export const createLoginUi = () => {
 
 	loginUi.createLoginView = () => {
 		const dom = document.getElementById('login');
+		dom.innerHTML = '';
+
+		document.getElementById('login-container').classList.remove('hidden');
 
 		const name = document.createElement('input');
 		name.setAttribute('id', 'name');
@@ -35,8 +37,10 @@ export const createLoginUi = () => {
 		button.addEventListener('click', login);
 
 		dom.appendChild(button);
-		on(LOGGED_IN, destroyLogin);
 	};
+
+	on(LOGGED_IN, destroyLogin);
+	on(TO_MAIN_MENU, loginUi.createLoginView);
 
 	return loginUi;
 };

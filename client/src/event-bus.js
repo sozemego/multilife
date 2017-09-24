@@ -13,6 +13,19 @@ export const on = (event, handler) => {
 	observers[event].push(handler);
 };
 
+export const off = (event, handler) => {
+	assertIsString(event);
+	assertIsFunction(handler);
+
+	const eventObservers = observers[event];
+	if (!eventObservers) {
+		const index = observers[event].findIndex(obs => obs === handler);
+		if(index > -1) {
+			observers[event].splice(index, 1);
+		}
+	}
+};
+
 export const notify = (event, message) => {
 	assertIsString(event);
 

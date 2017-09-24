@@ -4,7 +4,7 @@ import {
 	PLAYER_IDENTITY, PLAYER_POINTS,
 	SHAPE_PLACED, PLAYER_ADDED,
 	TICK_DATA, PLAYER_REMOVED,
-	TIME_REMAINING
+	TIME_REMAINING, REPEAT_LOGIN
 } from './events';
 import {assertIsArray, assertIsString} from './assert';
 
@@ -21,6 +21,7 @@ const messageTypeMarkers = {
 
 let webSocket = null;
 let connected = false;
+let lastLoginName = null;
 
 const onCellList = msg => {
 	const cellList = handleByteCellList(msg);
@@ -170,7 +171,7 @@ const handleBytePlayerAdded = msg => {
 	return playerData;
 };
 
-const handleBytePlayerRemoved = (msg) => {
+const handleBytePlayerRemoved = msg => {
 	return convertBytesToInt32(msg.slice(1, 5));
 };
 
@@ -214,12 +215,28 @@ const openConnection = webSocketPath => {
 			handleMessage(JSON.parse(msg.data));
 		}
 	};
+
+	webSocket.onclose = () => {
+		connected = false;
+	}
 };
 
 const onLogin = name => {
-	assertIsString(name);
+	lastLoginName = assertIsString(name);
 
-	webSocket.send(JSON.stringify({name, type: 'LOGIN'}));
+	if(!connected) {
+		setTimeout(() => onLogin(name), 150);
+	} else {
+		webSocket.send(JSON.stringify({name, type: 'LOGIN'}));
+	}
+};
+
+const onRepeatLogin = () => {
+	if(!connected) {
+		setTimeout(onRepeatLogin, 150);
+	} else {
+		webSocket.send(JSON.stringify({name: lastLoginName, type: 'LOGIN'}));
+	}
 };
 
 const onShapePlaced = indices => {
@@ -235,8 +252,15 @@ const onShapePlaced = indices => {
 export const createNetworkLayer = webSocketPath => {
 	assertIsString(webSocketPath);
 
+	const network = {};
+
 	on(LOGIN, onLogin);
 	on(SHAPE_PLACED, onShapePlaced);
+	on(REPEAT_LOGIN, onRepeatLogin);
 
-	openConnection(webSocketPath);
+	network.connect = () => {
+		openConnection(webSocketPath);
+	};
+
+	return network;
 };

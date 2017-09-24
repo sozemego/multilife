@@ -1,8 +1,9 @@
 import {convertIntToHexColor, getKey} from './utils';
 import {notify, on} from './event-bus';
 import {
-	LOGGED_IN, PLACE_SHAPE, PLAYER_DATA_UPDATED, SHAPE_SELECTED,
-	TIME_REMAINING
+	GAME_ENDED,
+	LOGGED_IN, NEW_GAME, PLACE_SHAPE, PLAYER_DATA_UPDATED, SHAPE_SELECTED,
+	TIME_REMAINING, TO_MAIN_MENU
 } from './events';
 import {assertInstanceOf, assertIsObject, assertIsString} from './assert';
 
@@ -12,6 +13,17 @@ let selectedShape = null;
 let recentlyClicked = false;
 
 let loggedIn = false;
+let playerData = undefined;
+
+const keys = {
+	Q: 81,
+	W: 87,
+	E: 69,
+	R: 82,
+	A: 65,
+	S: 83,
+	D: 68
+};
 
 /**
  * Parses a given string into a shape. Each row in a shape is delimited with a comma.
@@ -42,13 +54,15 @@ const styleCanvas = p5Canvas => {
 	p5Canvas.canvas.classList.add('canvas');
 };
 
-const renderPlayerPoints = playerData => {
-	if (!playerData) {
-		return;
-	}
+const renderPlayerPoints = nextPlayerData => {
+	playerData = nextPlayerData;
 
 	const dom = document.getElementById('player-points');
 	dom.innerHTML = '';
+
+	if (!playerData) {
+		return;
+	}
 
 	for (const playerId in playerData) {
 		if (playerData.hasOwnProperty(playerId)) {
@@ -121,14 +135,9 @@ const onRemainingTime = msg => {
 	dom.appendChild(span);
 };
 
-const keys = {
-	Q: 81,
-	W: 87,
-	E: 69,
-	R: 82,
-	A: 65,
-	S: 83,
-	D: 68
+const hideRemainingTime = () => {
+	const dom = document.getElementById('remaining-time');
+	dom.innerHTML = '';
 };
 
 const selectShape = keyCode => {
@@ -141,12 +150,12 @@ const selectShape = keyCode => {
 };
 
 const renderAvailableShapes = () => {
+	const dom = document.getElementById('available-shapes');
+	dom.innerHTML = '';
+
 	if (!loggedIn) {
 		return;
 	}
-
-	const dom = document.getElementById('available-shapes');
-	dom.innerHTML = '';
 
 	for (const key in shapeMap) {
 		if (shapeMap.hasOwnProperty(key)) {
@@ -198,6 +207,8 @@ const initShapes = () => {
 
 const onLogin = () => {
 	loggedIn = true;
+	hideScores();
+	hideOverlay();
 	renderAvailableShapes();
 };
 
@@ -207,6 +218,127 @@ const placeCanvasInContainer = p5Canvas => {
 	const canvasParent = canvas.parentNode;
 	canvasParent.removeChild(canvas);
 	document.getElementById('canvas-container').appendChild(canvas);
+};
+
+const onGameEnd = () => {
+	showOverlay();
+	renderScores();
+	renderEndOfGameButtons();
+};
+
+const showOverlay = () => {
+	document.getElementById('gray-overlay').classList.remove('gray-overlay-hidden');
+};
+
+const hideOverlay = () => {
+	document.getElementById('gray-overlay').classList.add('gray-overlay-hidden');
+};
+
+const renderScores = () => {
+	if(!playerData) {
+		return;
+	}
+
+	const sortedPlayerData = getPlayerDataSortedByPoints();
+
+	const scoresContainer = document.getElementById('scores-container');
+	scoresContainer.classList.remove('scores-hidden');
+	const scoresElement = document.getElementById('scores');
+	scoresElement.innerHTML = '';
+
+	for (const playerId in sortedPlayerData) {
+		if (sortedPlayerData.hasOwnProperty(playerId)) {
+
+			const color = sortedPlayerData[playerId].color;
+			const name = sortedPlayerData[playerId].name;
+			const points = sortedPlayerData[playerId].points;
+
+			const listElement = document.createElement('div');
+			listElement.classList.add('player-points-element');
+
+			const playerColorElement = document.createElement('span');
+			playerColorElement.classList.add('player-points-color');
+			playerColorElement.style.backgroundColor = convertIntToHexColor(color);
+
+			listElement.appendChild(playerColorElement);
+
+			const nameElement = document.createElement('span');
+			nameElement.classList.add('player-points-name');
+			const nameNode = document.createTextNode(name);
+			nameElement.appendChild(nameNode);
+			listElement.appendChild(nameElement);
+
+			const pointsElement = document.createElement('span');
+			pointsElement.classList.add('player-points-points');
+
+			const pointsNode = document.createTextNode(points === undefined ? '0' : points);
+			pointsElement.appendChild(pointsNode);
+
+			listElement.appendChild(pointsElement);
+
+			scoresElement.appendChild(listElement);
+		}
+	}
+};
+
+const getPlayerDataSortedByPoints = () => {
+	const sortedPlayerData = {};
+
+	const tempArray = [];
+	for (const playerId in playerData) {
+		if (playerData.hasOwnProperty(playerId)) {
+
+			tempArray.push({
+				playerId,
+				color: playerData[playerId].color,
+				name: playerData[playerId].name,
+				points: playerData[playerId].points
+			})
+		}
+	}
+	tempArray.sort((a, b) => b.points - a.points);
+	tempArray.forEach(e => {
+		sortedPlayerData[e.playerId] = {
+			color: e.color,
+			name: e.name,
+			points: e.points
+		};
+	});
+
+	return sortedPlayerData;
+};
+
+const renderEndOfGameButtons = () => {
+
+	const buttonsElement = document.getElementById('scores-buttons');
+	buttonsElement.innerHTML = '';
+
+	const backToMenuButton = document.createElement('button');
+	backToMenuButton.classList.add('score-button');
+	backToMenuButton.appendChild(document.createTextNode('BACK'));
+	backToMenuButton.addEventListener('click', () => notify(TO_MAIN_MENU));
+	buttonsElement.appendChild(backToMenuButton);
+
+	const nextGameButton = document.createElement('button');
+	nextGameButton.classList.add('score-button');
+	nextGameButton.appendChild(document.createTextNode('NEXT GAME'));
+	nextGameButton.addEventListener('click', () => notify(NEW_GAME));
+	buttonsElement.appendChild(nextGameButton);
+};
+
+const onToMainMenu = () => {
+	loggedIn = false;
+	hideScores();
+	hideOverlay();
+	renderPlayerPoints(undefined);
+	renderAvailableShapes();
+	hideRemainingTime();
+};
+
+export const hideScores = () => {
+	document.getElementById('scores-container').classList.add('scores-hidden');
+	document.getElementById('scores').innerHTML = '';
+	document.getElementById('scores-buttons').innerHTML = '';
 };
 
 export const createGameUI = p5Canvas => {
@@ -237,6 +369,8 @@ export const createGameUI = p5Canvas => {
 	on(PLAYER_DATA_UPDATED, renderPlayerPoints);
 	on(TIME_REMAINING, onRemainingTime);
 	on(LOGGED_IN, onLogin);
+	on(GAME_ENDED, onGameEnd);
+	on(TO_MAIN_MENU, onToMainMenu);
 
 	p5Canvas.mouseReleased(ui.onMouseUp);
 
