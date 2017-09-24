@@ -153,6 +153,7 @@ public class BaseGame implements Game {
 		checkContainsPlayer(id);
 		grid.killAll(id);
 		players.remove(id);
+		playerPoints.remove(id);
 	}
 
 	/**
