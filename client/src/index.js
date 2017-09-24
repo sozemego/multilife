@@ -3,6 +3,8 @@ import {createNetworkLayer} from './network';
 import {createLoginUi} from './login-ui';
 import {createGameUI} from './game-ui';
 import {createGame} from './game';
+import {on} from './event-bus';
+import {LOGGED_IN} from './events';
 
 export const sketch = new p5(p => {
 
@@ -24,6 +26,7 @@ export const sketch = new p5(p => {
 	};
 
 	p.draw = () => {
+		p.windowResized();
 		game.draw();
 	};
 
@@ -33,8 +36,9 @@ export const sketch = new p5(p => {
 
 	p.windowResized = () => {
 		p.resizeCanvas(
-			Math.max(window.innerWidth, game.getWidth() * game.getCellSize()),
-			Math.max(window.innerHeight, game.getHeight() * game.getCellSize())
+			game.getWidth() * game.getCellSize(),
+			game.getHeight() * game.getCellSize(),
+			true
 		);
 	};
 });

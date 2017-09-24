@@ -4,7 +4,7 @@ import {
 	LOGGED_IN, PLACE_SHAPE, PLAYER_DATA_UPDATED, SHAPE_SELECTED,
 	TIME_REMAINING
 } from './events';
-import {assertIsObject, assertIsString} from './assert';
+import {assertInstanceOf, assertIsObject, assertIsString} from './assert';
 
 const shapeMap = {};
 
@@ -196,10 +196,19 @@ const onLogin = () => {
 	renderAvailableShapes();
 };
 
+const placeCanvasInContainer = p5Canvas => {
+	assertIsObject(p5Canvas);
+	const canvas = p5Canvas.canvas;
+	const canvasParent = canvas.parentNode;
+	canvasParent.removeChild(canvas);
+	document.getElementById('canvas-container').appendChild(canvas);
+};
+
 export const createGameUI = p5Canvas => {
 	assertIsObject(p5Canvas);
 
 	styleCanvas(p5Canvas);
+	placeCanvasInContainer(p5Canvas);
 
 	const ui = {};
 
