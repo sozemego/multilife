@@ -1,8 +1,9 @@
-import {lineChart} from "./line-chart";
-import {textD3} from "./text-d3";
+import {lineChart} from './line-chart';
+import {textD3} from './text-d3';
+import {assertIsObject} from '../assert';
 
-const textFunction = (data) => {
-	return "Currently " + data + " players playing.";
+const textFunction = data => {
+	return `Currently ${data} players playing.`;
 };
 
 const getTimeDomainMin = () => {
@@ -18,19 +19,21 @@ const getTimeDomainMax = () => {
 };
 
 export const playerCountMetric = socket => {
+	assertIsObject(socket);
 
 	const playerCount = [];
-	const chart = lineChart(document.getElementById("player-count"), 850, 420);
-	const text = textD3(document.getElementById("player-count"), textFunction);
+	const chart = lineChart(document.getElementById('player-count'), 850, 420);
+	const text = textD3(document.getElementById('player-count'), textFunction);
 
 	const addPlayerCount = instancePlayerMap => {
+		assertIsObject(instancePlayerMap);
 		playerCount.push({players: Object.keys(instancePlayerMap).length, time: new Date()});
 	};
 
 	const transformData = () => {
 		return playerCount.map(item => {
 			return {count: item.players, time: item.time};
-		})
+		});
 	};
 
 	const handlePlayerMapCount = ({instancePlayerMap} = msg) => {
