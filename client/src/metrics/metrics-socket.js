@@ -1,4 +1,4 @@
-import {throwError} from "../utils";
+import {assertIsFunction, assertIsString} from '../assert';
 
 export const metricsSocket = () => {
 
@@ -8,6 +8,7 @@ export const metricsSocket = () => {
 	const metricSocket = {};
 
 	metricSocket.init = path => {
+		assertIsString(path);
 
 		webSocket = new WebSocket(path);
 		webSocket.onopen = () => {};
@@ -21,9 +22,7 @@ export const metricsSocket = () => {
 	};
 
 	metricSocket.addObserver = observer => {
-		if(typeof observer !== "function") {
-			throwError("Observer has to be a function.");
-		}
+		assertIsFunction(observer);
 		observers.push(observer);
 	};
 
