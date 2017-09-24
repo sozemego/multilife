@@ -1,9 +1,9 @@
-import {convertIntToHexColor, getKey, throwError} from "./utils";
-import {notify, on} from "./event-bus";
+import {convertIntToHexColor, getKey, throwError} from './utils';
+import {notify, on} from './event-bus';
 import {
 	LOGGED_IN, PLACE_SHAPE, PLAYER_DATA_UPDATED, SHAPE_SELECTED,
 	TIME_REMAINING
-} from "./events";
+} from './events';
 import {assertIsObject, assertIsString} from './assert';
 
 const shapeMap = {};
@@ -24,7 +24,7 @@ let loggedIn = false;
  */
 const parseShape = str => {
 	assertIsString(str);
-	const tokens = str.split(",");
+	const tokens = str.split(',');
 	const rows = tokens.length;
 	const columns = tokens[0].length;
 	const offsets = [];
@@ -39,7 +39,7 @@ const parseShape = str => {
 
 const styleCanvas = p5Canvas => {
 	assertIsObject(p5Canvas);
-	p5Canvas.canvas.classList.add("canvas");
+	p5Canvas.canvas.classList.add('canvas');
 };
 
 const renderPlayerPoints = playerData => {
@@ -47,34 +47,34 @@ const renderPlayerPoints = playerData => {
 		return;
 	}
 
-	const dom = document.getElementById("player-points");
-	dom.innerHTML = "";
+	const dom = document.getElementById('player-points');
+	dom.innerHTML = '';
 
-	for(const playerId in playerData) {
+	for (const playerId in playerData) {
 		if (playerData.hasOwnProperty(playerId)) {
 			const color = playerData[playerId].color;
 			const name = playerData[playerId].name;
 			const points = playerData[playerId].points;
 
-			const listElement = document.createElement("div");
-			listElement.classList.add("player-points-element");
+			const listElement = document.createElement('div');
+			listElement.classList.add('player-points-element');
 
-			const playerColorElement = document.createElement("span");
-			playerColorElement.classList.add("player-points-color");
+			const playerColorElement = document.createElement('span');
+			playerColorElement.classList.add('player-points-color');
 			playerColorElement.style.backgroundColor = convertIntToHexColor(color);
 
 			listElement.appendChild(playerColorElement);
 
-			const nameElement = document.createElement("span");
-			nameElement.classList.add("player-points-name");
+			const nameElement = document.createElement('span');
+			nameElement.classList.add('player-points-name');
 			const nameNode = document.createTextNode(name);
 			nameElement.appendChild(nameNode);
 			listElement.appendChild(nameElement);
 
-			const pointsElement = document.createElement("span");
-			pointsElement.classList.add("player-points-points");
+			const pointsElement = document.createElement('span');
+			pointsElement.classList.add('player-points-points');
 
-			const pointsNode = document.createTextNode(points === undefined ? "0" : points);
+			const pointsNode = document.createTextNode(points === undefined ? '0' : points);
 			pointsElement.appendChild(pointsNode);
 
 			listElement.appendChild(pointsElement);
@@ -95,13 +95,13 @@ const parseRemainingTime = remainingTime => {
 	let second = Math.max(Math.floor((remainingTime / 1000) % 60), 0);
 	let minute = Math.max(Math.floor((remainingTime / (1000 * 60)) % 60), 0);
 
-	second = "" + second;
-	second = ("00" + second).substr(second.length);
+	second = '' + second;
+	second = ('00' + second).substr(second.length);
 
-	minute = "" + minute;
-	minute = ("00" + minute).substr(minute.length);
+	minute = '' + minute;
+	minute = ('00' + minute).substr(minute.length);
 
-	return minute + ":" + second;
+	return minute + ':' + second;
 };
 
 /**
@@ -113,10 +113,10 @@ const onRemainingTime = msg => {
 	assertIsObject(msg);
 	const remainingTime = msg.remainingTime;
 
-	const dom = document.getElementById("remaining-time");
-	dom.innerHTML = "";
+	const dom = document.getElementById('remaining-time');
+	dom.innerHTML = '';
 
-	const span = document.createElement("span");
+	const span = document.createElement('span');
 	span.appendChild(document.createTextNode(parseRemainingTime(remainingTime)));
 	dom.appendChild(span);
 };
@@ -132,7 +132,7 @@ const keys = {
 };
 
 const selectShape = keyCode => {
-	if(!loggedIn) {
+	if (!loggedIn) {
 		return;
 	}
 	selectedShape = shapeMap[keyCode];
@@ -141,12 +141,12 @@ const selectShape = keyCode => {
 };
 
 const renderAvailableShapes = () => {
-	if(!loggedIn) {
+	if (!loggedIn) {
 		return;
 	}
 
-	const dom = document.getElementById("available-shapes");
-	dom.innerHTML = "";
+	const dom = document.getElementById('available-shapes');
+	dom.innerHTML = '';
 
 	for (const key in shapeMap) {
 		if (shapeMap.hasOwnProperty(key)) {
@@ -155,17 +155,17 @@ const renderAvailableShapes = () => {
 			const shapeName = shape.name;
 			const button = getKey(keys, key);
 
-			const container = document.createElement("div");
-			container.addEventListener("click", () => {
+			const container = document.createElement('div');
+			container.addEventListener('click', () => {
 				selectShape(key);
 			});
 
-			const textElement = document.createElement("span");
-			textElement.style.display = "inline-block";
-			textElement.appendChild(document.createTextNode(button + " " + shapeName));
+			const textElement = document.createElement('span');
+			textElement.style.display = 'inline-block';
+			textElement.appendChild(document.createTextNode(button + ' ' + shapeName));
 
 			if (selectedShape && shapeName === selectedShape.name) {
-				textElement.style.backgroundColor = "red";
+				textElement.style.backgroundColor = 'red';
 			}
 
 			container.appendChild(textElement);
@@ -180,14 +180,14 @@ const renderAvailableShapes = () => {
  */
 const initShapes = () => {
 	// INIT BASIC RULES
-	shapeMap[keys.Q] = {name: "block", shape: parseShape("11,11")};
-	shapeMap[keys.W] = {name: "hive", shape: parseShape("0110,1001,0110")};
-	shapeMap[keys.E] = {name: "loaf", shape: parseShape("0010,0101,1001,0110")};
-	shapeMap[keys.R] = {name: "tub", shape: parseShape("010,101,010")};
-	shapeMap[keys.A] = {name: "blinker", shape: parseShape("1,1,1")};
+	shapeMap[keys.Q] = {name: 'block', shape: parseShape('11,11')};
+	shapeMap[keys.W] = {name: 'hive', shape: parseShape('0110,1001,0110')};
+	shapeMap[keys.E] = {name: 'loaf', shape: parseShape('0010,0101,1001,0110')};
+	shapeMap[keys.R] = {name: 'tub', shape: parseShape('010,101,010')};
+	shapeMap[keys.A] = {name: 'blinker', shape: parseShape('1,1,1')};
 	shapeMap[keys.S] = {
-		name: "floodgate",
-		shape: parseShape("1110000,0100000,0000000,0000000,0000001,0000011,0000001")
+		name: 'floodgate',
+		shape: parseShape('1110000,0100000,0000000,0000000,0000001,0000011,0000001')
 	};
 };
 
