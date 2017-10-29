@@ -5,7 +5,8 @@ package soze.multilife.configuration.interfaces;
  */
 public interface ServerConfiguration {
 
-	public int getServerPort();
-	public String getExternalStaticFilesPath();
+  public int getServerPort();
+
+  public String getExternalStaticFilesPath();
 
 }

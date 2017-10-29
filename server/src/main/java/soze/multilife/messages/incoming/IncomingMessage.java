@@ -6,25 +6,25 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(
-	use = JsonTypeInfo.Id.NAME,
-	include = JsonTypeInfo.As.EXISTING_PROPERTY,
-	property = "type",
-	visible = true)
+  use = JsonTypeInfo.Id.NAME,
+  include = JsonTypeInfo.As.EXISTING_PROPERTY,
+  property = "type",
+  visible = true)
 @JsonSubTypes({
-	@JsonSubTypes.Type(value = LoginMessage.class, name = "LOGIN"),
-	@JsonSubTypes.Type(value = ClickMessage.class, name = "CLICK"),
-	@JsonSubTypes.Type(value = PingMessage.class, name = "PING")
+  @JsonSubTypes.Type(value = LoginMessage.class, name = "LOGIN"),
+  @JsonSubTypes.Type(value = ClickMessage.class, name = "CLICK"),
+  @JsonSubTypes.Type(value = PingMessage.class, name = "PING")
 })
 public abstract class IncomingMessage {
 
-	private IncomingType type;
+  private IncomingType type;
 
-	void setType(IncomingType type) {
-		this.type = type;
-	}
+  void setType(IncomingType type) {
+    this.type = type;
+  }
 
-	public IncomingType getType() {
-		return this.type;
-	}
+  public IncomingType getType() {
+    return this.type;
+  }
 
 }

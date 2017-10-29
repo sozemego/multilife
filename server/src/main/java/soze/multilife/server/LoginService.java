@@ -12,10 +12,10 @@ import java.util.Objects;
  */
 public class LoginService {
 
-	public Player login(LoginMessage message, Connection connection) {
-		Objects.requireNonNull(message);
-		Objects.requireNonNull(connection);
-		return new Player(connection.getId(), connection, message.getName());
-	}
+  public Player login(LoginMessage message, Connection connection) {
+    Objects.requireNonNull(message);
+    Objects.requireNonNull(connection);
+    return new Player(connection.getId(), connection, message.getName());
+  }
 
 }

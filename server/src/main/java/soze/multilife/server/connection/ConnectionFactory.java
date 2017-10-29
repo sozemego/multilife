@@ -10,23 +10,23 @@ import soze.multilife.metrics.MetricsConnection;
  */
 public class ConnectionFactory {
 
-	private final EventBus eventBus;
+  private final EventBus eventBus;
 
-	public ConnectionFactory(EventBus eventBus) {
-		this.eventBus = eventBus;
-	}
+  public ConnectionFactory(EventBus eventBus) {
+    this.eventBus = eventBus;
+  }
 
-	/**
-	 * Returns a default connection wrapper.
-	 *
-	 * @return
-	 */
-	public Connection getConnection(int id, Session session) {
-		return getMetricsConnection(id, session);
-	}
+  /**
+   * Returns a default connection wrapper.
+   *
+   * @return
+   */
+  public Connection getConnection(int id, Session session) {
+    return getMetricsConnection(id, session);
+  }
 
-	private Connection getMetricsConnection(int id, Session session) {
-		return new MetricsConnection(id, session, eventBus);
-	}
+  private Connection getMetricsConnection(int id, Session session) {
+    return new MetricsConnection(id, session, eventBus);
+  }
 
 }

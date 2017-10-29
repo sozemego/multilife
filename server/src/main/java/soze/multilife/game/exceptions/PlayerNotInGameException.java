@@ -5,14 +5,14 @@ package soze.multilife.game.exceptions;
  */
 public class PlayerNotInGameException extends Exception {
 
-	private final long playerId;
+  private final long playerId;
 
-	public PlayerNotInGameException(long playerId) {
-		this.playerId = playerId;
-	}
+  public PlayerNotInGameException(long playerId) {
+    this.playerId = playerId;
+  }
 
-	public long getPlayerId() {
-		return playerId;
-	}
+  public long getPlayerId() {
+    return playerId;
+  }
 
 }

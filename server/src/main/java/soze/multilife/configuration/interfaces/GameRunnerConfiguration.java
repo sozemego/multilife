@@ -2,7 +2,7 @@ package soze.multilife.configuration.interfaces;
 
 public interface GameRunnerConfiguration {
 
-	int getGamesPerThread();
+  int getGamesPerThread();
 
-	int getTickRate();
+  int getTickRate();
 }

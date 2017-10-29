@@ -8,13 +8,13 @@ import java.util.Map;
  */
 public interface MetricsRepository {
 
-	void saveOutgoingKilobytesPerSecond(double kbs, long timestamp);
+  void saveOutgoingKilobytesPerSecond(double kbs, long timestamp);
 
-	void saveIncomingKilobytesPerSecond(double kbs, long timestamp);
+  void saveIncomingKilobytesPerSecond(double kbs, long timestamp);
 
-	void saveMaxPlayers(int players, long timestamp);
+  void saveMaxPlayers(int players, long timestamp);
 
-	Map<Long, Double> getAverageKbsOutgoingSince(Instant instant);
+  Map<Long, Double> getAverageKbsOutgoingSince(Instant instant);
 
-	Map<Long,Double> getAverageKbsIncomingSince(Instant timeSince);
+  Map<Long, Double> getAverageKbsIncomingSince(Instant timeSince);
 }

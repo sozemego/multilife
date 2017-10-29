@@ -5,60 +5,60 @@ package soze.multilife.game;
  */
 public class Cell {
 
-	private final int x;
-	private final int y;
-	private boolean alive = false;
-	private int ownerId = 0;
+  private final int x;
+  private final int y;
+  private boolean alive = false;
+  private int ownerId = 0;
 
-	public Cell(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
+  public Cell(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
 
-	public void setAlive(boolean alive) {
-		this.alive = alive;
-	}
+  public void setAlive(boolean alive) {
+    this.alive = alive;
+  }
 
-	public int getX() {
-		return x;
-	}
+  public int getX() {
+    return x;
+  }
 
-	public int getY() {
-		return y;
-	}
+  public int getY() {
+    return y;
+  }
 
-	public boolean isAlive() {
-		return alive;
-	}
+  public boolean isAlive() {
+    return alive;
+  }
 
-	public void setIsAlive(boolean alive) {
-		this.alive = alive;
-	}
+  public void setIsAlive(boolean alive) {
+    this.alive = alive;
+  }
 
-	public int getOwnerId() {
-		return ownerId;
-	}
+  public int getOwnerId() {
+    return ownerId;
+  }
 
-	public void setOwnerId(int ownerId) {
-		this.ownerId = ownerId;
-	}
+  public void setOwnerId(int ownerId) {
+    this.ownerId = ownerId;
+  }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
 
-		Cell cell = (Cell) o;
+    Cell cell = (Cell) o;
 
-		if (x != cell.x) return false;
-		return y == cell.y;
-	}
+    if (x != cell.x) return false;
+    return y == cell.y;
+  }
 
-	@Override
-	public int hashCode() {
-		int result = x;
-		result = 31 * result + y;
-		return result;
-	}
+  @Override
+  public int hashCode() {
+    int result = x;
+    result = 31 * result + y;
+    return result;
+  }
 
 }

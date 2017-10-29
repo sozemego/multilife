@@ -10,26 +10,26 @@ package soze.multilife.events;
  */
 public interface EventBus {
 
-	/**
-	 * Registers an observer. Same observer cannot be registered twice.
-	 *
-	 * @param observer
-	 */
-	public void register(Object observer);
+  /**
+   * Registers an observer. Same observer cannot be registered twice.
+   *
+   * @param observer
+   */
+  public void register(Object observer);
 
-	/**
-	 * Unregisters an observer.
-	 *
-	 * @param observer
-	 */
-	public void unregister(Object observer);
+  /**
+   * Unregisters an observer.
+   *
+   * @param observer
+   */
+  public void unregister(Object observer);
 
-	/**
-	 * Posts an event. This event will be passed down to every
-	 * observer subscribing to its type.
-	 *
-	 * @param event
-	 */
-	public void post(Object event);
+  /**
+   * Posts an event. This event will be passed down to every
+   * observer subscribing to its type.
+   *
+   * @param event
+   */
+  public void post(Object event);
 
 }

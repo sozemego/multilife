@@ -10,24 +10,24 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class GameFactory {
 
-	private final GameConfiguration config;
-	private final AtomicInteger id = new AtomicInteger(1);
+  private final GameConfiguration config;
+  private final AtomicInteger id = new AtomicInteger(1);
 
-	public GameFactory(GameConfiguration config) {
-		this.config = Objects.requireNonNull(config);
-	}
+  public GameFactory(GameConfiguration config) {
+    this.config = Objects.requireNonNull(config);
+  }
 
-	public Game createGame() {
-		BaseGame baseGame = new BaseGame(
-			id.getAndIncrement(),
-			config.getInitialDensity(),
-			config.getGridWidth(),
-			config.getGridHeight(),
-			config.getMaxPlayers(),
-			config.getGameDuration()
-		);
+  public Game createGame() {
+    BaseGame baseGame = new BaseGame(
+      id.getAndIncrement(),
+      config.getInitialDensity(),
+      config.getGridWidth(),
+      config.getGridHeight(),
+      config.getMaxPlayers(),
+      config.getGameDuration()
+    );
 
-		return baseGame;
-	}
+    return baseGame;
+  }
 
 }

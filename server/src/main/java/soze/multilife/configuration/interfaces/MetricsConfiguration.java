@@ -5,9 +5,12 @@ package soze.multilife.configuration.interfaces;
  */
 public interface MetricsConfiguration {
 
-	public boolean isMetricsEnabled();
-	public long getCalculateMetricsInterval();
-	public long getMetricsPushInterval();
-	public long metricsSaveInterval();
+  public boolean isMetricsEnabled();
+
+  public long getCalculateMetricsInterval();
+
+  public long getMetricsPushInterval();
+
+  public long metricsSaveInterval();
 
 }

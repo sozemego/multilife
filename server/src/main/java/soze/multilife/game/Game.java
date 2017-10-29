@@ -11,73 +11,79 @@ import java.util.Map;
 
 public interface Game {
 
-	/**
-	 * Returns id of this game. Ids should be unique.
-	 */
-	int getId();
+  /**
+   * Returns id of this game. Ids should be unique.
+   */
+  int getId();
 
-	/**
-	 * Processes an incoming message. Those messages are sent from the client.
-	 * PlayerId denotes id of the player who sent the message.
-	 * @throws PlayerNotInGameException if player with given id is not in game
-	 */
-	void acceptMessage(IncomingMessage message, int playerId) throws PlayerNotInGameException;
+  /**
+   * Processes an incoming message. Those messages are sent from the client.
+   * PlayerId denotes id of the player who sent the message.
+   *
+   * @throws PlayerNotInGameException if player with given id is not in game
+   */
+  void acceptMessage(IncomingMessage message, int playerId) throws PlayerNotInGameException;
 
-	/**
-	 * Adds a player to the game.
-	 * @return true if player was added, false if game was full
-	 * @throws PlayerAlreadyInGameException if this player is already in game
-	 */
-	boolean addPlayer(Player player) throws PlayerAlreadyInGameException;
+  /**
+   * Adds a player to the game.
+   *
+   * @return true if player was added, false if game was full
+   * @throws PlayerAlreadyInGameException if this player is already in game
+   */
+  boolean addPlayer(Player player) throws PlayerAlreadyInGameException;
 
-	/**
-	 * Removes a player with given id from the game.
-	 * @throws PlayerNotInGameException if a player with given id is not in game
-	 */
-	void removePlayer(int playerId) throws PlayerNotInGameException;
+  /**
+   * Removes a player with given id from the game.
+   *
+   * @throws PlayerNotInGameException if a player with given id is not in game
+   */
+  void removePlayer(int playerId) throws PlayerNotInGameException;
 
-	/**
-	 * Ends the game. Disconnects all players and schedules this game for removal.
-	 */
-	void end();
+  /**
+   * Ends the game. Disconnects all players and schedules this game for removal.
+   */
+  void end();
 
-	int getMaxPlayers();
+  int getMaxPlayers();
 
-	Map<Integer, Integer> getPlayerPoints();
+  Map<Integer, Integer> getPlayerPoints();
 
-	/**
-	 * Returns a map of playerId-player pairs connected to the game.
-	 */
-	Map<Integer, Player> getPlayers();
+  /**
+   * Returns a map of playerId-player pairs connected to the game.
+   */
+  Map<Integer, Player> getPlayers();
 
-	String getPlayerColor(int playerId);
+  String getPlayerColor(int playerId);
 
-	int getWidth();
-	int getHeight();
+  int getWidth();
 
-	boolean isFull();
+  int getHeight();
 
-	/**
-	 * Returns number of iterations this game has gone through so far.
-	 */
-	int getIterations();
+  boolean isFull();
 
-	/**
-	 * Returns remaining time in milliseconds.
-	 */
-	long getRemainingTime();
-	boolean isOutOfTime();
+  /**
+   * Returns number of iterations this game has gone through so far.
+   */
+  int getIterations();
 
-	Collection<Cell> getClickedCells();
-	Map<Point, Cell> getAllCells();
+  /**
+   * Returns remaining time in milliseconds.
+   */
+  long getRemainingTime();
 
-	/**
-	 * Sends the given message to all players connected to the game.
-	 */
-	void sendMessage(OutgoingMessage message);
+  boolean isOutOfTime();
 
-	boolean isScheduledForRemoval();
+  Collection<Cell> getClickedCells();
 
-	public void run();
+  Map<Point, Cell> getAllCells();
+
+  /**
+   * Sends the given message to all players connected to the game.
+   */
+  void sendMessage(OutgoingMessage message);
+
+  boolean isScheduledForRemoval();
+
+  public void run();
 
 }

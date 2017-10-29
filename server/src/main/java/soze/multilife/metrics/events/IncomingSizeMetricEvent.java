@@ -7,30 +7,30 @@ import soze.multilife.metrics.service.MetricsServiceImpl;
  */
 public class IncomingSizeMetricEvent implements MetricEvent {
 
-	private final long timeStamp;
-	private final int connectionId;
-	private final int bytesReceived;
+  private final long timeStamp;
+  private final int connectionId;
+  private final int bytesReceived;
 
-	public IncomingSizeMetricEvent(long timeStamp, int connectionId, int bytesReceived) {
-		this.timeStamp = timeStamp;
-		this.connectionId = connectionId;
-		this.bytesReceived = bytesReceived;
-	}
+  public IncomingSizeMetricEvent(long timeStamp, int connectionId, int bytesReceived) {
+    this.timeStamp = timeStamp;
+    this.connectionId = connectionId;
+    this.bytesReceived = bytesReceived;
+  }
 
-	public long getTimeStamp() {
-		return timeStamp;
-	}
+  public long getTimeStamp() {
+    return timeStamp;
+  }
 
-	public int getConnectionId() {
-		return connectionId;
-	}
+  public int getConnectionId() {
+    return connectionId;
+  }
 
-	public int getBytesReceived() {
-		return bytesReceived;
-	}
+  public int getBytesReceived() {
+    return bytesReceived;
+  }
 
-	public void accept(MetricsServiceImpl.MetricEventVisitor visitor) {
-		visitor.visit(this);
-	}
+  public void accept(MetricsServiceImpl.MetricEventVisitor visitor) {
+    visitor.visit(this);
+  }
 
 }

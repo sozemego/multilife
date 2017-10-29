@@ -5,11 +5,11 @@ package soze.multilife.messages.outgoing;
  */
 public class PongMessage extends OutgoingMessage {
 
-	public PongMessage() {
-		setType(OutgoingType.PONG);
-	}
+  public PongMessage() {
+    setType(OutgoingType.PONG);
+  }
 
-	public void accept(OutgoingMessageVisitor visitor) {
-		visitor.visit(this);
-	}
+  public void accept(OutgoingMessageVisitor visitor) {
+    visitor.visit(this);
+  }
 }

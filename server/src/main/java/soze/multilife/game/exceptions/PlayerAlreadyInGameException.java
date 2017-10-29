@@ -5,14 +5,14 @@ package soze.multilife.game.exceptions;
  */
 public class PlayerAlreadyInGameException extends Exception {
 
-	private final long playerId;
+  private final long playerId;
 
-	public PlayerAlreadyInGameException(long playerId) {
-		this.playerId = playerId;
-	}
+  public PlayerAlreadyInGameException(long playerId) {
+    this.playerId = playerId;
+  }
 
-	public long getPlayerId() {
-		return playerId;
-	}
+  public long getPlayerId() {
+    return playerId;
+  }
 
 }

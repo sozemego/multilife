@@ -5,10 +5,14 @@ package soze.multilife.configuration.interfaces;
  */
 public interface MongoConfiguration {
 
-	public String getUsername();
-	public char[] getPassword();
-	public String getDatabase();
-	public String getHost();
-	public int getDatabasePort();
+  public String getUsername();
+
+  public char[] getPassword();
+
+  public String getDatabase();
+
+  public String getHost();
+
+  public int getDatabasePort();
 
 }

@@ -9,13 +9,13 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 @WebSocket
 public interface MetricsWebSocketHandler extends Runnable {
 
-	@OnWebSocketConnect
-	void onOpen(Session session) throws Exception;
+  @OnWebSocketConnect
+  void onOpen(Session session) throws Exception;
 
-	@OnWebSocketClose
-	void onClose(Session session, int statusCode, String reason) throws Exception;
+  @OnWebSocketClose
+  void onClose(Session session, int statusCode, String reason) throws Exception;
 
-	@OnWebSocketMessage
-	void onMessage(Session session, String msg) throws Exception;
+  @OnWebSocketMessage
+  void onMessage(Session session, String msg) throws Exception;
 
 }

@@ -7,52 +7,52 @@ import java.util.Objects;
 
 public class Player {
 
-	private final int id;
-	private final Connection connection;
-	private final String name;
+  private final int id;
+  private final Connection connection;
+  private final String name;
 
-	public Player(int id, Connection connection, String name) {
-		this.id = id;
-		this.connection = Objects.requireNonNull(connection);
-		this.name = Objects.requireNonNull(name);
-	}
+  public Player(int id, Connection connection, String name) {
+    this.id = id;
+    this.connection = Objects.requireNonNull(connection);
+    this.name = Objects.requireNonNull(name);
+  }
 
-	public int getId() {
-		return id;
-	}
+  public int getId() {
+    return id;
+  }
 
-	public void send(OutgoingMessage msg) {
-		this.connection.send(msg);
-	}
+  public void send(OutgoingMessage msg) {
+    this.connection.send(msg);
+  }
 
-	public void send(byte[] bytes) {
-		this.connection.send(bytes);
-	}
+  public void send(byte[] bytes) {
+    this.connection.send(bytes);
+  }
 
-	public void disconnect() {
-		this.connection.disconnect();
-	}
+  public void disconnect() {
+    this.connection.disconnect();
+  }
 
-	public Connection getConnection() {
-		return connection;
-	}
+  public Connection getConnection() {
+    return connection;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
 
-		Player player = (Player) o;
+    Player player = (Player) o;
 
-		return id == player.id;
-	}
+    return id == player.id;
+  }
 
-	@Override
-	public int hashCode() {
-		return (id ^ (id >>> 32));
-	}
+  @Override
+  public int hashCode() {
+    return (id ^ (id >>> 32));
+  }
 }

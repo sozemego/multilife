@@ -4,25 +4,25 @@ import soze.multilife.messages.incoming.IncomingMessage;
 
 class MessageQueueNode {
 
-	private final IncomingMessage incomingMessage;
-	private final int playerId;
-	private final int gameId;
+  private final IncomingMessage incomingMessage;
+  private final int playerId;
+  private final int gameId;
 
-	MessageQueueNode(IncomingMessage incomingMessage, int playerId, int gameId) {
-		this.incomingMessage = incomingMessage;
-		this.playerId = playerId;
-		this.gameId = gameId;
-	}
+  MessageQueueNode(IncomingMessage incomingMessage, int playerId, int gameId) {
+    this.incomingMessage = incomingMessage;
+    this.playerId = playerId;
+    this.gameId = gameId;
+  }
 
-	IncomingMessage getIncomingMessage() {
-		return incomingMessage;
-	}
+  IncomingMessage getIncomingMessage() {
+    return incomingMessage;
+  }
 
-	int getPlayerId() {
-		return playerId;
-	}
+  int getPlayerId() {
+    return playerId;
+  }
 
-	public int getGameId() {
-		return gameId;
-	}
+  public int getGameId() {
+    return gameId;
+  }
 }

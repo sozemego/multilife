@@ -33,159 +33,158 @@ import java.util.stream.Collectors;
  */
 public class Lobby implements Runnable {
 
-	private static final Logger LOG = LoggerFactory.getLogger(Lobby.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Lobby.class);
 
-	private final Map<Integer, Connection> connections = new ConcurrentHashMap<>();
-	private final Map<Integer, Integer> playerToGame = new ConcurrentHashMap<>();
-	private final Multimap<Integer, Player> gameToPlayers = Multimaps.synchronizedMultimap(ArrayListMultimap.create());
+  private final Map<Integer, Connection> connections = new ConcurrentHashMap<>();
+  private final Map<Integer, Integer> playerToGame = new ConcurrentHashMap<>();
+  private final Multimap<Integer, Player> gameToPlayers = Multimaps.synchronizedMultimap(ArrayListMultimap.create());
 
-	private final GameManager gameManager;
-	private final GameFactory gameFactory;
-	private final EventBus eventBus;
+  private final GameManager gameManager;
+  private final GameFactory gameFactory;
+  private final EventBus eventBus;
 
-	/**
-	 * Object used for locking when a new player is added.
-	 */
-	private final Object addPlayerLock = new Object();
+  /**
+   * Object used for locking when a new player is added.
+   */
+  private final Object addPlayerLock = new Object();
 
-	public Lobby(EventBus eventBus, GameManager gameManager, GameFactory gameFactory) {
-		this.eventBus = Objects.requireNonNull(eventBus);
-		this.gameManager = Objects.requireNonNull(gameManager);
-		this.gameFactory = Objects.requireNonNull(gameFactory);
-	}
+  public Lobby(EventBus eventBus, GameManager gameManager, GameFactory gameFactory) {
+    this.eventBus = Objects.requireNonNull(eventBus);
+    this.gameManager = Objects.requireNonNull(gameManager);
+    this.gameFactory = Objects.requireNonNull(gameFactory);
+  }
 
-	public void run() {
-		while (true) {
+  public void run() {
+    while (true) {
 
-			gameManager.clearEmptyContainers();
+      gameManager.clearEmptyContainers();
 
-			try {
-				Thread.sleep(1000 * 15);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+      try {
+        Thread.sleep(1000 * 15);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+  }
 
-	/**
-	 * Called when a new player connects.
-	 */
-	void onConnect(Connection connection) {
-		Objects.requireNonNull(connection);
-		connections.put(connection.getId(), connection);
-	}
+  /**
+   * Called when a new player connects.
+   */
+  void onConnect(Connection connection) {
+    Objects.requireNonNull(connection);
+    connections.put(connection.getId(), connection);
+  }
 
-	/**
-	 * Creates a PersonIdentity object.
-	 * This object is sent back to the client.
-	 */
-	private PlayerIdentity getPlayerIdentity(int id) {
-		return new PlayerIdentity(id);
-	}
+  /**
+   * Creates a PersonIdentity object.
+   * This object is sent back to the client.
+   */
+  private PlayerIdentity getPlayerIdentity(int id) {
+    return new PlayerIdentity(id);
+  }
 
-	/**
-	 * Called when a player disconnects.
-	 */
-	void onDisconnect(Connection connection) {
-		Objects.requireNonNull(connection);
-		int id = connection.getId();
-		connections.remove(id);
-		Integer gameId = playerToGame.remove(id);
-		if(gameId == null) {
-			//player was not in any game, so no further action is neccesary
-			return;
-		}
+  /**
+   * Called when a player disconnects.
+   */
+  void onDisconnect(Connection connection) {
+    Objects.requireNonNull(connection);
+    int id = connection.getId();
+    connections.remove(id);
+    Integer gameId = playerToGame.remove(id);
+    if (gameId == null) {
+      //player was not in any game, so no further action is neccesary
+      return;
+    }
 
-		gameToPlayers.removeAll(gameId);
-		gameManager.getGameById(gameId).ifPresent(game -> {
-			try {
-				game.removePlayer(id);
-			} catch (PlayerNotInGameException e) {
-				LOG.warn("Trying to remove a player with id [{}] that is not in-game.", e.getPlayerId());
-			} finally {
-				eventBus.post(new PlayerDisconnectedEvent(id));
-			}
-		});
-	}
+    gameToPlayers.removeAll(gameId);
+    gameManager.getGameById(gameId).ifPresent(game -> {
+      try {
+        game.removePlayer(id);
+      } catch (PlayerNotInGameException e) {
+        LOG.warn("Trying to remove a player with id [{}] that is not in-game.", e.getPlayerId());
+      } finally {
+        eventBus.post(new PlayerDisconnectedEvent(id));
+      }
+    });
+  }
 
-	/**
-	 * Handles incoming messages. Id is the connection connectionId.
-	 */
-	void onMessage(IncomingMessage incMessage, int connectionId) {
-		if (incMessage.getType() == IncomingType.PING) {
-			connections.get(connectionId).send(new PongMessage());
-			return;
-		}
+  /**
+   * Handles incoming messages. Id is the connection connectionId.
+   */
+  void onMessage(IncomingMessage incMessage, int connectionId) {
+    if (incMessage.getType() == IncomingType.PING) {
+      connections.get(connectionId).send(new PongMessage());
+      return;
+    }
 
-		int gameId = playerToGame.get(connectionId);
-		gameManager.acceptMessage(incMessage, connectionId, gameId);
-	}
+    int gameId = playerToGame.get(connectionId);
+    gameManager.acceptMessage(incMessage, connectionId, gameId);
+  }
 
-	/**
-	 * Adds a newly logged player to one of the games.
-	 */
-	void addPlayer(Player player) {
-		LOG.info("Player with name [{}] is trying to login. ", player.getName());
+  /**
+   * Adds a newly logged player to one of the games.
+   */
+  void addPlayer(Player player) {
+    LOG.info("Player with name [{}] is trying to login. ", player.getName());
 
-		synchronized (addPlayerLock) {
+    synchronized (addPlayerLock) {
 
-			Game game = gameManager.getFreeGame().orElse(gameFactory.createGame());
+      Game game = gameManager.getFreeGame().orElse(gameFactory.createGame());
 
-			try {
-				game.addPlayer(player);
-			} catch (PlayerAlreadyInGameException e) {
-				LOG.warn("Trying to add a player [{}] to a game and this player is already in that game.", e.getPlayerId());
-			}
+      try {
+        game.addPlayer(player);
+      } catch (PlayerAlreadyInGameException e) {
+        LOG.warn("Trying to add a player [{}] to a game and this player is already in that game.", e.getPlayerId());
+      }
 
-			gameManager.addGame(game);
-			playerToGame.put(player.getId(), game.getId());
-			eventBus.post(new PlayerLoggedEvent(player.getId(), game.getId()));
-			gameToPlayers.put(game.getId(), player);
+      gameManager.addGame(game);
+      playerToGame.put(player.getId(), game.getId());
+      eventBus.post(new PlayerLoggedEvent(player.getId(), game.getId()));
+      gameToPlayers.put(game.getId(), player);
 
-			sendDataToPlayers(player, game);
-		}
-	}
+      sendDataToPlayers(player, game);
+    }
+  }
 
-	private void sendDataToPlayers(Player player, Game game) {
-		Collection<Player> players = gameToPlayers.get(game.getId());
-		PlayerAdded playerAdded = new PlayerAdded(player.getId(), game.getPlayerColor(player.getId()), player.getName());
-		synchronized (gameToPlayers) {
-			players.forEach(p -> {
-				player.send(new PlayerAdded(p.getId(), game.getPlayerColor(p.getId()), p.getName()));
-				p.send(playerAdded);
-			});
-		}
+  private void sendDataToPlayers(Player player, Game game) {
+    Collection<Player> players = gameToPlayers.get(game.getId());
+    PlayerAdded playerAdded = new PlayerAdded(player.getId(), game.getPlayerColor(player.getId()), player.getName());
+    synchronized (gameToPlayers) {
+      players.forEach(p -> {
+        player.send(new PlayerAdded(p.getId(), game.getPlayerColor(p.getId()), p.getName()));
+        p.send(playerAdded);
+      });
+    }
 
-		player.send(getPlayerIdentity(player.getId()));
-		player.send(new MapData(game.getWidth(), game.getHeight()));
-		player.send(getAllAliveCellData(game));
-		player.send(new PlayerAdded(0, "#000000", "AI"));
-	}
+    player.send(getPlayerIdentity(player.getId()));
+    player.send(new MapData(game.getWidth(), game.getHeight()));
+    player.send(getAllAliveCellData(game));
+    player.send(new PlayerAdded(0, "#000000", "AI"));
+  }
 
-	/**
-	 * Assembles {@link CellList} from all alive cells
-	 * of this game.
-	 *
-	 */
-	private CellList getAllAliveCellData(Game game) {
-		List<Cell> cells = game.getAllCells().values().stream()
-				.filter(Cell::isAlive)
-				.collect(Collectors.toList());
-		return constructCellList(cells);
-	}
+  /**
+   * Assembles {@link CellList} from all alive cells
+   * of this game.
+   */
+  private CellList getAllAliveCellData(Game game) {
+    List<Cell> cells = game.getAllCells().values().stream()
+      .filter(Cell::isAlive)
+      .collect(Collectors.toList());
+    return constructCellList(cells);
+  }
 
-	/**
-	 * Assembles {@link CellList} from a given list of cells.
-	 *
-	 * @param cells cells
-	 * @return CellList
-	 */
-	private CellList constructCellList(Collection<Cell> cells) {
-		List<CellList.CellData> cellData = new ArrayList<>();
-		for (Cell cell : cells) {
-			cellData.add(new CellList.CellData(cell));
-		}
-		return new CellList(cellData);
-	}
+  /**
+   * Assembles {@link CellList} from a given list of cells.
+   *
+   * @param cells cells
+   * @return CellList
+   */
+  private CellList constructCellList(Collection<Cell> cells) {
+    List<CellList.CellData> cellData = new ArrayList<>();
+    for (Cell cell : cells) {
+      cellData.add(new CellList.CellData(cell));
+    }
+    return new CellList(cellData);
+  }
 
 }

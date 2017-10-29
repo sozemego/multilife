@@ -39,106 +39,107 @@ import java.util.concurrent.Executors;
  */
 public class MultiLife {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MultiLife.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MultiLife.class);
 
-	public static void main(String[] args) throws InterruptedException, ExecutionException {
+  public static void main(String[] args) throws InterruptedException, ExecutionException {
 
-		ConfigurationFactory cfgFactory = new ConfigurationFactory();
+    ConfigurationFactory cfgFactory = new ConfigurationFactory();
 
-		MultiLife ml = new MultiLife(cfgFactory);
-		ml.start(cfgFactory.getServerConfiguration());
+    MultiLife ml = new MultiLife(cfgFactory);
+    ml.start(cfgFactory.getServerConfiguration());
 
-	}
+  }
 
-	private final Executor executor = Executors.newCachedThreadPool();
-	private final ConnectionFactory connectionFactory;
-	private final LoginService loginService;
-	private final Lobby lobby;
-	private final EventBus eventBus;
-	private final MetricsWebSocketHandler metricsWebSocketHandler;
-	private final MetricsHttpHandler metricsHttpHandler;
+  private final Executor executor = Executors.newCachedThreadPool();
+  private final ConnectionFactory connectionFactory;
+  private final LoginService loginService;
+  private final Lobby lobby;
+  private final EventBus eventBus;
+  private final MetricsWebSocketHandler metricsWebSocketHandler;
+  private final MetricsHttpHandler metricsHttpHandler;
 
-	private MultiLife(ConfigurationFactory cfgFactory) {
+  private MultiLife(ConfigurationFactory cfgFactory) {
 
-		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger());
+    Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger());
 
-		this.loginService = new LoginService();
+    this.loginService = new LoginService();
 
-		this.eventBus = new EventBusImpl();
-		GameManager gameManager = new GameManager(cfgFactory.getGameRunnerConfiguration());
-		GameFactory gameFactory = new GameFactory(
-				cfgFactory.getGameConfiguration()
-		);
-		this.lobby = new Lobby(eventBus, gameManager, gameFactory);
+    this.eventBus = new EventBusImpl();
+    GameManager gameManager = new GameManager(cfgFactory.getGameRunnerConfiguration());
+    GameFactory gameFactory = new GameFactory(
+      cfgFactory.getGameConfiguration()
+    );
+    this.lobby = new Lobby(eventBus, gameManager, gameFactory);
 
-		this.connectionFactory = new ConnectionFactory(eventBus);
+    this.connectionFactory = new ConnectionFactory(eventBus);
 
-		MetricsConfiguration metricsConfiguration = cfgFactory.getMetricsConfiguration();
+    MetricsConfiguration metricsConfiguration = cfgFactory.getMetricsConfiguration();
 
-		if(metricsConfiguration.isMetricsEnabled()) {
+    if (metricsConfiguration.isMetricsEnabled()) {
 
-			MongoConfiguration mongoConfiguration = cfgFactory.getMongoConfiguration();
-			MongoClient mongoClient = createMongoClient(mongoConfiguration);
+      MongoConfiguration mongoConfiguration = cfgFactory.getMongoConfiguration();
+      MongoClient mongoClient = createMongoClient(mongoConfiguration);
 
-			MetricsRepository metricsRepository =
-					new MongoMetricsRepository(
-							mongoClient.getDatabase(mongoConfiguration.getDatabase())
-					);
+      MetricsRepository metricsRepository =
+        new MongoMetricsRepository(
+          mongoClient.getDatabase(mongoConfiguration.getDatabase())
+        );
 
-			 MetricsServiceImpl metricsService = new MetricsServiceImpl(
-					metricsRepository,
-					metricsConfiguration
-			);
-			this.eventBus.register(metricsService);
+      MetricsServiceImpl metricsService = new MetricsServiceImpl(
+        metricsRepository,
+        metricsConfiguration
+      );
+      this.eventBus.register(metricsService);
 
-			metricsHttpHandler = new MetricsHttpHandler(metricsService);
-			this.metricsWebSocketHandler = new MetricsWebSocketHandlerImpl(
-					metricsConfiguration,
-					metricsService, connectionFactory
-			);
+      metricsHttpHandler = new MetricsHttpHandler(metricsService);
+      this.metricsWebSocketHandler = new MetricsWebSocketHandlerImpl(
+        metricsConfiguration,
+        metricsService, connectionFactory
+      );
 
-			executor.execute(metricsService);
-			executor.execute(metricsWebSocketHandler);
-		} else {
-			this.metricsHttpHandler = new MetricsHttpHandler(new NullMetricsService()) {
-				public Route getMetricsRoute() {
-					return (req, res) -> "Metrics disabled";
-				}
-				public Route getMetricsOutgoingApi() {
-					return (request, response) -> "Metrics disabled";
-				}
-			};
-			this.metricsWebSocketHandler = new NullMetricsSocketHandler();
-		}
-		LOG.info("Metrics are " + (metricsConfiguration.isMetricsEnabled() ? "enabled" : "disabled") + ".");
+      executor.execute(metricsService);
+      executor.execute(metricsWebSocketHandler);
+    } else {
+      this.metricsHttpHandler = new MetricsHttpHandler(new NullMetricsService()) {
+        public Route getMetricsRoute() {
+          return (req, res) -> "Metrics disabled";
+        }
 
-		executor.execute(lobby);
-	}
+        public Route getMetricsOutgoingApi() {
+          return (request, response) -> "Metrics disabled";
+        }
+      };
+      this.metricsWebSocketHandler = new NullMetricsSocketHandler();
+    }
+    LOG.info("Metrics are " + (metricsConfiguration.isMetricsEnabled() ? "enabled" : "disabled") + ".");
 
-	private MongoClient createMongoClient(MongoConfiguration config) {
-		MongoCredential credential = MongoCredential.createCredential(
-			config.getUsername(),
-			config.getDatabase(),
-			config.getPassword()
-		);
-		return new MongoClient(
-			new ServerAddress(
-				config.getHost(),
-				config.getDatabasePort()
-			),
-			Collections.singletonList(credential)
-		);
-	}
+    executor.execute(lobby);
+  }
 
-	private void start(ServerConfiguration serverConfiguration) throws InterruptedException, ExecutionException {
-		new ServerBuilder(serverConfiguration.getServerPort())
-			.withWebSocketHandler("/game", new GameSocketHandler(lobby, loginService, connectionFactory, eventBus))
-			.withWebSocketHandler("/metrics-live", metricsWebSocketHandler)
-			.withHttpHandler("/metrics", metricsHttpHandler.getMetricsRoute())
-			.withHttpHandler("/metrics/outgoing", metricsHttpHandler.getMetricsOutgoingApi())
-			.withHttpHandler("/metrics/incoming", metricsHttpHandler.getMetricsIncomingApi())
-			.withExternalStaticFileHandler(serverConfiguration.getExternalStaticFilesPath())
-			.build();
-	}
+  private MongoClient createMongoClient(MongoConfiguration config) {
+    MongoCredential credential = MongoCredential.createCredential(
+      config.getUsername(),
+      config.getDatabase(),
+      config.getPassword()
+    );
+    return new MongoClient(
+      new ServerAddress(
+        config.getHost(),
+        config.getDatabasePort()
+      ),
+      Collections.singletonList(credential)
+    );
+  }
+
+  private void start(ServerConfiguration serverConfiguration) throws InterruptedException, ExecutionException {
+    new ServerBuilder(serverConfiguration.getServerPort())
+      .withWebSocketHandler("/game", new GameSocketHandler(lobby, loginService, connectionFactory, eventBus))
+      .withWebSocketHandler("/metrics-live", metricsWebSocketHandler)
+      .withHttpHandler("/metrics", metricsHttpHandler.getMetricsRoute())
+      .withHttpHandler("/metrics/outgoing", metricsHttpHandler.getMetricsOutgoingApi())
+      .withHttpHandler("/metrics/incoming", metricsHttpHandler.getMetricsIncomingApi())
+      .withExternalStaticFileHandler(serverConfiguration.getExternalStaticFilesPath())
+      .build();
+  }
 
 }

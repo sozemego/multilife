@@ -7,29 +7,29 @@ import soze.multilife.metrics.service.MetricsServiceImpl;
  */
 public class IncomingTypeMetricEvent implements MetricEvent {
 
-	private final long timestamp;
-	private final String type;
-	private final int connectionId;
+  private final long timestamp;
+  private final String type;
+  private final int connectionId;
 
-	public IncomingTypeMetricEvent(long timestamp, String type, int connectionId) {
-		this.timestamp = timestamp;
-		this.type = type;
-		this.connectionId = connectionId;
-	}
+  public IncomingTypeMetricEvent(long timestamp, String type, int connectionId) {
+    this.timestamp = timestamp;
+    this.type = type;
+    this.connectionId = connectionId;
+  }
 
-	public long getTimestamp() {
-		return timestamp;
-	}
+  public long getTimestamp() {
+    return timestamp;
+  }
 
-	public String getType() {
-		return type;
-	}
+  public String getType() {
+    return type;
+  }
 
-	public int getConnectionId() {
-		return connectionId;
-	}
+  public int getConnectionId() {
+    return connectionId;
+  }
 
-	public void accept(MetricsServiceImpl.MetricEventVisitor visitor) {
-		visitor.visit(this);
-	}
+  public void accept(MetricsServiceImpl.MetricEventVisitor visitor) {
+    visitor.visit(this);
+  }
 }

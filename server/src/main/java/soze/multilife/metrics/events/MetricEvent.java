@@ -7,6 +7,6 @@ import soze.multilife.metrics.service.MetricsServiceImpl;
  */
 public interface MetricEvent {
 
-	public void accept(MetricsServiceImpl.MetricEventVisitor visitor);
+  public void accept(MetricsServiceImpl.MetricEventVisitor visitor);
 
 }

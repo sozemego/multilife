@@ -24,104 +24,104 @@ import java.util.concurrent.atomic.AtomicInteger;
 @WebSocket
 public class MetricsWebSocketHandlerImpl implements MetricsWebSocketHandler {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MetricsWebSocketHandlerImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MetricsWebSocketHandlerImpl.class);
 
-	private final MetricsConfiguration configuration;
+  private final MetricsConfiguration configuration;
 
-	private final MetricsServiceImpl metricsService;
-	private final ConnectionFactory connectionFactory;
+  private final MetricsServiceImpl metricsService;
+  private final ConnectionFactory connectionFactory;
 
-	private final AtomicInteger nextId = new AtomicInteger();
-	private final Map<Session, Integer> sessionIdMap = new ConcurrentHashMap<>();
-	private final Map<Integer, Connection> connections = new ConcurrentHashMap<>();
+  private final AtomicInteger nextId = new AtomicInteger();
+  private final Map<Session, Integer> sessionIdMap = new ConcurrentHashMap<>();
+  private final Map<Integer, Connection> connections = new ConcurrentHashMap<>();
 
-	public MetricsWebSocketHandlerImpl(
-			MetricsConfiguration configuration,
-			MetricsServiceImpl metricsService,
-			ConnectionFactory connectionFactory
-	) {
-		this.configuration = Objects.requireNonNull(configuration);
-		this.metricsService = Objects.requireNonNull(metricsService);
-		this.connectionFactory = Objects.requireNonNull(connectionFactory);
-	}
+  public MetricsWebSocketHandlerImpl(
+    MetricsConfiguration configuration,
+    MetricsServiceImpl metricsService,
+    ConnectionFactory connectionFactory
+  ) {
+    this.configuration = Objects.requireNonNull(configuration);
+    this.metricsService = Objects.requireNonNull(metricsService);
+    this.connectionFactory = Objects.requireNonNull(connectionFactory);
+  }
 
-	@OnWebSocketConnect
-	public void onOpen(Session session) throws Exception {
-		Connection conn = getConnection(session);
-		sessionIdMap.put(session, conn.getId());
-		synchronized (connections) {
-			connections.put(conn.getId(), conn);
-		}
-	}
+  @OnWebSocketConnect
+  public void onOpen(Session session) throws Exception {
+    Connection conn = getConnection(session);
+    sessionIdMap.put(session, conn.getId());
+    synchronized (connections) {
+      connections.put(conn.getId(), conn);
+    }
+  }
 
-	@OnWebSocketClose
-	public void onClose(Session session, int statusCode, String reason) throws Exception {
-		int id = sessionIdMap.remove(session);
-		synchronized (connections) {
-			connections.remove(id);
-		}
-	}
+  @OnWebSocketClose
+  public void onClose(Session session, int statusCode, String reason) throws Exception {
+    int id = sessionIdMap.remove(session);
+    synchronized (connections) {
+      connections.remove(id);
+    }
+  }
 
-	@OnWebSocketMessage
-	public void onMessage(Session session, String msg) throws Exception {
+  @OnWebSocketMessage
+  public void onMessage(Session session, String msg) throws Exception {
 
-	}
+  }
 
-	public void run() {
-		while (true) {
+  public void run() {
+    while (true) {
 
-			synchronized (connections) {
+      synchronized (connections) {
 
-				if (connections.size() > 0) {
+        if (connections.size() > 0) {
 
-					MetricsMessage message = createMetricsMessage();
-					for (Connection connection : connections.values()) {
-						connection.send(message);
-					}
-				}
-			}
+          MetricsMessage message = createMetricsMessage();
+          for (Connection connection : connections.values()) {
+            connection.send(message);
+          }
+        }
+      }
 
-			try {
-				Thread.sleep(configuration.getMetricsPushInterval());
-			} catch (InterruptedException e) {
-				LOG.error("Thread interrupted [{}] ", e);
-			}
+      try {
+        Thread.sleep(configuration.getMetricsPushInterval());
+      } catch (InterruptedException e) {
+        LOG.error("Thread interrupted [{}] ", e);
+      }
 
-		}
-	}
+    }
+  }
 
-	private MetricsMessage createMetricsMessage() {
-		double averageOutgoingKbs = metricsService.getAverageOutgoingKbs();
-		long totalBytesSent = metricsService.getTotalBytesSent();
-		long messagesSent = metricsService.getTotalMessagesSent();
-		double averageBytesSent = metricsService.getAverageBytesSent();
+  private MetricsMessage createMetricsMessage() {
+    double averageOutgoingKbs = metricsService.getAverageOutgoingKbs();
+    long totalBytesSent = metricsService.getTotalBytesSent();
+    long messagesSent = metricsService.getTotalMessagesSent();
+    double averageBytesSent = metricsService.getAverageBytesSent();
 
-		double averageIncomingKbs = metricsService.getAverageIncomingKbs();
-		long totalBytesReceived = metricsService.getTotalBytesReceived();
-		long totalMessagesReceived = metricsService.getTotalMessagesReceived();
-		double averageBytesPerIncomingMessage = metricsService.getAverageBytesReceived();
+    double averageIncomingKbs = metricsService.getAverageIncomingKbs();
+    long totalBytesReceived = metricsService.getTotalBytesReceived();
+    long totalMessagesReceived = metricsService.getTotalMessagesReceived();
+    double averageBytesPerIncomingMessage = metricsService.getAverageBytesReceived();
 
-		Map<String, Long> outgoingTypeCountMap = metricsService.getOutgoingTypeCountMap();
-		Map<String, Long> incomingTypeCount = metricsService.getIncomingTypeCountMap();
-		Map<Integer, Integer> playerMap = metricsService.getPlayerMap();
+    Map<String, Long> outgoingTypeCountMap = metricsService.getOutgoingTypeCountMap();
+    Map<String, Long> incomingTypeCount = metricsService.getIncomingTypeCountMap();
+    Map<Integer, Integer> playerMap = metricsService.getPlayerMap();
 
-		return new MetricsMessage(
-				averageOutgoingKbs,
-				totalBytesSent,
-				averageBytesSent,
-				messagesSent,
-				averageIncomingKbs,
-				totalBytesReceived,
-				averageBytesPerIncomingMessage,
-				totalMessagesReceived,
-				outgoingTypeCountMap,
-				incomingTypeCount,
-				playerMap
-		);
-	}
+    return new MetricsMessage(
+      averageOutgoingKbs,
+      totalBytesSent,
+      averageBytesSent,
+      messagesSent,
+      averageIncomingKbs,
+      totalBytesReceived,
+      averageBytesPerIncomingMessage,
+      totalMessagesReceived,
+      outgoingTypeCountMap,
+      incomingTypeCount,
+      playerMap
+    );
+  }
 
-	private Connection getConnection(Session session) {
-		return connectionFactory.getConnection(nextId.incrementAndGet(), session);
-	}
+  private Connection getConnection(Session session) {
+    return connectionFactory.getConnection(nextId.incrementAndGet(), session);
+  }
 
 }

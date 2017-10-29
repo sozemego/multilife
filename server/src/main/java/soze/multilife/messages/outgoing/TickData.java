@@ -5,14 +5,14 @@ package soze.multilife.messages.outgoing;
  */
 public class TickData extends OutgoingMessage {
 
-	public int iterations;
+  public int iterations;
 
-	public TickData(int iterations) {
-		setType(OutgoingType.TICK_DATA);
-		this.iterations = iterations;
-	}
+  public TickData(int iterations) {
+    setType(OutgoingType.TICK_DATA);
+    this.iterations = iterations;
+  }
 
-	public void accept(OutgoingMessageVisitor visitor) {
-		visitor.visit(this);
-	}
+  public void accept(OutgoingMessageVisitor visitor) {
+    visitor.visit(this);
+  }
 }
