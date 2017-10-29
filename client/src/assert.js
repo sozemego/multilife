@@ -12,37 +12,37 @@ import {throwError} from './utils';
  * @returns {*}
  */
 const typeOf = argument => {
-	const type = typeof argument;
-	if (type === 'object') {
-		if (!argument) {
-			return 'null';
-		} else if (argument instanceof Array) {
-			return 'array';
-		}
-	}
-	return type;
+  const type = typeof argument;
+  if (type === 'object') {
+    if (!argument) {
+      return 'null';
+    } else if (argument instanceof Array) {
+      return 'array';
+    }
+  }
+  return type;
 };
 
 const assertType = expected => {
-	return (argument, message) => {
-		const type = typeOf(argument);
+  return (argument, message) => {
+    const type = typeOf(argument);
 
-		if (expected === type) {
-			return argument;
-		}
+    if (expected === type) {
+      return argument;
+    }
 
-		message = message || `Assertion failed`;
-		throwError(`${message}. Expected [${expected}], but got [${argument}]`);
-	};
+    message = message || `Assertion failed`;
+    throwError(`${message}. Expected [${expected}], but got [${argument}]`);
+  };
 };
 
 export const assertInstanceOf = (argument, type, message) => {
-	assertIsFunction(type);
-	if(argument instanceof type) {
-		return argument;
-	}
-	message = message || `Assertion failed`;
-	throwError(`${message}. Expected [${type}], but got [${argument}]`);
+  assertIsFunction(type);
+  if (argument instanceof type) {
+    return argument;
+  }
+  message = message || `Assertion failed`;
+  throwError(`${message}. Expected [${type}], but got [${argument}]`);
 };
 
 export const assertIsArray = assertType('array');

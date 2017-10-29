@@ -15,31 +15,31 @@
 import {assertIsString} from './assert';
 
 const ruleCreator = ruleString => {
-	assertIsString(ruleString);
-	const tokens = ruleString.split('/');
-	const birthNumbers = extractNumbers(tokens[0]);
-	const surviveNumbers = extractNumbers(tokens[1]);
+  assertIsString(ruleString);
+  const tokens = ruleString.split('/');
+  const birthNumbers = extractNumbers(tokens[0]);
+  const surviveNumbers = extractNumbers(tokens[1]);
 
-	return function (n, alive) {
-		if (alive) {
-			if (!surviveNumbers.includes(n)) return -1;
-		} else {
-			if (birthNumbers.includes(n)) return 1;
-		}
-		return 0;
-	};
+  return function (n, alive) {
+    if (alive) {
+      if (!surviveNumbers.includes(n)) return -1;
+    } else {
+      if (birthNumbers.includes(n)) return 1;
+    }
+    return 0;
+  };
 };
 
 const extractNumbers = token => {
-	assertIsString(token);
-	const numbers = [];
-	const result = token.match(/\d/g);
-	if (result) {
-		for (let i = 0; i < result.length; i++) {
-			numbers.push(parseInt(result[i]));
-		}
-	}
-	return numbers;
+  assertIsString(token);
+  const numbers = [];
+  const result = token.match(/\d/g);
+  if (result) {
+    for (let i = 0; i < result.length; i++) {
+      numbers.push(parseInt(result[i]));
+    }
+  }
+  return numbers;
 };
 
 export const basicRule = ruleCreator('B3/S23');
